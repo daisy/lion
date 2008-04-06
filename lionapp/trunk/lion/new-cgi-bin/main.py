@@ -24,7 +24,11 @@ class Login:
 class MainMenu():
     def index(self):
         """Show the links for the main menu"""
-        return main_menu_links(get_user())
+        user = get_user()
+        if user == None:
+            return general_error()
+        else:
+            return main_menu_links(get_user())
     
     index.exposed = True
 

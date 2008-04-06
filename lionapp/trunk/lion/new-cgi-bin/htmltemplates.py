@@ -37,6 +37,12 @@ def login_error():
     body = "<p>There was an error logging in.  Try again?</p>" + LOGIN_FORM
     return XHTML_TEMPLATE % {"TITLE": "Login error -- try again", "BODY": body}
 
+
+def general_error():
+    body = "<h1>General error</h1><p>Dear user: Sorry!</p>"
+    return XHTML_TEMPLATE % {"TITLE": "General error", "BODY": body}
+
+
 def user_information(user):
     body = "<p>Hello %(user)s. You are working on %(lang)s.</p>" % \
         {"user": user["realname"], "lang": user["langname"]}

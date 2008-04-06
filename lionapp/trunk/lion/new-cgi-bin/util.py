@@ -11,8 +11,8 @@ sys.path.append("/home/daisyfor")
 sys.path.append("../")
 from DB.connect import *
 
-COOKIE_USERNAME = "l10n_username"
-COOKIE_SESSIONID = "l10n_sessionid"
+COOKIE_USERNAME = "username"
+COOKIE_SESSIONID = "sessionid"
 
 def get_uuid():
     """Get a uuid from the os to act as a session id."""
@@ -45,8 +45,8 @@ def login(username, password):
         request = """
         UPDATE users SET sessionid="%(id)s", lastlogin="%(last)s" WHERE username="%(name)s" """ % \
         {"id": sessionid, "last": now.strftime("%Y-%m-%d %H:%M:%S"), "name": username}
-        cursor.execute("set autocommit = 1")
         cursor.execute(request)
+        print "Session ID in database = " + sessionid
         set_cookie(username, sessionid)
     else:
         return None
@@ -79,6 +79,7 @@ def get_user():
     print request
     cursor.execute(request)
     row = cursor.fetchone()
+    if row == None: return None
     cursor.close()
     db.close()
     return dict(zip(fields, row))
@@ -88,18 +89,24 @@ def get_user():
 def set_cookie(username, sessionid):
     """Set the login cookie."""
     cookie = cherrypy.response.cookie
-    cookie["sessionid"] = sessionid
-    cookie["username"] = username
-    print cookie
+    cookie[COOKIE_USERNAME] = username
+    cookie[COOKIE_SESSIONID] = sessionid
+    print str(cookie)
 
 
 def read_cookie():
     """Read user name and session id for the cookie. If there is an error, user
     name will be empty."""
+    
     username = ""
     sessionid = ""
-    print "in read_cookie"
     cookie = cherrypy.request.cookie
-    username = cookie["username"].value
-    sessionid = cookie["sessionid"].value
+    res = ""
+    print cookie
+    for name in cookie.keys():
+        res += "name: %s, value: %s<br>" % (name, cookie[name].value)
+                
+    username = cookie[COOKIE_USERNAME].value
+    sessionid = cookie[COOKIE_SESSIONID].value
+    print "Read cookie %s %s" % (username, sessionid)
     return username, sessionid
