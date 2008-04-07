@@ -1,3 +1,4 @@
+XHTML_XSLT = """
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xsl:transform version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -13,13 +14,13 @@
       <xsl:copy-of select="@dir"/>
       <head>
         <title>
-          <xsl:value-of select="@xml:lang"/>
+          <xsl:value-of select="%(langname)s"/>
         </title>
         <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
       </head>
       <body>
         <h1 class="title">
-          <xsl:value-of select="@xml:lang"/>
+          <xsl:value-of select="%(langname)s"/>
         </h1>
         <xsl:apply-templates/>
       </body>
@@ -37,3 +38,16 @@
   <xsl:template match="text()"/>
 
 </xsl:transform>
+"""
+
+def export_xhtml(file, langname):
+    """output xhtml"""
+    xslt = XSLT_XHTML % langname
+    #save xslt to temp directory
+    filename = langname + ".xslt"
+    xslt_file = open(filename, 'w')
+    xslt_file.write(xslt)
+    xslt_file.close()
+    
+    
+    

@@ -5,7 +5,7 @@
 import getopt
 import os
 from xml.dom import minidom
-
+from export_xhtml import *
 # Harcoded DB connection info, not stored in SVN
 os.sys.path.append("../")
 from DB.connect import *
@@ -74,11 +74,10 @@ die just yet."""
         """Check the existence of a table for the given language id."""
         self.execute_query("SELECT langname FROM languages WHERE langid='%s'" \
             % langid)
-        for langname in self.cursor:
-            self.trace_msg("%s is %s." % (langid, langname))
-            return True
-        return False
-
+        row = self.cursor.fetchone()
+        if row != None: return row[0]
+        else: return None
+    
     def import_xml(self, file, langid):
         """Import from XML to the database."""
         if not file: die("No XML file given.")
@@ -87,7 +86,7 @@ die just yet."""
         self.trace_msg("Import from " + file + " for " + langid)
         doc = minidom.parse(file)
         self.dbio.import_from_xml(self, doc, langid)
-
+        
 
 def usage(code=0):
     """Print usage information and exits with an error code."""
@@ -97,6 +96,7 @@ Usage:
   %(script)s --help                              Show this help message.
   %(script)s --import --language=id --file=file  Import file into table id.
   %(script)s --export --language=id --file=file  Export to XML
+  %(script)s --xhtml --language=id --file=file   Output an XHTML version of all prompts
 
 Other options:
   --application, -a: which application module to use (e.g. "amis" or "obi")
@@ -109,6 +109,17 @@ def export_action(session, file, langid):
     """Export."""
     session.trace_msg("Export to " + file + " for " + langid)
 
+
+def export_xhtml_action(session, file, langid):
+    """create xhtml where each text element becomes an h1
+       note that the langid parameter is required because we can't 
+       necessarily use the xml:lang value in the file (we require 
+       a longer format like eng-US)"""
+    session.trace_msg("Export XHTML from " + file + " for " + langid)
+    langname = session.check_language(langid)
+    #in export_xhtml.py
+    export_xhtml(file, langname)    
+
 def main():
     """Parse command line arguments and run."""
     app = "amis"
@@ -118,9 +129,9 @@ def main():
     file = None
     langid = None
     try:
-        opts, args = getopt.getopt(os.sys.argv[1:], "a:ef:hil:t",
-            ["application", "export", "file", "help", "import", "language",
-                "trace"])
+        opts, args = getopt.getopt(os.sys.argv[1:], "ef:hil:t",
+            ["export", "file", "help", "import", "language", "trace", 
+            "xhtml"])
     except getopt.GetoptError, e:
         die(e.msg, 0)
         usage(1)
@@ -135,6 +146,8 @@ def main():
             action = lambda s, f, l: s.import_xml(f, l)
         elif opt in ("-l", "--language"): langid = arg
         elif opt in ("-t", "--trace"): trace = True
+        elif opt in ("-x", "--xhtml"): action = export_xhtml_action
+    errors = 0
     if not action:
         die("no action defined.", 0)
         usage(1)
