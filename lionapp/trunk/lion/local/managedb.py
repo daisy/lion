@@ -116,7 +116,7 @@ def main():
     langid = None
     try:
         opts, args = getopt.getopt(os.sys.argv[1:], "a:ef:hil:t",
-            ["application", "export", "file", "help", "import", "language",
+            ["application=", "export", "file=", "help", "import", "language=",
                 "trace"])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
