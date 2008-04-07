@@ -33,8 +33,8 @@ actualkeys) VALUES ("%(textstring)s", "%(textflag)s", "%(audioflag)s",
             "audioflag": audioflag, "audiouri": audiouri, "xmlid": xmlid,
             "keys": keys})
     amis_import.set_roles(doc, session, langid)
-    amis_import.find_mnemonic_groups(session, langid)
-    amis_import.find_accelerator_targets(session, langid)
+    amis_import.find_mnemonic_groups(doc, session, langid)
+    amis_import.find_accelerator_targets(doc, session, langid)
     
 
 def export_xhtml(session, langid):
