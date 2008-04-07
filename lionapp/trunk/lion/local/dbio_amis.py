@@ -135,8 +135,8 @@ def export_xhtml(session, langid):
         body += """<h1 id="%s">%s</h1>""" % (id, txt)
     return XHTML_TEMPLATE % (thislang, body)
     
-def export(session, langid, file):
-    session.trace_msg("Export for %s to %s" % (langname, file))
+def export(session, file, langid):
+    session.trace_msg("Export for %s to %s" % (langid, file))
       
     #export the XHTML list of all the text prompts
     xhtml_contents = export_xhtml(session, langid)
