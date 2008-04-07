@@ -133,7 +133,7 @@ def export_xhtml(session, langid):
     session.execute_query(request)
     for id, txt in session.cursor:
         body += """<h1 id="%s">%s</h1>""" % (id, txt)
-    return XHTML_TEMPLATE % (thislang, body)
+    return XHTML_TEMPLATE % {"TITLE": thislang, "BODY": body)
     
 def export(session, file, langid):
     session.trace_msg("Export for %s to %s" % (langid, file))
