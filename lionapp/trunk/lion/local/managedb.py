@@ -10,16 +10,27 @@ from xml.dom import minidom
 os.sys.path.append("../")
 from DB.connect import *
 
-# TODO select this module dynamically
-import dbio_amis
-
 class DBSession:
     """A session with the DB."""
 
-    def __init__(self, trace):
-        self.trace = trace  # trace flag
-        self.warnings = 0   # warnings during operation
+    def __init__(self, trace, app=None):
+        self.trace = trace      # trace flag
+        self.warnings = 0       # warnings during operation
+        self.connected = False  # no connection yet
+        if app:
+            # Import the application module
+            module = "dbio_" + app
+            self.trace_msg("import %s" % module)
+            try:
+                self.dbio = __import__(module)
+            except:
+                self.die("""Unknown application "%s".""" % app)
         self.connect()
+
+    def __del__(self):
+        """Disconnect when disappearing."""
+        self.disconnect()
+
 
     def trace_msg(self, msg):
         """Output a trace message if the trace flag is set."""
@@ -35,22 +46,24 @@ class DBSession:
 die just yet."""
         os.sys.stderr.write("Error: %s\n" % msg)
         if err > 0:
-            self.disconnect()
             os.sys.exit(err)
 
     def connect(self):
         """Connect to the database."""
-        self.trace_msg("Connecting to the database...")
-        self.db = connect_to_db_from_local_machine("admin")
-        self.cursor = self.db.cursor()
-        self.trace_msg("... connected")
+        if not self.connected:
+            self.trace_msg("Connecting to the database...")
+            self.db = connect_to_db_from_local_machine("admin")
+            self.cursor = self.db.cursor()
+            self.connected = True
+            self.trace_msg("... connected")
 
     def disconnect(self):
         """Disconnect from the database."""
-        self.trace_msg("Disconnecting from the database...")
-        self.cursor.close()
-        self.db.close()
-        self.trace_msg("... disconnected.")
+        if self.connected:
+            self.trace_msg("Disconnecting from the database...")
+            self.cursor.close()
+            self.db.close()
+            self.trace_msg("... disconnected.")
 
     def execute_query(self, q):
         """Execute a query."""
@@ -66,6 +79,15 @@ die just yet."""
             return True
         return False
 
+    def import_xml(self, file, langid):
+        """Import from XML to the database."""
+        if not file: die("No XML file given.")
+        if not self.check_language(langid):
+            die("No table for language %s." % langid)
+        self.trace_msg("Import from " + file + " for " + langid)
+        doc = minidom.parse(file)
+        self.dbio.import_from_xml(self, doc, langid)
+
 
 def usage(code=0):
     """Print usage information and exits with an error code."""
@@ -74,19 +96,14 @@ Usage:
 
   %(script)s --help                              Show this help message.
   %(script)s --import --language=id --file=file  Import file into table id.
-  %(script)s --export                            Export to XML
+  %(script)s --export --language=id --file=file  Export to XML
 
 Other options:
+  --application, -a: which application module to use (e.g. "amis" or "obi")
   --trace, -t: trace mode (send trace messages to stderr.)
 
 """ % {"script": os.sys.argv[0]}
     os.sys.exit(code)
-
-def import_action(session, file, langid):
-    """Import."""
-    session.trace_msg("Import from " + file + " for " + langid)
-    doc = minidom.parse(file)
-    dbio_amis.import_from_xml(session, doc, langid)
 
 def export_action(session, file, langid):
     """Export."""
@@ -94,39 +111,34 @@ def export_action(session, file, langid):
 
 def main():
     """Parse command line arguments and run."""
+    app = "amis"
     trace = False
     errors = 0
     action = None
     file = None
     langid = None
     try:
-        opts, args = getopt.getopt(os.sys.argv[1:], "ef:hil:t",
-            ["export", "file", "help", "import", "language", "trace"])
+        opts, args = getopt.getopt(os.sys.argv[1:], "a:ef:hil:t",
+            ["application", "export", "file", "help", "import", "language",
+                "trace"])
     except getopt.GetoptError, e:
         die(e.msg, 0)
         usage(1)
     for opt, arg in opts:
-        if opt in ("-e", "--export"): action = export_action
+        if opt in ("-a", "--app"): app = arg
+        elif opt in ("-e", "--export"):
+            action = lambda s, f, l: s.export(f, l)
         elif opt in ("-f", "--file"): file = arg
-        elif opt in ("-h", "--help"): usage()
-        elif opt in ("-i", "--import"): action = import_action
+        elif opt in ("-h", "--help"):
+            action = lambda s, f, l: usage()
+        elif opt in ("-i", "--import"):
+            action = lambda s, f, l: s.import_xml(f, l)
         elif opt in ("-l", "--language"): langid = arg
         elif opt in ("-t", "--trace"): trace = True
-    errors = 0
     if not action:
         die("no action defined.", 0)
-        errors += 1
-    if not file:
-        die("no XML file given.", 0)
-        errors += 1
-    if not langid:
-        die("no language code given.", 0)
-        errors += 1
-    if errors: usage(1)
-    session = DBSession(trace)
-    if not session.check_language(langid):
-        session.die("""No table for language "%s".""" % langid)
+        usage(1)
+    session = DBSession(trace, app)
     action(session, file, langid)
-    session.disconnect()
 
 if __name__ == "__main__": main()

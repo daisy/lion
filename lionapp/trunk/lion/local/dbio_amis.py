@@ -14,8 +14,8 @@ current connection to the database."""
             textstring, audiouri, xmlid, textflag, audioflag = data
             keys = elem.parentNode.tagName == "accelerator" and \
                 elem.parentNode.getAttribute("keys") or "NULL"
-        session.execute_query("""
-INSERT INTO %(table)s (textstring, textflag, audioflag, audiouri, xmlid,
+        session.execute_query(
+"""INSERT INTO %(table)s (textstring, textflag, audioflag, audiouri, xmlid,
 actualkeys) VALUES ("%(textstring)s", "%(textflag)s", "%(audioflag)s",
 "%(audiouri)s", "%(xmlid)s", "%(keys)s")""" % \
         {"table": langid, "textstring": textstring, "textflag": textflag,
