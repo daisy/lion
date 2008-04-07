@@ -5,7 +5,6 @@
 import getopt
 import os
 from xml.dom import minidom
-
 # Harcoded DB connection info, not stored in SVN
 os.sys.path.append("../")
 from DB.connect import *
@@ -101,7 +100,7 @@ Usage:
   %(script)s --help                              Show this help message.
   %(script)s --import --language=id --file=file  Import file into table id.
   %(script)s --export --language=id --file=file  Export to XML
-  %(script)s --xhtml --language=id --file=file   Output an XHTML version of all prompts to the output file file
+
 
 Other options:
   --application, -a: which application module to use (e.g. "amis" or "obi")
@@ -119,9 +118,8 @@ def main():
     file = None
     langid = None
     try:
-        opts, args = getopt.getopt(os.sys.argv[1:], "a:ef:hil:tx",
-            ["application", "export", "file", "help", "import", "language",
-                "trace", "xhtml"])
+        opts, args = getopt.getopt(os.sys.argv[1:], "ef:hil:t",
+            ["export", "file", "help", "import", "language", "trace"])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
@@ -136,8 +134,6 @@ def main():
             action = lambda s, f, l: s.import_xml(f, l)
         elif opt in ("-l", "--language"): langid = arg
         elif opt in ("-t", "--trace"): trace = True
-        elif opt in ("-x", "--xhtml"):
-            action = lambda s, f, l: s.export_xhtml(f, l)
     if not action:
         die("no action defined.", 0)
         usage(1)
