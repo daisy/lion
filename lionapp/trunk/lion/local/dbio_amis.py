@@ -48,6 +48,7 @@ def export_xhtml(session, langid):
        ...
     """
     thislang = session.check_language(langid)
+    print thislang
     body = """<h1 id="thislang">%s</h1>""" % thislang
     table = langid.replace("-", "_")
     request = "SELECT xmlid, textstring from %s" % table
