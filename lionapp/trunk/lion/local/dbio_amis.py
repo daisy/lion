@@ -2,8 +2,7 @@ import amis_import
 
 #note that this is also defined for the web scripts
 #we could share when the managedb stuff goes online instead of locally
-XHTML_TEMPLATE = """Content-type: text/html; charset=utf-8
-
+XHTML_TEMPLATE = """
 <?xml version="1.0"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -55,7 +54,7 @@ def export_xhtml(session, langid):
     session.execute_query(request)
     for id, txt in session.cursor:
         body += """<h1 id="%s">%s</h1>""" % (id, txt)
-    return XHTML_TEMPLATE % {"TITLE": thislang, "BODY": body)
+    return XHTML_TEMPLATE % {"TITLE": thislang, "BODY": body}
     
 def export(session, file, langid):
     session.trace_msg("Export for %s to %s" % (langid, file))
