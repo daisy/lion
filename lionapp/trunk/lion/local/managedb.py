@@ -23,8 +23,7 @@ class DBSession:
             try:
                 self.dbio = __import__(module)
             except Exception, e :
-                self.die("""Unknown application "%s" (%s)""" % (app, e.msg))
-        self.connect()
+                self.die("""Unknown application "%s" (%s)""" % (app, e))
 
     def __del__(self):
         """Disconnect when disappearing."""
@@ -40,12 +39,11 @@ class DBSession:
         os.sys.stderr.write("Warning: %s\n" % msg)
         self.warnings += 1
 
-    def die(self, msg, err=1):
+    def die(self, msg, err=0):
         """Die with an error message and an error code. If the code is 0, don't
 die just yet."""
         os.sys.stderr.write("Error: %s\n" % msg)
-        if err > 0:
-            os.sys.exit(err)
+        if err > 0: os.sys.exit(err)
 
     def connect(self):
         """Connect to the database."""
@@ -66,6 +64,7 @@ die just yet."""
 
     def execute_query(self, q):
         """Execute a query."""
+        self.connect()
         self.trace_msg("""Query: "%s".""" % q)
         self.cursor.execute(q)
 
@@ -85,6 +84,9 @@ die just yet."""
         self.trace_msg("Import from " + file + " for " + langid)
         doc = minidom.parse(file)
         self.dbio.import_from_xml(self, doc, langid)
+
+    def export(self, file, langid):
+        self.dbio.export(self, file, langid)
 
 
 def usage(code=0):
@@ -109,7 +111,7 @@ def main():
     """Parse command line arguments and run."""
     app = "amis"
     trace = False
-    action = None
+    action = lambda s, f, l: usage(1)
     file = None
     langid = None
     try:
@@ -130,9 +132,6 @@ def main():
             action = lambda s, f, l: s.import_xml(f, l)
         elif opt in ("-l", "--language"): langid = arg
         elif opt in ("-t", "--trace"): trace = True
-    if not action:
-        die("no action defined.", 0)
-        usage(1)
     session = DBSession(trace, app)
     action(session, file, langid)
 

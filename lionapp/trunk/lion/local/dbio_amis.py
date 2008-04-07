@@ -99,10 +99,5 @@ groupings."""
         #get_mnemonics_and_write_data(langid, items, groupid)
         groupid += 1
 
-def export_xhtml(session, file, langname):
-    """create xhtml where each text element becomes an h1
-    note that the langid parameter is required because we can't
-    necessarily use the xml:lang value in the file (we require
-    a longer format like eng-US)"""
-    if not file: file = langname + ".xslt"
-    session.trace_msg("Export XHTML for %s to %s" % (langname, file))
+def export(session, langid, file):
+    session.trace_msg("Export for %s to %s" % (langname, file))
