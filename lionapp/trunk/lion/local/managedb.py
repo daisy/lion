@@ -5,7 +5,7 @@
 import getopt
 import os
 from xml.dom import minidom
-from export_xhtml import *
+
 # Harcoded DB connection info, not stored in SVN
 os.sys.path.append("../")
 from DB.connect import *
@@ -23,8 +23,8 @@ class DBSession:
             self.trace_msg("import %s" % module)
             try:
                 self.dbio = __import__(module)
-            except:
-                self.die("""Unknown application "%s".""" % app)
+            except Exception, e :
+                self.die("""Unknown application "%s" (%s)""" % (app, e.msg))
         self.connect()
 
     def __del__(self):
@@ -77,7 +77,7 @@ die just yet."""
         row = self.cursor.fetchone()
         if row != None: return row[0]
         else: return None
-    
+
     def import_xml(self, file, langid):
         """Import from XML to the database."""
         if not file: die("No XML file given.")
@@ -86,7 +86,12 @@ die just yet."""
         self.trace_msg("Import from " + file + " for " + langid)
         doc = minidom.parse(file)
         self.dbio.import_from_xml(self, doc, langid)
-        
+
+    def export_xhtml(self, file, langid):
+        """Export to XHTML from the dbio module."""
+        langname = self.check_language(langid)
+        self.dbio.export_xhtml(self, file, langname)
+
 
 def usage(code=0):
     """Print usage information and exits with an error code."""
@@ -96,7 +101,7 @@ Usage:
   %(script)s --help                              Show this help message.
   %(script)s --import --language=id --file=file  Import file into table id.
   %(script)s --export --language=id --file=file  Export to XML
-  %(script)s --xhtml --language=id --file=file   Output an XHTML version of all prompts
+  %(script)s --xhtml --language=id --file=file   Output an XHTML version of all prompts to the output file file
 
 Other options:
   --application, -a: which application module to use (e.g. "amis" or "obi")
@@ -105,38 +110,23 @@ Other options:
 """ % {"script": os.sys.argv[0]}
     os.sys.exit(code)
 
-def export_action(session, file, langid):
-    """Export."""
-    session.trace_msg("Export to " + file + " for " + langid)
-
-
-def export_xhtml_action(session, file, langid):
-    """create xhtml where each text element becomes an h1
-       note that the langid parameter is required because we can't 
-       necessarily use the xml:lang value in the file (we require 
-       a longer format like eng-US)"""
-    session.trace_msg("Export XHTML from " + file + " for " + langid)
-    langname = session.check_language(langid)
-    #in export_xhtml.py
-    export_xhtml(file, langname)    
 
 def main():
     """Parse command line arguments and run."""
     app = "amis"
     trace = False
-    errors = 0
     action = None
     file = None
     langid = None
     try:
-        opts, args = getopt.getopt(os.sys.argv[1:], "ef:hil:t",
-            ["export", "file", "help", "import", "language", "trace", 
-            "xhtml"])
+        opts, args = getopt.getopt(os.sys.argv[1:], "a:ef:hil:tx",
+            ["application", "export", "file", "help", "import", "language",
+                "trace", "xhtml"])
     except getopt.GetoptError, e:
-        die(e.msg, 0)
+        os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
     for opt, arg in opts:
-        if opt in ("-a", "--app"): app = arg
+        if opt in ("-a", "--application"): app = arg
         elif opt in ("-e", "--export"):
             action = lambda s, f, l: s.export(f, l)
         elif opt in ("-f", "--file"): file = arg
@@ -146,8 +136,8 @@ def main():
             action = lambda s, f, l: s.import_xml(f, l)
         elif opt in ("-l", "--language"): langid = arg
         elif opt in ("-t", "--trace"): trace = True
-        elif opt in ("-x", "--xhtml"): action = export_xhtml_action
-    errors = 0
+        elif opt in ("-x", "--xhtml"):
+            action = lambda s, f, l: s.export_xhtml(f, l)
     if not action:
         die("no action defined.", 0)
         usage(1)
