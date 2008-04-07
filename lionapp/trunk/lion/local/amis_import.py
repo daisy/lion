@@ -86,9 +86,9 @@ def parse_text_element(session, elem):
         <text>CDATA</text>
         <audio src="path"/>
     </parent>
-
 Return None in case of error, otherwise a tuple: (textstring, audiosrc, xmlid,
 textflag, audioflag)"""
+
     if not elem.firstChild or \
         elem.firstChild.nodeType != Node.TEXT_NODE or \
         not elem.parentNode:
@@ -102,9 +102,17 @@ textflag, audioflag)"""
     src = audio.getAttribute("src")
     if src == "":
         session.warn('No src for for audio element near text with id "%s"' % id)
-    textflag = elem.getAttribute("flag") == "new" and 3 or 1
-    audioflag = audio.getAttribute("flag") == "new" and 3 or 1
+        
+    if elem.getAttribute("flag") == "new": textflag = 3
+    elif elem.getAttribute("flag") == "changed": textflag = 2
+    else: textflag = 1
+    
+    if audio.getAttribute("flag") == "new": audioflag = 3
+    elif audio.getAttribute("flag") == "changed": audioflag = 2
+    else: audioflag = 1
+    
     return text, src, id, textflag, audioflag
+
 
 def quote(str):
     """Escape double quotes inside a double-quoted string."""

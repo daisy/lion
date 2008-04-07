@@ -73,6 +73,7 @@ die just yet."""
         self.execute_query("SELECT langname FROM languages WHERE langid='%s'" \
             % langid)
         row = self.cursor.fetchone()
+        print row
         if row != None: return row[0]
         else: return None
 
@@ -84,6 +85,10 @@ die just yet."""
         self.trace_msg("Import from " + file + " for " + langid)
         doc = minidom.parse(file)
         self.dbio.import_from_xml(self, doc, langid)
+        #TODO: add a scan function that 
+        #1. takes all "new" items in the master table and copies them to the language tables.
+        # they should be flagged as "new" in the language tables
+        #2. takes all "changed" items in the master table and flags them as "changed" in the language tables
 
     def export(self, file, langid):
         self.dbio.export(self, file, langid)
