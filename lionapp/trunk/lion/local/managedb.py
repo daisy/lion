@@ -86,11 +86,6 @@ die just yet."""
         doc = minidom.parse(file)
         self.dbio.import_from_xml(self, doc, langid)
 
-    def export_xhtml(self, file, langid):
-        """Export to XHTML from the dbio module."""
-        langname = self.check_language(langid)
-        self.dbio.export_xhtml(self, file, langname)
-
 
 def usage(code=0):
     """Print usage information and exits with an error code."""
@@ -118,8 +113,9 @@ def main():
     file = None
     langid = None
     try:
-        opts, args = getopt.getopt(os.sys.argv[1:], "ef:hil:t",
-            ["export", "file", "help", "import", "language", "trace"])
+        opts, args = getopt.getopt(os.sys.argv[1:], "a:ef:hil:t",
+            ["application", "export", "file", "help", "import", "language",
+                "trace"])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
