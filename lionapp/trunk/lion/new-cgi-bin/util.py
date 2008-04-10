@@ -57,6 +57,9 @@ def login(username, password):
 
 
 def connect_to_db(user):
+    """connect to the database
+       one day, this function should be replaced with the DBSession class.
+    """
     db = connect_to_db_from_local_machine(user)
     if db == None:
         xhtml_die("<p>Could not connect to database</p>")
