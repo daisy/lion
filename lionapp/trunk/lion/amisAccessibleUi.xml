@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ui xmlns="http://amisproject.org" next-id="t373" xml:lang="en">
+<ui xmlns="http://amisproject.org" next-id="t376" xml:lang="en">
   <containers>
     <container id="file">
       <note>This is the menu header "File"</note>
@@ -322,7 +322,7 @@
             <audio src="./audio/speechgen0057.mp3" from="file:///Users/marisa/amisxml/narrated/daisy202/speechgen0057.smil#txtd394e9"/>
           </caption>
           <description>
-            <text id="t48">Start synchronized playback.</text>
+            <text id="t48" flag="changed">Start or pause synchronized playback.</text>
             <audio src="./audio/speechgen0058.mp3" from="file:///Users/marisa/amisxml/narrated/daisy202/speechgen0058.smil#txtd401e9"/>
           </description>
           <accelerator keys="Space">
@@ -343,7 +343,7 @@
             <audio src="./audio/speechgen0061.mp3" from="file:///Users/marisa/amisxml/narrated/daisy202/speechgen0061.smil#txtd422e9"/>
           </caption>
           <description>
-            <text id="t52">Pause playback of this DAISY book.</text>
+            <text id="t52" flag="changed">Start or pause playback of this DAISY book.</text>
             <audio src="./audio/speechgen0062.mp3" from="file:///Users/marisa/amisxml/narrated/daisy202/speechgen0062.smil#txtd429e9"/>
           </description>
           <accelerator keys="Space">
@@ -764,10 +764,7 @@
         <audio src="./audio/speechgen0141.mp3" from="file:///Users/marisa/amisxml/narrated/daisy202/speechgen0141.smil#txtd982e9"/>
       </caption>
       <action mfcid="ID_AMIS_SHOW_HELP_CONTENTS" widget="menuItem toolbarItem">
-        <note>This is going to be a menu item and toolbar item</note>
-        <icon src="./settings/img/help.ico" type="smallIcon"/>
-        <icon src="./settings/img/help_big.ico" type="largeIcon"/>
-        <caption>
+     	  <caption>
           <text id="t138">Contents</text>
           <audio src="./audio/speechgen0142.mp3" from="file:///Users/marisa/amisxml/narrated/daisy202/speechgen0142.smil#txtd989e9"/>
         </caption>
@@ -778,6 +775,20 @@
         <mnemonic>
           <text id="t140">C</text>
           <audio src="./audio/speechgen0144.mp3" from="file:///Users/marisa/amisxml/narrated/daisy202/speechgen0144.smil#txtd1003e9"/>
+        </mnemonic>
+      </action>
+      <action mfcid="ID_AMIS_SHOW_KEYBOARD_SHORTCUTS" widget="menuItem">
+     	  <caption>
+          <text id="t373" flag="new">Keyboard shortcuts</text>
+          <audio src="./audio/keyboardshortcuts.mp3"/>
+        </caption>
+        <description>
+          <text id="t374" flag="new">See and hear all the keyboard shortcuts for AMIS.</text>
+          <audio src="./audio/keyboardshortcuts_desc.mp3"/>
+        </description>
+        <mnemonic>
+          <text id="t375" flag="new">K</text>
+          <audio src="./audio/K.mp3"/>
         </mnemonic>
       </action>
       <action mfcid="ID_AMIS_ABOUT" widget="menuItem">
@@ -1485,15 +1496,6 @@
           <caption condition="DATA_EXISTS">
             <prompt>
               <promptItem>
-                <text id="t357" flag="new">Current time:</text>
-                <audio src="./audio/speechgen0228.mp3" from="file:///Users/marisa/amisxml/narrated/daisy202/speechgen0228.smil#txtd1595e9"/>
-              </promptItem>
-              <promptVar name="CURRENT_TIME"/>
-            </prompt>
-          </caption>
-          <caption condition="DATA_EXISTS">
-            <prompt>
-              <promptItem>
                 <text id="t215" flag="changed">Current section:</text>
                 <audio src="./audio/speechgen0229.mp3" from="file:///Users/marisa/amisxml/narrated/daisy202/speechgen0229.smil#txtd1602e9"/>
               </promptItem>
@@ -1535,7 +1537,7 @@
         </list>
       </control>
     </dialog>
-    <dialog>
+    <dialog mfcid="IDD_TEXTSTYLE">
       <note>This dialog lets the user set text style properties.</note>
       <caption>
         <text id="t358" flag="new">Text Style</text>
@@ -1577,7 +1579,7 @@
         </description>
         <list repeat="yes">
           <caption>
-            <promptVar name="COLOR_NAME"/>
+            <promptVar name="FOREGROUND_COLOR_NAME"/>
           </caption>
         </list>
       </control>
@@ -1592,7 +1594,7 @@
         </description>
         <list repeat="yes">
           <caption>
-            <promptVar name="COLOR_NAME"/>
+            <promptVar name="BACKGROUND_COLOR_NAME"/>
           </caption>
         </list>
       </control>
