@@ -6,6 +6,7 @@ What needs to be done?
 * input script that works for AMIS and Obi
  - AMIS XML => English table
  - AMIS XML new items => All other tables and flag them
+DONE! (6 may)
  
 * output script that works for AMIS and Obi
  - AMIS DB to AMIS XML
