@@ -44,11 +44,13 @@ def import_from_xml(session, doc, langid):
     amis_import.set_roles(doc, session, table)
     amis_import.find_mnemonic_groups(doc, session, table)
     amis_import.find_accelerator_targets(doc, session, table)
+
+def get_removed_ids(doc):
+    """Items that have been removed are specified in the document root's 
+    "removed" attribute"""
+    return amis_import.process_removals(doc)
+
     
-    # flag the items that have been removed; actual removal happens elsewhere
-    amis_import.process_removals(doc, session, langid)
-
-
 def export_xhtml(session, langid):
     """return a string of xhtml generated from the database
        each text string will be an h1 with the xml id from the database.  

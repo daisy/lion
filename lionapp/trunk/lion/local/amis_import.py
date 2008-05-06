@@ -85,15 +85,11 @@ groupings."""
         groupid += 1
 
 
-def process_removals(doc, session, langid):
+def process_removals(doc):
     """Flag items as removed"""
     ui = doc.getElementsByTagName("ui")[0]
     ids_to_remove = ui.getAttribute("removed").split(" ")
-    table = langid.replace("-", "_")
-    for id in ids_to_remove:
-        request = """UPDATE %(table)s SET textflag=4 WHERE xmlid='%(id)s'""" % \
-        {"table": table, "id": id}
-        session.execute_query(request)
+    return ids_to_remove
 
 def get_all_children_with_tagname(elem, tagname):
     """Get the immediate children (not the grandchildren) of the element with

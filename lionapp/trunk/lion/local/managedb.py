@@ -87,28 +87,27 @@ die just yet."""
         self.trace_msg("Import from " + file + " for " + langid)
         doc = minidom.parse(file)
         self.dbio.import_from_xml(self, doc, langid)
-        self.process_db_flags(langid)
-    
+        removed_ids = self.dbio.get_removed_ids(doc)
+        self.process_changes(langid, removed_ids)
     
     def export(self, file, langid):
         self.dbio.export(self, file, langid)
     
     
-    def process_db_flags(self, langid):
-        """ Process the textflag values 
-        (1 = nothing, 2 = changed, 3 = new, 4 = remove)"""
+    def process_changes(self, langid, removed_ids):
+        """ Process the textflag values (1 = nothing, 2 = changed, 3 = new)"""
         table = langid.replace("-", "_")
         # get all the other languages except the master language
         self.execute_query("SELECT langid FROM languages WHERE langid != '%s'" % langid)
         languages = self.cursor.fetchall()
+        # get the changed items
         self.execute_query("SELECT xmlid FROM %s WHERE textflag=2" % table)
         changed = self.cursor.fetchall()
+        # get the new items
         self.execute_query("SELECT textstring, xmlid, role, mnemonicgroup, target, actualkeys FROM %s WHERE textflag=3"\
          % table)
         newstuff = self.cursor.fetchall()
-        self.execute_query("SELECT xmlid FROM %s WHERE textflag=4" % table)
-        deleted = self.cursor.fetchall()
-        
+        # for every language (except the master language) make the appropriate changes
         for lang in languages:
             langtable = lang[0].replace("-", "_")
             # if something changed in the master table, flag it as changed in all other tables
@@ -127,16 +126,11 @@ die just yet."""
                  "role": role, "mnem": mnemonicgroup, "target": target, \
                  "keys": actualkeys})
             
-            #if something was flagged for deletion in the master table, delete it from all other tables
-            for row in deleted:
+            #if something was flagged for deletion in the master document, delete it from all other tables
+            for id in removed_ids:
                 self.execute_query("DELETE FROM %(table)s WHERE xmlid='%(xmlid)s'" % \
-                {"table": langtable, "xmlid": row[0]})
-                
-        # now delete rows flagged for deletion in the master table
-        for row in deleted:
-            self.execute_query("DELETE FROM %(table)s WHERE xmlid='%(xmlid)s'" % \
-            {"table": table, "xmlid": row[0]})
-        
+                {"table": langtable, "xmlid": id})
+
 
 def usage(code=0):
     """Print usage information and exits with an error code."""
