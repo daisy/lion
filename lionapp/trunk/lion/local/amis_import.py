@@ -1,3 +1,5 @@
+# this file needs some clean-up
+
 from xml.dom import Node
 
 def parse_text_element(session, elem):

@@ -18,7 +18,7 @@ XHTML_TEMPLATE = """
 def import_from_xml(session, doc, langid):
     """Import a document object (from minidom) into a table."""
     session.trace_msg("IMPORT FROM AMIS.")
-    table = langid.replace("-", "_")
+    table = session.make_table_name(langid)
     
     # clear the table
     session.execute_query("DELETE FROM %s" % table)
@@ -54,18 +54,17 @@ def get_removed_ids(doc):
 def export_xhtml(session, langid):
     """return a string of xhtml generated from the database
        each text string will be an h1 with the xml id from the database.  
-       the first heading will be the name of the language 
        E.g.:
-       <h1 id="thislang">U.S. English</h1>
        <h1 id="t1">File...</h1>
        <h1 id="t2">F</h1>
        <h1 id="t3">Alt + F</h1>
        ...
     """
     thislang = session.check_language(langid)
-    print thislang
-    body = """<h1 id="thislang">%s</h1>""" % thislang
-    table = langid.replace("-", "_")
+    if thislang == None:
+        session.die("Language does not exist.")
+    body = ""
+    table = session.make_table_name(langid)
     request = "SELECT xmlid, textstring from %s" % table
     session.execute_query(request)
     for id, txt in session.cursor:
