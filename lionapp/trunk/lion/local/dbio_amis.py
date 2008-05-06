@@ -18,24 +18,36 @@ XHTML_TEMPLATE = """
 def import_from_xml(session, doc, langid):
     """Import a document object (from minidom) into a table."""
     session.trace_msg("IMPORT FROM AMIS.")
-    session.execute_query("DELETE FROM %s" % langid)
+    table = langid.replace("-", "_")
+    
+    # clear the table
+    session.execute_query("DELETE FROM %s" % table)
+    
+    # add all the text item data to the table
     for elem in doc.getElementsByTagName("text"):
         data = amis_import.parse_text_element(session, elem)
         if data:
             textstring, audiouri, xmlid, textflag, audioflag = data
+            # keys = the actual keys associated with a command
             keys = elem.parentNode.tagName == "accelerator" and \
                 elem.parentNode.getAttribute("keys") or "NULL"
+        
         session.execute_query(
-"""INSERT INTO %(table)s (textstring, textflag, audioflag, audiouri, xmlid,
-actualkeys) VALUES ("%(textstring)s", "%(textflag)s", "%(audioflag)s",
-"%(audiouri)s", "%(xmlid)s", "%(keys)s")""" % \
-        {"table": langid, "textstring": textstring, "textflag": textflag,
+        """INSERT INTO %(table)s (textstring, textflag, audioflag, audiouri, xmlid,
+        actualkeys) VALUES ("%(textstring)s", "%(textflag)s", "%(audioflag)s",
+        "%(audiouri)s", "%(xmlid)s", "%(keys)s")""" % \
+        {"table": table, "textstring": textstring, "textflag": textflag,
             "audioflag": audioflag, "audiouri": audiouri, "xmlid": xmlid,
             "keys": keys})
-    amis_import.set_roles(doc, session, langid)
-    amis_import.find_mnemonic_groups(doc, session, langid)
-    amis_import.find_accelerator_targets(doc, session, langid)
     
+    # specify relationships 
+    amis_import.set_roles(doc, session, table)
+    amis_import.find_mnemonic_groups(doc, session, table)
+    amis_import.find_accelerator_targets(doc, session, table)
+    
+    # flag the items that have been removed; actual removal happens elsewhere
+    amis_import.process_removals(doc, session, langid)
+
 
 def export_xhtml(session, langid):
     """return a string of xhtml generated from the database
