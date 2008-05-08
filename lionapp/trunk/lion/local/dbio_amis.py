@@ -34,7 +34,7 @@ def import_from_xml(session, doc, langid):
         
         session.execute_query(
         """INSERT INTO %(table)s (textstring, textflag, audioflag, audiouri, xmlid,
-        actualkeys) VALUES ("%(textstring)s", "%(textflag)s", "%(audioflag)s",
+        actualkeys) VALUES ("%(textstring)s", "%(textflag)d", "%(audioflag)d",
         "%(audiouri)s", "%(xmlid)s", "%(keys)s")""" % \
         {"table": table, "textstring": textstring, "textflag": textflag,
             "audioflag": audioflag, "audiouri": audiouri, "xmlid": xmlid,
@@ -80,3 +80,68 @@ def export(session, file, langid):
     outfile = open(filename, 'w')
     outfile.write(xhtml_contents)
     outfile.close
+
+# add or remove a single string from the master table
+def add_string(session, langid, string, stringid):
+    """Add a new string to all tables
+        langid = master table
+        stringid = xmlid for the string
+        This function is ONLY for adding anything with role=STRING"""
+
+    # make sure the stringid doesn't already exist
+    if session.check_string_id(langid, stringid) != None:
+        session.die("String with ID %s already exists." % stringid)
+        return False
+    table = session.make_table_name(langid)
+    # error check the role value
+    if session.force == False:
+        session.execute_query("""SELECT id FROM %(table)s \
+            WHERE role=%(role)s""" % \
+            {"table": table, "role": role})
+        rows = session.cursor.fetchall()
+        if rows == None:
+            session.die("Role value is new for this database; \
+                run with --force to override.")
+            return False
+    # add the string to the master table
+    session.execute_query("""INSERT INTO %(table)s (textstring, textflag, \
+        audioflag, xmlid, role) VALUES ("%(textstring)s", 3, \
+        3, "%(xmlid)s", "STRING")""" % \
+        {"table": table, "textstring": string, "xmlid": stringid})
+    session.warn("Remember to change the next-id value in the AMIS XML file.")
+    return True
+
+def remove_item(session, langid, stringid):
+    """Remove a string from all the tables
+        langid = master table
+        stringid = xmlid for the string"""
+    # make sure the stringid exists
+    if session.check_string_id(langid, stringid) == None:
+        session.die("String with ID %s does not exist." % stringid)
+        return False
+    
+    # safety check
+    can_remove = session.force
+    if session.force == False:
+        rly = raw_input("Do you REALLY want to remove a string?  This is serious.\n \
+            Type your answer (definitely/no)  ")
+        if rly == "definitely":
+            can_remove = True
+        else:
+            can_remove = False
+    
+    table = session.make_table_name(langid)
+    # really delete it!
+    if can_remove == True:
+        session.execute_query("""DELETE FROM %(table)s \
+            WHERE xmlid="%(xmlid)s" """ % \
+            {"table": table, "xmlid": stringid})
+    
+    return True
+
+def add_accelerator(session, langid, stringid, refid, keys, keysname):
+    """Add an accelerator to the master table
+        refid = the item it refers to
+        keysname = the human-readable or translated name of the keys
+        keys = the actual keypress"""
+    return True

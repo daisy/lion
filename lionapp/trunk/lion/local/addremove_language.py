@@ -14,24 +14,24 @@ def add_language(session, langid, langname, username, password, realname, email)
     _add_language_to_database(session, langid, langname, username, password, realname, email)
 
 
-def remove_language(session, langid, force):
+def remove_language(session, langid):
     """Remove a language and the user associated with it"""
     if session.check_language(langid) == None:
         session.die("Language not found.")
         return
     
     # safety check
-    can_remove = force
-    if force == False:
+    can_remove = session.force
+    if session.force == False:
         rly = raw_input("Do you REALLY want to remove a language?  This is serious.\n \
             Type your answer (definitely/no)  ")
         if rly == "definitely":
             can_remove = True
-    
+        else:
+            can_remove = False
     # really delete it!
     if can_remove == True:
         _remove_language_from_database(session, langid)
-        print langid
         session.trace_msg("Language %s deleted!" % langid)
 
     
