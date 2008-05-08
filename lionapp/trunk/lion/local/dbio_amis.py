@@ -93,16 +93,7 @@ def add_string(session, langid, string, stringid):
         session.die("String with ID %s already exists." % stringid)
         return False
     table = session.make_table_name(langid)
-    # error check the role value
-    if session.force == False:
-        session.execute_query("""SELECT id FROM %(table)s \
-            WHERE role=%(role)s""" % \
-            {"table": table, "role": role})
-        rows = session.cursor.fetchall()
-        if rows == None:
-            session.die("Role value is new for this database; \
-                run with --force to override.")
-            return False
+    
     # add the string to the master table
     session.execute_query("""INSERT INTO %(table)s (textstring, textflag, \
         audioflag, xmlid, role) VALUES ("%(textstring)s", 3, \

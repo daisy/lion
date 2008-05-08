@@ -9,12 +9,11 @@ from xml.dom import minidom
 os.sys.path.append("../")
 from DB.connect import *
 import addremove_language
-import addremove_string
 
 class DBSession:
     """A session with the DB."""
 
-    def __init__(self, trace, app=None, force):
+    def __init__(self, trace, force, app=None):
         self.trace = trace      # trace flag
         self.warnings = 0       # warnings during operation
         self.connected = False  # no connection yet
@@ -52,8 +51,8 @@ die just yet."""
         """Connect to the database."""
         if not self.connected:
             self.trace_msg("Connecting to the database...")
-            self.db = connect_to_db_from_local_machine("admin")
-            #self.db = connect_to_local_test_db("admin")
+            #self.db = connect_to_db_from_local_machine("admin")
+            self.db = connect_to_local_test_db("admin")
             self.cursor = self.db.cursor()
             self.connected = True
             self.trace_msg("... connected")
@@ -91,7 +90,7 @@ die just yet."""
     def check_string_id(self, langid, stringid):
         """Check the existence of a string with the given xmlid"""
         self.execute_query("SELECT textstring FROM %(table)s WHERE xmlid='%(xmlid)s'" \
-            % {"table": make_table_name(langid), "xmlid": stringid})
+            % {"table": self.make_table_name(langid), "xmlid": stringid})
         row = self.cursor.fetchone()
         if row != None: return row[0]
         else: return None
@@ -115,13 +114,16 @@ die just yet."""
         self.dbio.export(self, file, langid)
     
     def process_changes(self, langid, removed_ids):
-        """ Process the textflag values (1 = nothing, 2 = changed, 3 = new)
-        and the IDs to remove"""
+        """Process the textflag values (2: changed, 3: new)
+        and remove the IDs from all tables"""
         table = self.make_table_name(langid)
-        # get all the other languages except the master language
+        # get all the other language tables except the master (langid)
         self.execute_query("SELECT langid FROM languages WHERE langid != '%s'" \
             % langid)
         languages = self.cursor.fetchall()
+        # we can't do anything if there are no other languages
+        if languages == None: return;
+        
         # get the changed items
         self.execute_query("SELECT xmlid FROM %s WHERE textflag=2" % table)
         changed = self.cursor.fetchall()
@@ -129,58 +131,53 @@ die just yet."""
         self.execute_query("SELECT textstring, xmlid, role, mnemonicgroup, \
         target, actualkeys FROM %s WHERE textflag=3" % table)
         newstuff = self.cursor.fetchall()
-        # for every language (except the master language), 
-        # make the appropriate changes
-        if languages != None:
-            for lang in languages:
-                langtable = self.make_table_name(lang[0])
-                # if something changed in the master table, 
-                # flag it as changed in all other tables
-                if changed != None:
-                    for row in changed:
-                        self.execute_query("UPDATE %(table)s SET textflag=2 WHERE \
-                            xmlid='%(xmlid)s'" % {"table": langtable, "xmlid": row[0]})
-                
-                # if something was added in the master table, 
-                # add it to all other tables
-                if newstuff != None:
-                    for row in newstuff:
-                        text, xmlid, role, mnemonicgroup, target, actualkeys = row
-                        self.execute_query("""INSERT INTO %(table)s (textstring, \
-                            xmlid, role, mnemonicgroup, target, actualkeys, textflag, \
-                            audioflag)
-                            VALUES ("%(text)s", "%(xmlid)s", "%(role)s", "%(mnem)s", \
-                            "%(target)s", "%(keys)s", 3, 3)""" % \
-                            {"table": langtable, "text": text, "xmlid": xmlid, \
-                            "role": role, "mnem": mnemonicgroup, "target": target, \
-                            "keys": actualkeys})
-                
-            
-            # end languages loop
-            
-            #if something was flagged for deletion in the master document, 
-            # delete it from all other tables
+        
+        # reflect the changes/newstuff in all the other languages
+        for lang in languages:
+            langtable = self.make_table_name(lang[0])
+            if changed != None:
+                for row in changed:
+                    self.execute_query("UPDATE %(table)s SET textflag=2 WHERE \
+                        xmlid='%(xmlid)s'" % \
+                        {"table": langtable, "xmlid": row[0]})
+            if newstuff != None:
+                for row in newstuff:
+                    text, xmlid, role, mnem, target, keys = row
+                    self.execute_query("""INSERT INTO %(table)s (textstring, \
+                        xmlid, role, mnemonicgroup, target, actualkeys, \
+                        textflag, audioflag) VALUES ("%(text)s", "%(xmlid)s", \
+                        "%(role)s", "%(mnem)s", "%(target)s", "%(keys)s", \
+                        3, 3)""" % \
+                        {"table": langtable, "text": text, "xmlid": xmlid, \
+                            "role": role, "mnem": mnem, "target": target, \
+                            "keys": keys})
             if removed_ids != None:
                 for id in removed_ids:
                     self.execute_query("DELETE FROM %(table)s WHERE \
-                        xmlid='%(xmlid)s'" % {"table": langtable, "xmlid": id}
+                        xmlid='%(xmlid)s'" % {"table": langtable, "xmlid": id})
+        #end language list loop
     
     def add_language(self, langid, langname, username, password, realname, email):
         addremove_language.add_language(self, langid, langname, username, password, realname, email)
     
-    def remove_language(self, langid, force):
-        addremove_language.remove_language(self, langid, force)
     
-    def add_string(self, langid, string, stringid, role, keys, force):
-        success = self.dbio.add_string(self, langid, string, stringid, force)
+    def remove_language(self, langid):
+        addremove_language.remove_language(self, langid)
+    
+    def add_string(self, langid, string, stringid):
+        self.die("I don't work yet.")
+        return
+        success = self.dbio.add_string(self, langid, string, stringid)
         if success == True:
-            process_changes(langid, None)
+            self.process_changes(langid, None)
     
-    def remove_string(self, langid, stringid, force):
-        success = self.dbio.remove_string(self, langid, stringid, force)
+    def remove_item(self, langid, stringid):
+        self.die("Not tested yet")
+        return
+        success = self.dbio.remove_item(self, langid, stringid)
         if success == True:
             removed_ids = stringid,
-            process_changes(langid, removed_ids)
+            self.process_changes(langid, removed_ids)
         
     
 def usage(code=0):
@@ -226,7 +223,7 @@ def main():
     add_language = False  
     remove_language = False
     add_string = False
-    remove_string = False
+    remove_item = False
     string = None
     stringid = None
     try:
@@ -251,7 +248,7 @@ def main():
             ["application=", "export", "file=", "help", "import", "langid=",
                 "trace", "add_language", "remove_language", "langname=", 
                 "username=", "password=", "realname=", "email=", "force", 
-                "stringid=", "string", "remove_item", "add_string"])
+                "stringid=", "string=", "remove_item", "add_string"])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
@@ -276,9 +273,9 @@ def main():
         elif opt in ("-f", "--force"): force = True
         elif opt in ("--stringid"): stringid = arg
         elif opt in ("--string"): string = arg
-        elif opt in ("--remove_item"): remove_string = True
+        elif opt in ("--remove_item"): remove_item = True
         elif opt in ("--add_string"): add_string = True
-    session = DBSession(trace, app, force)
+    session = DBSession(trace, force, app)
     if add_language == True:
         session.add_language(langid, langname, username, password, realname, email)
     elif remove_language == True:
@@ -286,7 +283,7 @@ def main():
     elif add_string == True:
         session.add_string(langid, string, stringid)
     elif remove_item == True:
-        session.remove_string(langid, stringid)
+        session.remove_item(langid, stringid)
     else:
         action(session, file, langid)
 
