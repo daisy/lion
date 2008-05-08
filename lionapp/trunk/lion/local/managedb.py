@@ -51,8 +51,8 @@ die just yet."""
         """Connect to the database."""
         if not self.connected:
             self.trace_msg("Connecting to the database...")
-            #self.db = connect_to_db_from_local_machine("admin")
-            self.db = connect_to_local_test_db("admin")
+            self.db = connect_to_db_from_local_machine("admin")
+            #self.db = connect_to_local_test_db("admin")
             self.cursor = self.db.cursor()
             self.connected = True
             self.trace_msg("... connected")
@@ -156,6 +156,12 @@ die just yet."""
                     self.execute_query("DELETE FROM %(table)s WHERE \
                         xmlid='%(xmlid)s'" % {"table": langtable, "xmlid": id})
         #end language list loop
+        
+        # clear the flags in the master table -- otherwise the changes get 
+        # re-added to all tables each time anything changes
+        self.execute_query("UPDATE %s SET textflag=1 WHERE textflag=2 \
+            or textflag=3" % table)
+    
     
     def add_language(self, langid, langname, username, password, realname, email):
         """Add a language and corresponding uer"""
