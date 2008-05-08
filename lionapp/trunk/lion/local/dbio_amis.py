@@ -82,7 +82,7 @@ def export(session, file, langid):
     outfile.close
 
 # add or remove a single string from the master table
-def add_string(session, langid, string, stringid):
+def add_string(session, langid, textstring, stringid):
     """Add a new string to all tables
         langid = master table
         stringid = xmlid for the string
@@ -98,8 +98,8 @@ def add_string(session, langid, string, stringid):
     session.execute_query("""INSERT INTO %(table)s (textstring, textflag, \
         audioflag, xmlid, role) VALUES ("%(textstring)s", 3, \
         3, "%(xmlid)s", "STRING")""" % \
-        {"table": table, "textstring": string, "xmlid": stringid})
-    session.warn("Remember to change the next-id value in the AMIS XML file.")
+        {"table": table, "textstring": textstring, "xmlid": stringid})
+    session.trace_msg("Remember to change the next-id value in the AMIS XML file.")
     return True
 
 def remove_item(session, langid, stringid):
@@ -130,9 +130,24 @@ def remove_item(session, langid, stringid):
     
     return True
 
-def add_accelerator(session, langid, stringid, refid, keys, keysname):
+def add_accelerator(session, langid, textstring, stringid, refid, keys):
     """Add an accelerator to the master table
         refid = the item it refers to
         keysname = the human-readable or translated name of the keys
         keys = the actual keypress"""
+    # make sure the stringid doesn't already exist
+    if session.check_string_id(langid, stringid) != None:
+        session.die("String with ID %s already exists." % stringid)
+        return False
+    table = session.make_table_name(langid)
+    
+    # add the string to the master table
+    session.execute_query("""INSERT INTO %(table)s (textstring, textflag, \
+        audioflag, xmlid, actualkeys, target, role) VALUES \
+        ("%(textstring)s", 3, 3, "%(xmlid)s", "%(keys)s", "%(refid)s", \
+        "ACCELERATOR")""" % \
+        {"table": table, "textstring": textstring, "xmlid": stringid,
+            "keys": keys, "refid": refid})
+    session.trace_msg("Remember to change the next-id value in the AMIS XML file.")
     return True
+

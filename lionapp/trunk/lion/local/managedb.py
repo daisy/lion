@@ -158,27 +158,37 @@ die just yet."""
         #end language list loop
     
     def add_language(self, langid, langname, username, password, realname, email):
+        """Add a language and corresponding uer"""
         addremove_language.add_language(self, langid, langname, username, password, realname, email)
     
-    
     def remove_language(self, langid):
+        """Remove a language (also removes the user)"""
         addremove_language.remove_language(self, langid)
     
-    def add_string(self, langid, string, stringid):
-        self.die("I don't work yet.")
-        return
-        success = self.dbio.add_string(self, langid, string, stringid)
+    def add_string(self, langid, textstring, stringid):
+        """Add a string to all language tables.  XMLID must be supplied."""
+        success = self.dbio.add_string(self, langid, textstring, stringid)
         if success == True:
             self.process_changes(langid, None)
     
     def remove_item(self, langid, stringid):
-        self.die("Not tested yet")
-        return
+        """Remove an item from all language tables by XMLID."""
         success = self.dbio.remove_item(self, langid, stringid)
         if success == True:
             removed_ids = stringid,
             self.process_changes(langid, removed_ids)
-        
+    
+    def add_accelerator(self, langid, textstring, stringid, refid, keys):
+        """Add an accelerator to all language tables.  
+        textstring = the name of the keys (e.g. Space/Espacio)
+        stringid = the XMLID value (even if it's not in the XML file, you need
+        to give it a unique value as if it were)
+        refid = the XMLID value of the entry that this is an accelerator for.  
+        keys = the actual keys (Ctrl+O or Space or whatever)"""
+        success = self.dbio.add_accelerator(self, langid, textstring, stringid, refid, keys)
+        if success == True:
+            self.process_changes(langid, None)
+    
     
 def usage(code=0):
     """Print usage information and exits with an error code."""
@@ -193,10 +203,13 @@ Usage:
 --realname=realname                              
                                                  Add a new language
   %(script)s --remove_language --langid=id       Remove a language
-  %(script)s --add_string --langid=id --string=string --stringid=itemid 
+  %(script)s --add_string --langid=id --textstring=string --stringid=id 
                                                  Add a string to all tables
-  %(script)s --remove_string --langid=id --stringid=itemid
+  %(script)s --remove_string --langid=id --stringid=id
                                                  Remove an item from all tables
+  %(script)s --add_accelerator --langid=id --textstring=string --stringid=id
+--refid=id --keys=accelerator                    Add an accelerator to all tables
+
 Other options:
   --application, -a: which application module to use (e.g. "amis" or "obi")
   --trace, -t: trace mode (send trace messages to stderr.)
@@ -219,13 +232,16 @@ def main():
     email = None
     realname = None
     force = False
-    # if the action is add/remove a language/string, the parameters are different
+    # if the action is add/remove a language/string/accelerator, the parameters are different
     add_language = False  
     remove_language = False
     add_string = False
     remove_item = False
-    string = None
+    add_accel = False
+    textstring = None
     stringid = None
+    refid = None
+    actualkeys = None
     try:
         """
         a: - application
@@ -248,7 +264,8 @@ def main():
             ["application=", "export", "file=", "help", "import", "langid=",
                 "trace", "add_language", "remove_language", "langname=", 
                 "username=", "password=", "realname=", "email=", "force", 
-                "stringid=", "string=", "remove_item", "add_string"])
+                "stringid=", "text=", "remove_item", "add_string", "refid=", 
+                "keys=", "add_accelerator"])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
@@ -272,18 +289,23 @@ def main():
         elif opt in ("-e", "--email"): email = arg
         elif opt in ("-f", "--force"): force = True
         elif opt in ("--stringid"): stringid = arg
-        elif opt in ("--string"): string = arg
+        elif opt in ("--text"): textstring = arg
         elif opt in ("--remove_item"): remove_item = True
         elif opt in ("--add_string"): add_string = True
+        elif opt in ("--refid"): refid = arg
+        elif opt in ("--keys"): actualkeys = arg
+        elif opt in ("--add_accelerator"): add_accel = True
     session = DBSession(trace, force, app)
     if add_language == True:
         session.add_language(langid, langname, username, password, realname, email)
     elif remove_language == True:
         session.remove_language(langid)
     elif add_string == True:
-        session.add_string(langid, string, stringid)
+        session.add_string(langid, textstring, stringid)
     elif remove_item == True:
         session.remove_item(langid, stringid)
+    elif add_accel == True:
+        session.add_accelerator(langid, textstring, stringid, refid, actualkeys)
     else:
         action(session, file, langid)
 
