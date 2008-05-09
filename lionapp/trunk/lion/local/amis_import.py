@@ -37,7 +37,7 @@ def parse_text_element(session, elem):
 
 
 def set_roles(doc, session, table):
-    """Set role for text elements (?)"""
+    """Set role for text elements"""
     session.execute_query("SELECT id, xmlid, textstring FROM %s" % table)
     for id, xmlid, textstring in session.cursor:
         elem = get_element_by_id(doc, "text", xmlid)

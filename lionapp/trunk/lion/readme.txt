@@ -130,16 +130,20 @@ amisdb.py
 	Operations related to the database described above.  Requires your IP to be authorized.  See the file itself for usage instructions.
 
 fill in the RC template:
-	perl instantiate.pl AmisLangpackTemplate.rc yourAccessibleUi.xml
-
-fill in the help file template:
-	perl instantiate.pl yourHelpFileTemplate.html yourAccessibleUi.xml
+	XXold way perl instantiate.pl AmisLangpackTemplate.rc yourAccessibleUi.xml
 
 make an html file with each prompt as a heading
-	xsltproc prompts.xslt yourAccessibleUi.xml
+	1) managedb.py --strings > strings.xml
+	2) xsltproc xhtml.xslt strings.xml > strings.html
+	
+make a PDF with each prompt as a heading:
+	1) managedb.py --strings > strings.xml
+	2) xsltproc fo.xslt strings.xml > strings.fo
+	3) fop strings.fo strings.pdf
 
 fill the accessibleUi.xml file with audio prompts from an NCC-only book containing TOC entries for each prompt:
-	The stuff after the pipe ( | ) is for utf8 output
-	perl audio-files.pl -d --nobarf NCC_FILE XML_FILE  | perl -pe'BEGIN{binmode STDOUT, ":utf8"}s/&#x([^;]+);/chr(hex($1))/ge' > out.xml
+	XX old way 
+		The stuff after the pipe ( | ) is for utf8 output
+		perl audio-files.pl -d --nobarf NCC_FILE XML_FILE  | perl -pe'BEGIN{binmode STDOUT, ":utf8"}s/&#x([^;]+);/chr(hex($1))/ge' > out.xml
 	
 	
