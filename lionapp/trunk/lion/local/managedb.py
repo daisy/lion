@@ -112,7 +112,15 @@ die just yet."""
     
     def export(self, file, langid):
         self.dbio.export(self, file, langid)
-    
+
+    def strings(self):
+        """Export strings to stdout"""
+        self.trace_msg("Export strings to stdout")
+        self.execute_query("""SELECT textstring FROM daisyfor_amisl10n.eng_US where role="STRING" """)
+        strings = self.cursor.fetchall()
+        for string in strings:
+            print string[0]
+
     def process_changes(self, langid, removed_ids):
         """Process the textflag values (2: changed, 3: new)
         and remove the IDs from all tables"""
@@ -265,13 +273,14 @@ def main():
         f  - force
         A  - add language
         R  - remove language
+        s  - strings export
         """
-        opts, args = getopt.getopt(os.sys.argv[1:], "a:eF:hil:tn:u:p:r:e:fAR",
+        opts, args = getopt.getopt(os.sys.argv[1:], "a:eF:hil:tn:u:p:r:e:fARs",
             ["application=", "export", "file=", "help", "import", "langid=",
                 "trace", "add_language", "remove_language", "langname=", 
                 "username=", "password=", "realname=", "email=", "force", 
                 "stringid=", "text=", "remove_item", "add_string", "refid=", 
-                "keys=", "add_accelerator"])
+                "keys=", "add_accelerator", "strings"])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
@@ -301,6 +310,8 @@ def main():
         elif opt in ("--refid"): refid = arg
         elif opt in ("--keys"): actualkeys = arg
         elif opt in ("--add_accelerator"): add_accel = True
+        elif opt in ("-s", "--strings"):
+            action = lambda s, f, l: s.strings()
     session = DBSession(trace, force, app)
     if add_language == True:
         session.add_language(langid, langname, username, password, realname, email)
