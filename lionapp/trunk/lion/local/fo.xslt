@@ -50,7 +50,8 @@ file that can be transformed into a PDF with FOP. -->
       <fo:inline font-weight="bold">
         <xsl:value-of select="normalize-space(.)"/>
       </fo:inline>
-      <xsl:text>: </xsl:text>
+      <!-- Uncomment for colons -->
+      <!-- <xsl:text>: </xsl:text> -->
       <xsl:call-template name="make-lines">
         <xsl:with-param name="str" select="."/>
       </xsl:call-template>
