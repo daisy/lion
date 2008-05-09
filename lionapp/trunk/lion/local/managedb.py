@@ -118,8 +118,10 @@ die just yet."""
         self.trace_msg("Export strings to stdout")
         self.execute_query("""SELECT textstring FROM daisyfor_amisl10n.eng_US where role="STRING" """)
         strings = self.cursor.fetchall()
+        print """<?xml version="1.0"?>\n<strings>"""
         for string in strings:
-            print string[0]
+            print "<s>" + string[0] + "</s>"
+        print "</strings>"
 
     def process_changes(self, langid, removed_ids):
         """Process the textflag values (2: changed, 3: new)
