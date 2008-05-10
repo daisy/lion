@@ -37,6 +37,9 @@ def login_error():
     body = "<p>There was an error logging in.  Try again?</p>" + LOGIN_FORM
     return XHTML_TEMPLATE % {"TITLE": "Login error -- try again", "BODY": body}
 
+def login_success():
+    body = "<p>Login successful!  <a href=\"MainMenu\">Start working.</a></p>"
+    return XHTML_TEMPLATE % {"TITLE": "Logged in", "BODY": body}
 
 def general_error():
     body = "<h1>General error</h1><p>Dear user: Sorry!</p>"
@@ -49,6 +52,7 @@ def user_information(user):
 
 
 def main_menu_links(user):
+    
     user_info = user_information(user)
     body = """
     <h1>Welcome!</h1>

@@ -14,12 +14,10 @@ class Login:
         if login(username, password) == None:
             return login_error()
         else:
-            menu = MainMenu()
-            return menu.index()
+            return login_success()
     
     index.exposed = True
     process_login.exposed = True
-
 
 class MainMenu():
     def index(self):

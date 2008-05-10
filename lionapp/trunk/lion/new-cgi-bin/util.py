@@ -92,9 +92,9 @@ def get_user():
 def set_cookie(username, sessionid):
     """Set the login cookie."""
     cookie = cherrypy.response.cookie
-    cookie[COOKIE_USERNAME] = username
-    cookie[COOKIE_SESSIONID] = sessionid
-    print str(cookie)
+    cookie['username'] = username
+    cookie['sessionid'] = sessionid
+    print "set_cookie *" + str(cookie) + "*"
 
 
 def read_cookie():
@@ -105,11 +105,13 @@ def read_cookie():
     sessionid = ""
     cookie = cherrypy.request.cookie
     res = ""
-    print cookie
+    print "read_cookie *" + str(cookie) + "*"
+    #if cookie == None or len(cookie) == 0:
+    #    return "", ""
     for name in cookie.keys():
         res += "name: %s, value: %s<br>" % (name, cookie[name].value)
                 
-    username = cookie[COOKIE_USERNAME].value
-    sessionid = cookie[COOKIE_SESSIONID].value
+    username = cookie['username'].value
+    sessionid = cookie['sessionid'].value
     print "Read cookie %s %s" % (username, sessionid)
     return username, sessionid
