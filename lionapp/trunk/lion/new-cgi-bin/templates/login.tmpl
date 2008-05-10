@@ -5,7 +5,7 @@ Login
 #end def
 #def body
 <h1>$title</h1>
-#if $message != None or len($message) > 0
+#if $message != None and len($message) > 0
 <p>$message</p>
 #end if
 <form action="process_login" method="post">

@@ -1,11 +1,12 @@
 import sys
 import MySQLdb
 import cherrypy
-from templates import *
 from util import *
-import translatestrings
+os.sys.path.append("./templates")
+from translatestrings import *
 from Cheetah.Template import Template
 
+# this doesn't have anywhere else to go right now
 ACTIONS = ("<a href=\"TranslateStrings?view=all\">Translate AMIS strings</a>",
     "Assign AMIS keyboard shortcuts",
     "Assign mnemonics (single-letter shortcuts)")
@@ -14,20 +15,22 @@ class Login:
     """Things relating to logging in"""
     def index(self):
         """show the login form"""
-        return Template(file="login.tmpl")
+        t = Template(file="./templates/login.tmpl")
+        t.message = None
+        return str(t)
     index.exposed = True
     
     def process_login(self, username, password):
         if login(username, password) == None:
-            t = Template(file="login.tmpl")
+            t = Template(file="./templates/login.tmpl")
             t.message = "There was an error logging in.  Try again?"
             t.title = "Login error -- try again" 
-            return t
+            return str(t)
         else:
-            t = Template(file="xhtml.tmpl")
+            t = Template(file="./templates/xhtml.tmpl")
             t.title = "Logged in"
             t.body = "<p>Login successful!  <a href=\"MainMenu\">Start working.</a></p>"
-            return t
+            return str(t)    
     process_login.exposed = True
 
 class MainMenu():
@@ -35,21 +38,19 @@ class MainMenu():
         """Show the links for the main menu"""
         user = get_user()
         if user == None:
-            return Template(file="error.tmpl")
+            return str(Template(file="./templates/error.tmpl"))
         else:
-            user_info = user_information(get_user())
-            t = Template(file="mainmenu.tmpl")
-            t.user = user_info["users.realname"]
-            t.language = user_info["languages.langname"]
+            t = Template(file="./templates/mainmenu.tmpl")
+            t.user = user["users.realname"]
+            t.language = user["languages.langname"]
             t.actions = ACTIONS
-            return t
-    
+            return str(t)
     index.exposed = True
 
 #set up cherrypy
 root = Login()
 root.MainMenu = MainMenu()
-root.MainMenu.TranslateStrings = translatestrings.TranslateStrings()
+root.MainMenu.TranslateStrings = TranslateStrings()
 
 #root.show_mnemonics_page = show_mnemonics_page()
 #root.show_accelerators_page = show_accelerators_page()

@@ -1,0 +1,10 @@
+#!/bin/bash
+# compile the templates before using them.  delete backup files.
+
+cd ./templates
+cheetah compile *.tmpl
+echo "Removing backup files"
+rm -fv *.bak
+cd ../
+echo "Starting..."
+python main.py
