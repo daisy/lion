@@ -9,14 +9,16 @@ class Login:
     """Things relating to logging in"""
     def index(self):
         """show the login form"""
-        return login_form()
+        return XHTML_TEMPLATE % {"TITLE": "Login", "BODY": LOGIN_FORM}
     index.exposed = True
     
     def process_login(self, username, password):
         if login(username, password) == None:
-            return login_error()
+            body = "<p>There was an error logging in.  Try again?</p>" + LOGIN_FORM
+            return XHTML_TEMPLATE % {"TITLE": "Login error -- try again", "BODY": body}
         else:
-            return login_success()
+            body = "<p>Login successful!  <a href=\"MainMenu\">Start working.</a></p>"
+            return XHTML_TEMPLATE % {"TITLE": "Logged in", "BODY": body}
     
     process_login.exposed = True
 
@@ -27,7 +29,16 @@ class MainMenu():
         if user == None:
             return general_error()
         else:
-            return main_menu_links(get_user())
+            user_info = user_information(get_user())
+            body = """
+            <h1>Welcome!</h1>
+            %(user_info)s
+            <h1>Actions</h1>
+            <ul>
+            %(list)s
+            </ul>
+            """ % {"user_info": user_info, "list": listize(ACTIONS)}
+            return XHTML_TEMPLATE % {"TITLE": "Main Menu", "BODY": body}
     
     index.exposed = True
 
@@ -35,6 +46,7 @@ class MainMenu():
 root = Login()
 root.MainMenu = MainMenu()
 root.MainMenu.TranslateStrings = translatestrings.TranslateStrings()
+
 #root.show_mnemonics_page = show_mnemonics_page()
 #root.show_accelerators_page = show_accelerators_page()
 
