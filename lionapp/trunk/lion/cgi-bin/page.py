@@ -16,7 +16,9 @@ TEXTFLAGS_SQL = {"new": "and %(table)s.textflag=3",
                 "newtodo": "and (%(table)s.textflag=2 or %(table)s.textflag=3)", 
                 "all": ""}
 #need to supply the table name
-ROLES_SQL = {"main": """ and (%(table)s.role="STRING" or %(table)s.role="CONTROL" or %(table)s.role="DIALOG" or %(table)s.role="MENUITEM") """,
+ROLES_SQL = {"main": """ and (%(table)s.role="STRING" or \
+                %(table)s.role="CONTROL" or %(table)s.role="DIALOG" or \
+                %(table)s.role="MENUITEM") """,
             "mnemonics": """ and %(table)s.role="MNEMONIC" """, 
             "accelerators": """ and %(table)s.role="ACCELERATOR" """}
 #the width and height of the text box that translators type into

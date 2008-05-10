@@ -1,7 +1,7 @@
 #small and useful things...
 
-import cgi
-import cgitb; cgitb.enable()
+#import cgi
+#import cgitb; cgitb.enable()
 import sys
 import os
 import datetime
@@ -17,15 +17,6 @@ def get_uuid():
     uuid = pipe.readline()
     pipe.close()
     return uuid.rstrip()
-
-def get_login_info():
-    """Get login info from the form (username, password) or die on error."""
-    form = cgi.FieldStorage()
-    if form == None or not form.has_key("username") or \
-    not form.has_key("password"):
-        xhtml_die("""<p>Could not get login information. Please <a href="%s">try again</a>.</p>""" % LOGIN_URL)
-    
-    return form["username"].value, form["password"].value
 
 def login(username, password):
     """Try to login the user and return None on failure."""

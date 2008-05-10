@@ -1,0 +1,35 @@
+#from xhtml import xhtml
+#extends xhtml
+#def title
+AMIS translation for $language: $section section
+#end def
+#def body
+<h1>$title</h1>
+<div id="navigation">
+## build a list separated by vertical lines
+#for $a in $actions
+	#if $a != $actions[len($actions) - 1] 
+	$a | 
+	#else 
+	$a
+	#end if
+#end for
+</div>
+<div class="description">
+	<p>$about</p>
+	<p>$count items</p>
+</div>
+<div>
+    <form action="@TODO" method="POST">
+        <select name="viewfilter">
+            <option value="all">all items</option>
+            <option value="newtodo">all items marked new or to-do</option>
+            <option value="new">all new items</option>
+            <option value="todo">all to-do items</option>
+        </select>
+        <input type="submit" value="Change view" />
+    </form>
+</div>
+<br/>
+<div>$form</div>
+#end def
