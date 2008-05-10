@@ -11,9 +11,6 @@ sys.path.append("/home/daisyfor")
 sys.path.append("../")
 from DB.connect import *
 
-COOKIE_USERNAME = "username"
-COOKIE_SESSIONID = "sessionid"
-
 def get_uuid():
     """Get a uuid from the os to act as a session id."""
     pipe = os.popen("uuidgen", "r")
@@ -100,14 +97,13 @@ def set_cookie(username, sessionid):
 def read_cookie():
     """Read user name and session id for the cookie. If there is an error, user
     name will be empty."""
-    
     username = ""
     sessionid = ""
     cookie = cherrypy.request.cookie
     res = ""
     print "read_cookie *" + str(cookie) + "*"
-    #if cookie == None or len(cookie) == 0:
-    #    return "", ""
+    if cookie == None or len(cookie) == 0:
+        return "", ""
     for name in cookie.keys():
         res += "name: %s, value: %s<br>" % (name, cookie[name].value)
                 
