@@ -42,7 +42,8 @@ document. -->
       <strong>
         <xsl:value-of select="."/>
       </strong>
-      <xsl:text>:</xsl:text>
+      <!--Uncomment for colons-->
+	  <!--<xsl:text>:</xsl:text>-->
     </p>
   </xsl:template>
 
