@@ -11,6 +11,7 @@ sys.path.append("/home/daisyfor")
 sys.path.append("../")
 from DB.connect import *
 
+
 def get_uuid():
     """Get a uuid from the os to act as a session id."""
     pipe = os.popen("uuidgen", "r")

@@ -17,3 +17,4 @@ class TranslateStrings(TranslationPage):
         # the other pages (mnemonics, accelerators) will need this sql:
         #"mnemonics": """ and %(table)s.role="MNEMONIC" """, 
         #"accelerators": """ and %(table)s.role="ACCELERATOR" """}
+        print "init strings"

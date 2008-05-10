@@ -6,10 +6,7 @@ os.sys.path.append("./templates")
 from translatestrings import *
 from Cheetah.Template import Template
 
-# this doesn't have anywhere else to go right now
-ACTIONS = ("<a href=\"TranslateStrings?view=all\">Translate AMIS strings</a>",
-    "Assign AMIS keyboard shortcuts",
-    "Assign mnemonics (single-letter shortcuts)")
+
 
 class Login:
     """Things relating to logging in"""
@@ -43,7 +40,9 @@ class MainMenu():
             t = Template(file="./templates/mainmenu.tmpl")
             t.user = user["users.realname"]
             t.language = user["languages.langname"]
-            t.actions = ACTIONS
+            t.actions = ("<a href=\"TranslateStrings?view=all\">Translate AMIS strings</a>",
+                "Assign AMIS keyboard shortcuts",
+                "Assign mnemonics (single-letter shortcuts)")
             return str(t)
     index.exposed = True
 
