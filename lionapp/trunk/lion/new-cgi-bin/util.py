@@ -21,7 +21,7 @@ def get_uuid():
 
 def login(username, password):
     """Try to login the user and return None on failure."""
-    db = connect_to_db("rw")
+    db = connect_to_lion_db("rw")
     cursor = db.cursor()
     request = """
     SELECT * FROM users WHERE username="%(name)s" AND password="%(pwd)s" """ \
@@ -35,7 +35,6 @@ def login(username, password):
         UPDATE users SET sessionid="%(id)s", lastlogin="%(last)s" WHERE username="%(name)s" """ % \
         {"id": sessionid, "last": now.strftime("%Y-%m-%d %H:%M:%S"), "name": username}
         cursor.execute(request)
-        print "Session ID in database = " + sessionid
         set_cookie(username, sessionid)
     else:
         return None
@@ -45,13 +44,14 @@ def login(username, password):
     return userinfo
 
 
-def connect_to_db(user):
+def connect_to_lion_db(user):
     """connect to the database
        one day, this function should be replaced with the DBSession class.
     """
-    db = connect_to_db_from_local_machine(user)
+    db = connect_to_remote_db(user)
     if db == None:
-        xhtml_die("<p>Could not connect to database</p>")
+        print "Error connecting to the database"
+        sys.exit()
     else:
         return db
 
@@ -61,14 +61,13 @@ def get_user():
     user info in a dictionary. If not logged in, return None."""
     username, sessionid = read_cookie()
     if username == "" or username == None: return None
-    db = connect_to_db("ro")
+    db = connect_to_lion_db("ro")
     cursor = db.cursor()
     fields = ["users.username", "users.realname", "users.password", "users.email", "users.langid", \
     "users.lastactivity", "users.svnpath", "users.sessionid", "languages.langname"]
     request = """
     SELECT %s FROM users, languages WHERE users.username="%s" AND users.sessionid="%s" AND users.langid = languages.langid""" % \
         (",".join(fields), username, sessionid)
-    print request
     cursor.execute(request)
     row = cursor.fetchone()
     if row == None: return None
@@ -83,7 +82,6 @@ def set_cookie(username, sessionid):
     cookie = cherrypy.response.cookie
     cookie['username'] = username
     cookie['sessionid'] = sessionid
-    print "set_cookie *" + str(cookie) + "*"
 
 
 def read_cookie():
@@ -93,13 +91,10 @@ def read_cookie():
     sessionid = ""
     cookie = cherrypy.request.cookie
     res = ""
-    print "read_cookie *" + str(cookie) + "*"
     if cookie == None or len(cookie) == 0:
         return "", ""
     for name in cookie.keys():
-        res += "name: %s, value: %s<br>" % (name, cookie[name].value)
-                
+        res += "name: %s, value: %s<br>" % (name, cookie[name].value) 
     username = cookie['username'].value
     sessionid = cookie['sessionid'].value
-    print "Read cookie %s %s" % (username, sessionid)
     return username, sessionid

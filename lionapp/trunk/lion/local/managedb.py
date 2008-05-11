@@ -51,8 +51,8 @@ die just yet."""
         """Connect to the database."""
         if not self.connected:
             self.trace_msg("Connecting to the database...")
-            self.db = connect_to_db_from_local_machine("admin")
-            #self.db = connect_to_local_test_db("admin")
+            self.db = connect_to_remote_db("admin")
+            #self.db = connect_to_local_db("admin")
             self.cursor = self.db.cursor()
             self.connected = True
             self.trace_msg("... connected")

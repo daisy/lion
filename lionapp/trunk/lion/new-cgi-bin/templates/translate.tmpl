@@ -1,3 +1,14 @@
+#*
+Template variables:
+
+	title = page title
+	actions = navigation links
+	about = about this page
+	view_description = about this page view
+	count = number of items being displayed
+	formrows = table rows, each containing a translation form
+*#
+
 #from xhtml import xhtml
 #extends xhtml
 #def title
@@ -6,14 +17,11 @@ AMIS translation for $language: $section section
 #def body
 <h1>$title</h1>
 <div id="navigation">
-## build a list separated by vertical lines
-#for $a in $actions
-	#if $a != $actions[len($actions) - 1] 
-	$a | 
-	#else 
-	$a
-	#end if
-#end for
+## each link is separated by a vertical line
+#if $actions != None
+#set $list = " | ".join($actions)
+$list
+#end if
 </div>
 <div class="description">
 	<p>$about</p>
@@ -32,5 +40,5 @@ AMIS translation for $language: $section section
     </form>
 </div>
 <br/>
-<div>$form</div>
+<div><table>$formrows</table></div>
 #end def

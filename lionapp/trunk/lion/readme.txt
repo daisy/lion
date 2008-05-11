@@ -20,7 +20,7 @@ sys.path.append("../")	#location of the parent folder for the DB folder
 from DB.connect import *
 #username can be "admin", "rw", "ro" for "admin", "read-write", "read-only"
 #two options - the first for connecting from a local machine, the second for connecting from within a webscript
-db = connect_to_db_from_local_machine("admin")
+db = connect_to_remote_db("admin")
 db = connect_to_db("admin")
 
 Note that with the current server (bluehost), your IP has to be authorized in order to connect from a local machine.  Do the following:

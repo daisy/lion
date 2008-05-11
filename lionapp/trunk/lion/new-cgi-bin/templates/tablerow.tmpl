@@ -1,0 +1,46 @@
+#*
+Template variables:
+
+	searchList = a row with these fields:
+		xmlid, textstring, textflag, remarks, ref_string, our_remarks
+
+	instructions = what the translator should do	
+	handler = the function to handle the form submission
+	width = the width of the text box for the translation
+	height = the height of the text box for the translation
+	langid = the id of the language being translated into
+*#
+
+#if $textflag == 1:
+	#set $ok = "checked"
+	#set $todo = ""
+#elif $textflag == 2:
+	#set $todo = "checked"
+	#set $ok = ""
+#end if
+<tr>
+<form action="$handler" method="POST">
+<td width="30%%">$ref_string</td>
+<td>
+    <p class="comments">$our_remarks</p>
+    $instructions
+    <textarea id="$xmlid" name="translation" cols="$width" rows="$height">$textstring</textarea>
+    <p class="comments">Remarks from you:</p>
+	<textarea class="remarks" name="remarks" cols="64" rows="2">$remarks</textarea>
+</td>
+<td>
+	<p>Status:</p>
+	<input name="status" type="radio" $ok value="1"/>
+	<span class="ok">OK</span><br/>
+	
+	<input name="status" type="radio" $todo value="2"/>
+	<span class="todo">TODO</span><br/>
+	
+</td>
+<td>
+	<input type="submit" value="Save" style="align: bottom"/>
+	<input type="hidden" name="xmlid" value="$xmlid"/>
+	<input type="hidden" name="langid" value="$langid"/>
+</td>
+</form>
+</tr>
