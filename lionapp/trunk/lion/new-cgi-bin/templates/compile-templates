@@ -1,5 +1,0 @@
-#!/bin/bash
-# compile the templates before using them.  delete backup files.
-cheetah compile *.tmpl
-echo "Removing backup files"
-rm -fv *.bak
