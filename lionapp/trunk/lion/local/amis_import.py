@@ -46,12 +46,14 @@ def set_roles(doc, session, table):
             if tag == "accelerator": role = "ACCELERATOR"
             elif tag == "mnemonic": role = "MNEMONIC"
             elif tag == "caption":
-                tag = elem.parentNode.tagName
+                tag = elem.parentNode.parentNode.tagName
                 if tag == "action" or tag == "container": role = "MENUITEM"
                 elif tag == "control": role = "CONTROL"
                 elif tag == "dialog": role = "DIALOG"
                 else: role = "STRING"
             else: role = "STRING"
+            if session.trace == True:
+                print "Role = %s for %s" % (role, xmlid)
             session.execute_query("""UPDATE %s SET role="%s" WHERE id=%s""" % \
                 (table, role, id))
 
@@ -78,12 +80,18 @@ groupings."""
     for elem in doc.getElementsByTagName("container") + \
         doc.getElementsByTagName("containers"):
         items = get_items_in_container(elem)
+        if session.trace == True:
+            print "group id = %d" % groupid
+            printelements(session, items)
         get_mnemonics_and_write_data(doc, session, table, items, groupid)
         groupid += 1
     # Dialog elements
     for elem in doc.getElementsByTagName("dialog"):
         items = get_items_in_dialog(elem)
         get_mnemonics_and_write_data(doc, session, table, items, groupid)
+        if session.trace == True:
+            print "group id = %d" % groupid
+            printelements(session, items)
         groupid += 1
 
 
@@ -217,3 +225,9 @@ def get_text_id_from_prompt_item(doc, elm):
             return get_text_id_from_prompt_item(doc, prompt)
         else:
             return ""
+
+def printelements(session, elms):
+    for el in elms:
+        print "\t%s\n" % el.toxml()
+
+    
