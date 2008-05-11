@@ -4,9 +4,14 @@ import cherrypy
 from util import *
 os.sys.path.append("./templates")
 from translatestrings import *
+from choosemnemonics import *
 from Cheetah.Template import Template
 
-
+def get_actions():
+    return ("<a href=\"../TranslateStrings?view=all\">Translate AMIS strings</a>", 
+        "Assign AMIS keyboard shortcuts",
+        "<a href=\"../ChooseMnemonics?view=all\">Choose mnemonics</a> \
+            (single-letter shortcuts)")
 
 class Login:
     """Things relating to logging in"""
@@ -40,18 +45,15 @@ class MainMenu():
             t = Template(file="./templates/mainmenu.tmpl")
             t.user = user["users.realname"]
             t.language = user["languages.langname"]
-            t.actions = ("<a href=\"TranslateStrings?view=all\">Translate AMIS strings</a>",
-                "Assign AMIS keyboard shortcuts",
-                "Assign mnemonics (single-letter shortcuts)")
+            t.actions = get_actions()
             return str(t)
     index.exposed = True
 
 #set up cherrypy
 root = Login()
 root.MainMenu = MainMenu()
-root.MainMenu.TranslateStrings = TranslateStrings()
-
-#root.show_mnemonics_page = show_mnemonics_page()
+root.TranslateStrings = TranslateStrings()
+root.ChooseMnemonics = ChooseMnemonics()
 #root.show_accelerators_page = show_accelerators_page()
 
 app = cherrypy.tree.mount(root, script_name='/')
