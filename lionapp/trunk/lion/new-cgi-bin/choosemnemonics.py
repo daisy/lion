@@ -11,13 +11,13 @@ class ChooseMnemonics(TranslationPage):
         "MNEMONIC": "letter (underlined) to press to activate the item"}
     
     def __init__(self):
-        self.title = "AMIS Translation -- mnemonics section"
         self.section = "mnemonics"
         self.textbox_columns = 64
         self.textbox_rows = 3
         self.instructions = "Enter a single letter:"
         self.about = "This is the mnemonics page.  Mnemonics are shortcut \
-            letters in a menu item or button."     
+            letters in a menu item or button.  Each item in a group must have \
+            a unique mnemonic."    
 
     def make_table(self, view_filter):
         """Make the form for main page"""
@@ -37,6 +37,7 @@ class ChooseMnemonics(TranslationPage):
         mnem_groups = cursor.fetchall()
         form = ""
         group_number = 1
+        num_rows = 0
         # each mnemonic group gets its own section
         for g in mnem_groups:
             # the title of each section
@@ -49,15 +50,16 @@ class ChooseMnemonics(TranslationPage):
 
             cursor.execute(request)
             rows = cursor.fetchall()
-            
+            num_rows += len(rows)
             form += "<table>"
             for r in rows:
                 data = dict(zip(template_fields, r))
-                # override some values
-                data["ref_string"] = self.build_mnemonic_string(cursor, table,
+                local_ref = self.build_mnemonic_string(cursor, table,
                     data["target"], data["textstring"])
                 eng_ref = self.build_mnemonic_string(cursor, "eng_US", 
                         data["target"], data["ref_string"])
+                # override some values
+                data["ref_string"] = local_ref
                 data["our_remarks"] = "This is for a %(item)s.  In English, it is \
                     used like this: \"%(example)s\"" \
                     % {"item": self.ROLE_DESCRIPTIONS[data["role"]], 
@@ -71,15 +73,17 @@ class ChooseMnemonics(TranslationPage):
                 t.handler = self.handler
                 form += str(t)
             form += "</table>"
+            group_number += 1
         #end for
         cursor.close()
         db.close()
         
-        return form, len(rows)
+        return form, num_rows
     
-    def build_mnemonic_string(self, cursor, table, target_id, textstring):
-        """build a string where the mnemonic letter (given by textstring) is 
+    def build_mnemonic_string(self, cursor, table, target_id, letter):
+        """build a string where the mnemonic letter is 
         underlined in the word (referenced by target_id)"""
+        
         cursor.execute("SELECT textstring FROM %s WHERE xmlid = \"%s\"" \
             % (table, target_id))
         row = cursor.fetchone()
@@ -88,12 +92,13 @@ class ChooseMnemonics(TranslationPage):
             print "Warning: invalid mnemonic"
             return ""
         word = row[0]
-        pos = word.lower().find(textstring.lower())
+        pos = word.lower().find(letter.lower())
+        print "word = %s, letter = %s" % (word, letter)
         if pos == -1:
             return word + ("""(<span style="text-decoration: underline">%s\
-                </span>)""" % textstring)
+                </span>)""" % letter)
         else:
             # underline the mnemonic
-            return word[0:pos] + ("""<span style="text-decoration: underline">\
-                %s</span>""" % word[pos]) + word[pos+1:len(word)]
+            return word[0:pos] + ("""<span style="text-decoration: \
+                underline">%s</span>""" % word[pos]) + word[pos+1:len(word)]
     

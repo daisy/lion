@@ -35,7 +35,6 @@ class TranslationPage():
         self.user = user
         self.view_description = VIEW_DESCRIPTIONS[view]
         t = Template(file="./templates/translate.tmpl")
-        t.title = self.title
         t.actions = ("<a href=\"../TranslateStrings?view=all\">Translate AMIS strings</a>", 
             "Assign AMIS keyboard shortcuts",
             "<a href=\"../ChooseMnemonics?view=all\">Choose mnemonics</a> \
@@ -44,6 +43,7 @@ class TranslationPage():
         t.language = self.language
         t.form, t.count = self.make_table(view)
         t.view_description = self.view_description
+        t.section = self.section
         return str(t)
     index.exposed = True
     

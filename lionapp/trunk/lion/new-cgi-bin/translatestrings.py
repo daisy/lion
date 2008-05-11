@@ -3,7 +3,6 @@ from translationpage import *
 class TranslateStrings(TranslationPage):
     """The page of all the strings (the main page)"""
     def __init__(self):
-        self.title = "AMIS Translation -- main section"
         self.section = "main"
         self.textbox_columns = 64
         self.textbox_rows = 3
