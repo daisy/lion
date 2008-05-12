@@ -1,15 +1,20 @@
+
 #*
 Template variables:
 
 	searchList = a row with these fields:
-		xmlid, textstring, textflag, remarks, ref_string, our_remarks
+		xmlid, textstring, textflag, remarks, ref_string, our_remarks, thekeys, keymask
 
 	instructions = what the translator should do	
 	handler = the function to handle the form submission
 	width = the width of the text box for the translation
 	height = the height of the text box for the translation
 	langid = the id of the language being translated into
+	
+Identical to tablerow except for the dataentry part.This should really be derived from tablerow but it's not working; I suspect because Cheetah #blocks can't have arguments.
+
 *#
+
 #if $textflag == 1
 	#set $ok = "checked"
 	#set $todo = ""
@@ -26,9 +31,25 @@ Template variables:
 <td width="30%%">$ref_string</td>
 <td>
     <p class="comments">$our_remarks</p>
-    $instructions  Remember to <em>Save</em>.<br/>
-	<textarea id="$xmlid" name="translation" cols="$width" rows="$height" class="$classattr">$textstring</textarea>
-    <p class="comments">Remarks from you:</p>
+    
+	## start of dataentry area
+	## this looks like KEYMASK + small textbox for entering a letter 
+	#if len($thekeys) > 0
+	$instructions 
+	#end if
+	Remember to <em>Save</em>.<br/><br/>
+	Shortcut: <span class="$classattr">$keymask</span>
+	#if len($thekeys) > 0
+	<textarea id="keys_$xmlid" name="thekeys" cols="5" rows="1" class="$classattr">$thekeys</textarea>
+	#end if
+	<br/>
+	## and then another text box for entering the label for the entire shortcut
+	<p>Now type the human-readable version of the shortcut.  For example, your language might have its own words or abbreviations for Space or Control.</p>
+	<textarea id="$xmlid" name="translation" cols="30" rows="3" class="$classattr">$textstring</textarea>
+	<input type="hidden" name="keymask" value="$keymask"/>
+	## end of dataentry area
+	
+	<p class="comments">Remarks from you:</p>
 	<textarea class="remarks" name="remarks" cols="64" rows="2">$remarks</textarea>
 </td>
 <td width="100px">

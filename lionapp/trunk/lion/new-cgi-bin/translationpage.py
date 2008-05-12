@@ -15,7 +15,7 @@ class TranslationPage(translate.translate):
     warning_message = ""
     check_conflict = False
     show_no_conflicts = False
-    prefix = ""
+    
     def index(self, view):
         """Show the big table of translate-able items"""
         self.last_view = view
@@ -24,6 +24,7 @@ class TranslationPage(translate.translate):
             return error.error().respond()
         self.user = user
         self.language = user["languages.langname"]
+        print "view " + str(view)
         self.view_description = VIEW_DESCRIPTIONS[view]
         self.form, self.count = self.make_table(view)
         return self.respond()
@@ -45,6 +46,7 @@ class TranslationPage(translate.translate):
         cursor.execute(request)
         cursor.close()
         db.close()
+        self.show_no_conflicts = False
         return self.index(self.last_view)
     save_string.exposed = True
         

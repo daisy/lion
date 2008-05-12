@@ -1,5 +1,5 @@
 from translationpage import *
-from templates import tablerow
+from templates import tablerow, acceltablerow
 import util
 import re
 
@@ -53,13 +53,11 @@ class ChooseAccelerators(TranslationPage):
             # override some values
             data["ref_string"] = local_ref
             data["our_remarks"] = "In English, the accelerator is %s" % eng_ref
-            key_mask, letter = self.parse_key_masks(data["textstring"])
-            data["textstring"] = letter
-            t = tablerow.tablerow(searchList=data)
-            t.prefix = key_mask
+            key_mask, letter = self.parse_key_masks(data["actualkeys"])
+            data["thekeys"] = letter
+            data["keymask"] = key_mask
+            t = acceltablerow.acceltablerow(searchList=data)
             t.instructions = self.instructions
-            t.width = self.textbox_columns
-            t.height = self.textbox_rows
             t.langid = self.user["users.langid"]
             form += t.respond()
         #end for
@@ -79,13 +77,18 @@ class ChooseAccelerators(TranslationPage):
         return accel_string
     
     def parse_key_masks(self, keys):
-        """Take something like 'Ctrl+0' and isolate 'Ctrl+' and 'O'.  Return both parts.  Account for 'Ctrl++' """
+        """Take something like 'Ctrl+0' and isolate 'Ctrl+' and 'O'.  Return both parts.  Account for 'Ctrl++' and Space
+        (in AMIS, you can't change Space, so we can treat it like a keymask) """
+        if keys == "Space":
+            return keys, ""
+        
         last_part=""
         if keys.endswith("+") == True:
             # reverse the string, replace the last '+' with another letter, but remember what we did
             keys = keys[::-1]
-            keys.replace("+", "x", 1)
+            keys = keys.replace("+", "x", 1)
             last_part = "+"
+            keys = keys[::-1]
         pos = keys.rfind("+")
         if pos == -1:
             return "", keys
@@ -99,12 +102,12 @@ class ChooseAccelerators(TranslationPage):
         it ignores Space because that one is used twice (play/pause) and is not allowed to be changed by the user."""
         conflict_found = False
         table = self.user["users.langid"].replace("-", "_")
-        request = "SELECT DISTINCT actualkeys FROM %s WHERE role=\"ACCELERATOR\" and textstring != \"Space\"" % table
+        request = "SELECT DISTINCT actualkeys FROM %s WHERE role=\"ACCELERATOR\" and actualkeys != \"Space\"" % table
         db = util.connect_to_lion_db("ro")
         cursor = db.cursor()
         cursor.execute(request)
         first_count = cursor.rowcount
-        request = "SELECT id FROM %s WHERE role=\"ACCELERATOR\" and textstring != \"Space\"" % table
+        request = "SELECT id FROM %s WHERE role=\"ACCELERATOR\" and actualkeys != \"Space\"" % table
         cursor.execute(request)
         second_count = cursor.rowcount
         cursor.close()
@@ -119,27 +122,33 @@ class ChooseAccelerators(TranslationPage):
     check_conflicts.exposed = True
     
     def is_excluded(self, actualkeys):
-        """True if keys contains Alt, Space, or F-anything. """
-        # excluded patterns are Alt+__, F__, and Space
+        """True if keys contains Alt or F-anything. """
+        # excluded patterns are Alt+__, F__
         p1 = re.compile("Alt+.*")
         p2 = re.compile("F.*")
-        if p1.match(actualkeys) or p2.match(actualkeys) or actualkeys == "Space":
+        if p1.match(actualkeys) or p2.match(actualkeys): #or actualkeys == "Space":
             return True
         else:
             return False
     
-    def save_string(self, translation, remarks, status, xmlid, langid, prefix):
+    def save_string(self, remarks, status, xmlid, langid, keymask, translation, thekeys):
+        if thekeys == None or len(thekeys) == 0:
+            return ("""Field cannot be empty.  Press the back button to try again.""")
+        
         table = langid.replace("-", "_")
         db = util.connect_to_lion_db("rw")
         cursor = db.cursor()
-        keys = prefix + translation
+        actualkeys = keymask + thekeys
         request = """UPDATE %(table)s SET textflag="%(status)s", \
-            textstring="%(keys)s", remarks="%(remarks)s", actualkeys="%(keys)s" WHERE \
+            textstring="%(textstring)s", remarks="%(remarks)s", actualkeys="%(actualkeys)s" WHERE \
             xmlid="%(xmlid)s" """ % \
-            {"table": table, "status": status, "keys": keys, \
-                "remarks": remarks, "xmlid": xmlid}
+            {"table": table, "status": status, "actualkeys": actualkeys, \
+                "remarks": remarks, "xmlid": xmlid, "textstring": translation}
         cursor.execute(request)
         cursor.close()
         db.close()
+        self.show_no_conflicts = False
         return self.index(self.last_view)
     save_string.exposed = True
+        
+            
