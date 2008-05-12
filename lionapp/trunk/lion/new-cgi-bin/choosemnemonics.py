@@ -14,7 +14,7 @@ class ChooseMnemonics(TranslationPage):
         self.section = "mnemonics"
         self.textbox_columns = 64
         self.textbox_rows = 3
-        self.instructions = "Enter a single letter:"
+        self.instructions = "Enter a single letter and press save:"
         self.about = "This is the mnemonics page.  Mnemonics are shortcut \
             letters in a menu item or button.  Each item in a group must have \
             a unique mnemonic."    

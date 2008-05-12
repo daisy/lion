@@ -6,7 +6,7 @@ class TranslateStrings(TranslationPage):
         self.section = "main"
         self.textbox_columns = 64
         self.textbox_rows = 3
-        self.instructions = "Enter the translation:"
+        self.instructions = "Enter the translation and press save:"
         self.about = "This is the main page.  All the strings to be translated\
          for the AMIS interface are on this page."
             
@@ -26,12 +26,13 @@ class TranslateStrings(TranslationPage):
             "eng_US.remarks"]
         
         request = """SELECT %(fields)s FROM %(table)s, eng_US WHERE %(table)s.\
-            xmlid=eng_US.xmlid AND (%(table)s.role="STRING" OR \
-                    %(table)s.role="CONTROL" OR %(table)s.role="DIALOG" OR \
-                    %(table)s.role="MENUITEM") %(where_flags)s""" % \
+            xmlid=eng_US.xmlid AND %(table)s.translate=1 AND \
+            (%(table)s.role="STRING" OR %(table)s.role="CONTROL" OR \
+            %(table)s.role="DIALOG" OR %(table)s.role="MENUITEM") \
+            %(where_flags)s""" % \
             {"fields": ",".join(dbfields), "table": table, 
                 "where_flags": textflags_sql}
-
+        print request
         db = connect_to_lion_db("ro")
         cursor=db.cursor()
         cursor.execute(request)

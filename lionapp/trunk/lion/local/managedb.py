@@ -116,7 +116,9 @@ die just yet."""
     def strings(self):
         """Export strings to stdout"""
         self.trace_msg("Export strings to stdout")
-        self.execute_query("""SELECT textstring FROM daisyfor_amisl10n.eng_US where role="STRING" """)
+        self.execute_query("""SELECT textstring FROM daisyfor_amisl10n.eng_US \
+            where (role="STRING" or role="MENUITEM" or role="DIALOG" or \
+            role="CONTROL") and translate=1""")
         strings = self.cursor.fetchall()
         print """<?xml version="1.0"?>\n<strings>"""
         for string in strings:
