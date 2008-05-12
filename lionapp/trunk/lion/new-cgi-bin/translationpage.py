@@ -14,7 +14,8 @@ class TranslationPage(translate.translate):
     warning_links = None
     warning_message = ""
     check_conflict = False
-    
+    show_no_conflicts = False
+    prefix = ""
     def index(self, view):
         """Show the big table of translate-able items"""
         self.last_view = view
@@ -22,7 +23,6 @@ class TranslationPage(translate.translate):
         if user == None:
             return error.error().respond()
         self.user = user
-        
         self.language = user["languages.langname"]
         self.view_description = VIEW_DESCRIPTIONS[view]
         self.form, self.count = self.make_table(view)
@@ -33,14 +33,14 @@ class TranslationPage(translate.translate):
         return self.index(viewfilter)
     change_view.exposed = True
     
-    def save_string(self, translation, remarks, status, xmlid, langid):
+    def save_string(self, translation, remarks, status, xmlid, langid, prefix):
         table = langid.replace("-", "_")
         db = util.connect_to_lion_db("rw")
         cursor = db.cursor()
         request = """UPDATE %(table)s SET textflag="%(status)s", \
             textstring="%(translation)s", remarks="%(remarks)s" WHERE \
             xmlid="%(xmlid)s" """ % \
-            {"table": table, "status": status, "translation": translation, \
+            {"table": table, "status": status, "translation": prefix + translation, \
                 "remarks": remarks, "xmlid": xmlid}
         cursor.execute(request)
         cursor.close()

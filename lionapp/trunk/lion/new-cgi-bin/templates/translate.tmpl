@@ -9,6 +9,7 @@ Template variables:
 	check_conflict = if True, the check conflict button will appear
 	warning_links = a list of links to go along with a warning
 	warning_message = a warning message
+	show_no_conflicts = if True, show a message area that says "no conflicts"
 *#
 
 #from xhtml import xhtml
@@ -20,7 +21,7 @@ AMIS translation for $language: $section section
 <h1>$title</h1>
 <div id="navigation">
 	<a href="../TranslateStrings?view=all">Translate strings</a> | 
-	Assign keyboard shortcuts | 
+	<a href="../ChooseAccelerators?view=all">Assign keyboard shortcuts</a> | 
 	<a href="../ChooseMnemonics?view=all">Choose mnemonics</a> (single-letter shortcuts)
 </div>
 
@@ -42,10 +43,12 @@ AMIS translation for $language: $section section
 <br/>
 
 #if $check_conflict
+<p>When you have finished with all items, be sure to press the <em>Check for Conflicts</em> button</p>
 <form action="check_conflicts"><input type="submit" value="Check for conflicts"/></form>	
+<br/>
 #end if
 
-#if $warning_links != None or ($warning_message != None and len($warning_message) > 0)
+#if ($warning_links != None and len($warning_links) > 0) or ($warning_message != None and len($warning_message) > 0)
 <div class="warning">
 	<h2>Warning!</h2>
 	#if $warning_links != None and len($warning_links) > 0
@@ -60,6 +63,12 @@ AMIS translation for $language: $section section
 	#if $warning_message != None and len($warning_message) > 0
 		<p>$warning_message</p>
 	#end if
+</div>
+#end if
+
+#if $show_no_conflicts
+<div class="message">
+	<p>No conflicts</p>
 </div>
 #end if
 

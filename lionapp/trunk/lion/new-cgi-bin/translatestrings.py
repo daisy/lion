@@ -8,7 +8,7 @@ class TranslateStrings(TranslationPage):
         self.section = "main"
         self.textbox_columns = 64
         self.textbox_rows = 3
-        self.instructions = "Enter the translation and press save:"
+        self.instructions = "Enter the translation below."
         self.about = "This is the main page.  All the strings to be translated\
          for the AMIS interface are on this page."
         self.warning_links = None
@@ -16,9 +16,6 @@ class TranslateStrings(TranslationPage):
         self.warning_message = None
         #this is weird but necessary .. otherwise cheetah complains
         TranslationPage.__init__(self)
-        
-        # the other pages (mnemonics, accelerators) will need this sql:
-        #"accelerators": """ and %(table)s.role="ACCELERATOR" """}
     
     def make_table(self, view_filter):
         """Make the form for main page"""

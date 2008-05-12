@@ -16,11 +16,10 @@ class ChooseMnemonics(TranslationPage):
         self.section = "mnemonics"
         self.textbox_columns = 10
         self.textbox_rows = 1
-        self.instructions = "Enter a single letter and press save:"
+        self.instructions = "Enter a single letter."
         self.about = "This is the mnemonics page.  Mnemonics are shortcut \
             letters in a menu item or button.  Each item in a group must have \
-            a unique mnemonic.  When you have finished with all items, be sure to \
-            press the <em>Check for Conflicts</em> button"
+            a unique mnemonic."
         self.check_conflict = True
         #this is weird but necessary .. otherwise cheetah complains
         TranslationPage.__init__(self)    
@@ -136,5 +135,6 @@ class ChooseMnemonics(TranslationPage):
                 conflict_found = True
         cursor.close()
         db.close()
+        self.show_no_conflicts = not conflict_found
         return self.index(self.last_view)
     check_conflicts.exposed = True

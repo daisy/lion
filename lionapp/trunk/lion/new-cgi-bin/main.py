@@ -6,6 +6,7 @@ os.sys.path.append("./templates")
 import util
 import translatestrings
 import choosemnemonics
+import chooseaccelerators
 from templates import login, mainmenu, error, xhtml
 
 class Login(login.login):
@@ -45,7 +46,7 @@ root = Login()
 root.MainMenu = MainMenu()
 root.TranslateStrings = translatestrings.TranslateStrings()
 root.ChooseMnemonics = choosemnemonics.ChooseMnemonics()
-#root.ChooseAccelerators = ChooseAccelerators()
+root.ChooseAccelerators = chooseaccelerators.ChooseAccelerators()
 
 app = cherrypy.tree.mount(root, script_name='/')
 

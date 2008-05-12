@@ -10,21 +10,27 @@ Template variables:
 	height = the height of the text box for the translation
 	langid = the id of the language being translated into
 *#
-
-#if $textflag == 1:
+#def prefix
+#end def
+#if $textflag == 1
 	#set $ok = "checked"
 	#set $todo = ""
-#elif $textflag == 2:
+	#set $classattr = "ok"
+#elif $textflag == 2
 	#set $todo = "checked"
 	#set $ok = ""
+	#set $classattr = "todo"
+#elif $textflag == 3
+	#set $classattr = "new"
 #end if
 <tr>
 <form action="save_string" method="POST">
 <td width="30%%">$ref_string</td>
 <td>
     <p class="comments">$our_remarks</p>
-    $instructions<br/>
-    <textarea id="$xmlid" name="translation" cols="$width" rows="$height">$textstring</textarea>
+    $instructions  Remember to <em>Save</em>.<br/>
+    $prefix
+	<textarea id="$xmlid" name="translation" cols="$width" rows="$height" class="$classattr">$textstring</textarea>
     <p class="comments">Remarks from you:</p>
 	<textarea class="remarks" name="remarks" cols="64" rows="2">$remarks</textarea>
 </td>
@@ -41,6 +47,7 @@ Template variables:
 	<input type="submit" value="Save" style="align: bottom"/>
 	<input type="hidden" name="xmlid" value="$xmlid"/>
 	<input type="hidden" name="langid" value="$langid"/>
+	<input type="hidden" name="prefix" value="$prefix"/>
 </td>
 </form>
 </tr>
