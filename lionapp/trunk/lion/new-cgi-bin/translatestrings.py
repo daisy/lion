@@ -1,4 +1,6 @@
 from translationpage import *
+from templates import tablerow
+import util
 
 class TranslateStrings(TranslationPage):
     """The page of all the strings (the main page)"""
@@ -9,9 +11,13 @@ class TranslateStrings(TranslationPage):
         self.instructions = "Enter the translation and press save:"
         self.about = "This is the main page.  All the strings to be translated\
          for the AMIS interface are on this page."
-            
+        self.warning_links = None
+        self.check_conflict = False
+        self.warning_message = None
+        #this is weird but necessary .. otherwise cheetah complains
+        TranslationPage.__init__(self)
+        
         # the other pages (mnemonics, accelerators) will need this sql:
-        #"mnemonics": """ and %(table)s.role="MNEMONIC" """, 
         #"accelerators": """ and %(table)s.role="ACCELERATOR" """}
     
     def make_table(self, view_filter):
@@ -33,22 +39,20 @@ class TranslateStrings(TranslationPage):
             {"fields": ",".join(dbfields), "table": table, 
                 "where_flags": textflags_sql}
         print request
-        db = connect_to_lion_db("ro")
+        db = util.connect_to_lion_db("ro")
         cursor=db.cursor()
         cursor.execute(request)
         rows = cursor.fetchall()
         cursor.close()
         db.close()
-
         
         form = "<table>"
         for r in rows:
-            t = Template(file="./templates/tablerow.tmpl", 
-                searchList=dict(zip(template_fields, r)))
+            t = tablerow.tablerow(searchList=dict(zip(template_fields, r)))
             t.instructions = self.instructions
     	    t.width = self.textbox_columns
     	    t.height = self.textbox_rows
     	    t.langid = self.user["users.langid"]
-            form += str(t)
+            form += t.respond()
         form += "</table>"
         return form, len(rows)

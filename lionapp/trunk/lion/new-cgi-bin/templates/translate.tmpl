@@ -1,12 +1,14 @@
 #*
 Template variables:
 
-	title = page title
 	actions = navigation links
 	about = about this page
 	view_description = about this page view
 	count = number of items being displayed
-	formrows = table rows, each containing a translation form
+	form = table rows, each containing a translation form
+	check_conflict = if True, the check conflict button will appear
+	warning_links = a list of links to go along with a warning
+	warning_message = a warning message
 *#
 
 #from xhtml import xhtml
@@ -17,12 +19,11 @@ AMIS translation for $language: $section section
 #def body
 <h1>$title</h1>
 <div id="navigation">
-## each link is separated by a vertical line
-#if $actions != None
-#set $list = " | ".join($actions)
-$list
-#end if
+	<a href="../TranslateStrings?view=all">Translate strings</a> | 
+	Assign keyboard shortcuts | 
+	<a href="../ChooseMnemonics?view=all">Choose mnemonics</a> (single-letter shortcuts)
 </div>
+
 <div class="description">
 	<p>$about</p>
 	<p>Showing $view_description ($count items)</p>
@@ -39,5 +40,30 @@ $list
     </form>
 </div>
 <br/>
+
+#if $check_conflict
+<form action="check_conflicts"><input type="submit" value="Check for conflicts"/></form>	
+#end if
+
+#if $warning_links != None or ($warning_message != None and len($warning_message) > 0)
+<div class="warning">
+	<h2>Warning!</h2>
+	#if $warning_links != None and len($warning_links) > 0
+		<h3>Conflicts found:</h3>
+		<ul>
+		#for $link in $warning_links
+			<li>There is a conflict in <a href="#$link">this group</a></li>
+		#end for
+		</ul>
+	#end if
+
+	#if $warning_message != None and len($warning_message) > 0
+		<p>$warning_message</p>
+	#end if
+</div>
+#end if
+
+## the big table
 <div>$form</div>
+
 #end def

@@ -1,49 +1,32 @@
-from util import *
-from Cheetah.Template import Template
-os.sys.path.append("./templates")
-import translate
+import util
+from templates import translate, error
 
 VIEW_DESCRIPTIONS = {"all": "all items", 
     "newtodo": "all items marked new or to-do", 
     "new": "all new items", 
     "todo": "all to-do items"}
 
-#TODO: make this have "translate.tmpl" as its base class and avoid
-#the redundant t.attribute value-setting
-class TranslationPage():
+class TranslationPage(translate.translate):
     """The base class for a page of items to be translated"""
-    view_description = None
-    about = None
-    title = None
-    section = None
-    language = None
-    user = None
-    textbox_columns = 0
-    textbox_rows = 0
-    instructions = None
-    roles_sql = None
     last_view = None
+    roles_sql = None
+    user = None
+    warning_links = None
+    warning_message = ""
+    check_conflict = False
     
     def index(self, view):
         """Show the big table of translate-able items"""
         self.last_view = view
-        user = get_user()
+        user = util.get_user()
         if user == None:
-            return Template(file="error.tmpl")
-        self.language = user["languages.langname"]
+            return error.error().respond()
         self.user = user
+        
+        self.language = user["languages.langname"]
         self.view_description = VIEW_DESCRIPTIONS[view]
-        t = Template(file="./templates/translate.tmpl")
-        t.actions = ("<a href=\"../TranslateStrings?view=all\">Translate AMIS strings</a>", 
-            "Assign AMIS keyboard shortcuts",
-            "<a href=\"../ChooseMnemonics?view=all\">Choose mnemonics</a> \
-                (single-letter shortcuts)")
-        t.about = self.about
-        t.language = self.language
-        t.form, t.count = self.make_table(view)
-        t.view_description = self.view_description
-        t.section = self.section
-        return str(t)
+        self.form, self.count = self.make_table(view)
+        return self.respond()
     index.exposed = True
     
     def change_view(self, viewfilter):
@@ -52,7 +35,7 @@ class TranslationPage():
     
     def save_string(self, translation, remarks, status, xmlid, langid):
         table = langid.replace("-", "_")
-        db = connect_to_lion_db("rw")
+        db = util.connect_to_lion_db("rw")
         cursor = db.cursor()
         request = """UPDATE %(table)s SET textflag="%(status)s", \
             textstring="%(translation)s", remarks="%(remarks)s" WHERE \

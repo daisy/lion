@@ -17,3 +17,4 @@ input { margin-left: 2em; border: thin black solid; }
 .warning {font-weight: bold !important; color: red !important; background-color: yellow !important; border: thin solid red !important;}
 #header img {float: right; margin-right: 3em; margin-top: -1em;}
 #header {font-size: smaller; border-bottom: thin black solid; padding-bottom: 2em;}
+em {font-weight: bold;}

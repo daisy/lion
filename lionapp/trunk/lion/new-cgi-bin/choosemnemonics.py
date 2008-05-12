@@ -1,4 +1,6 @@
 from translationpage import *
+from templates import tablerow
+import util
 
 class ChooseMnemonics(TranslationPage):
     """The page of all the strings (the main page)"""
@@ -12,12 +14,16 @@ class ChooseMnemonics(TranslationPage):
     
     def __init__(self):
         self.section = "mnemonics"
-        self.textbox_columns = 64
-        self.textbox_rows = 3
+        self.textbox_columns = 10
+        self.textbox_rows = 1
         self.instructions = "Enter a single letter and press save:"
         self.about = "This is the mnemonics page.  Mnemonics are shortcut \
             letters in a menu item or button.  Each item in a group must have \
-            a unique mnemonic."    
+            a unique mnemonic.  When you have finished with all items, be sure to \
+            press the <em>Check for Conflicts</em> button"
+        self.check_conflict = True
+        #this is weird but necessary .. otherwise cheetah complains
+        TranslationPage.__init__(self)    
 
     def make_table(self, view_filter):
         """Make the form for main page"""
@@ -31,7 +37,7 @@ class ChooseMnemonics(TranslationPage):
             "eng_US.textstring", "eng_US.role"]
         
         request = "SELECT DISTINCT mnemonicgroup FROM %s WHERE mnemonicgroup >= 0" % table
-        db = connect_to_lion_db("ro")
+        db = util.connect_to_lion_db("ro")
         cursor = db.cursor()
         cursor.execute(request)
         mnem_groups = cursor.fetchall()
@@ -66,12 +72,12 @@ class ChooseMnemonics(TranslationPage):
                         % {"item": self.ROLE_DESCRIPTIONS[data["role"]], 
                             "example": eng_ref}
                 
-                    t = Template(file="./templates/tablerow.tmpl", searchList=data)
+                    t = tablerow.tablerow(searchList=data)
                     t.instructions = self.instructions
                     t.width = self.textbox_columns
                     t.height = self.textbox_rows
                     t.langid = self.user["users.langid"]
-                    form += str(t)
+                    form += t.respond()
                 form += "</table>"
                 group_number += 1
         #end for
@@ -93,7 +99,6 @@ class ChooseMnemonics(TranslationPage):
             return ""
         word = row[0]
         pos = word.lower().find(letter.lower())
-        print "word = %s, letter = %s" % (word, letter)
         if pos == -1:
             return word + ("""(<span style="text-decoration: underline">%s\
                 </span>)""" % letter)
@@ -102,3 +107,34 @@ class ChooseMnemonics(TranslationPage):
             return word[0:pos] + ("""<span style="text-decoration: \
                 underline">%s</span>""" % word[pos]) + word[pos+1:len(word)]
     
+    def check_conflicts(self):
+        """check the mnemonic groups for conflicts"""
+        table = self.user["users.langid"].replace("-", "_")
+        request = "SELECT DISTINCT mnemonicgroup FROM %s WHERE mnemonicgroup >= 0" % table
+        db = util.connect_to_lion_db("ro")
+        cursor = db.cursor()
+        cursor.execute(request)
+        rows = cursor.fetchall()
+        # for each mnemonic group, make sure that each entry is unique
+        conflict_found = False
+        self.warning_links = []
+        for r in rows:
+            group_id = r[0]
+            #first get all the items in this mnemonic group
+            request = "SELECT id FROM %s WHERE mnemonicgroup = %d" % (table, group_id)
+            cursor.execute(request)
+            first_set = cursor.fetchall()
+            #then get all unique textstrings from this mnemonic group.  
+            #this relies on MYSQL being case-insensitive in its comparisons.
+            request = "SELECT DISTINCT textstring FROM %s WHERE mnemonicgroup = %d" % (table, group_id)
+            cursor.execute(request)
+            second_set = cursor.fetchall()
+            #if they returned different numbers of results, then probably a mnemonic was repeated
+            if len(first_set) != len(second_set):
+                group_link = "group_%d" % group_id
+                self.warning_links.append(group_link)
+                conflict_found = True
+        cursor.close()
+        db.close()
+        return self.index(self.last_view)
+    check_conflicts.exposed = True
