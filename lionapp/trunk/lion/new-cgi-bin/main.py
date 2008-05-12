@@ -54,7 +54,7 @@ root = Login()
 root.MainMenu = MainMenu()
 root.TranslateStrings = TranslateStrings()
 root.ChooseMnemonics = ChooseMnemonics()
-#root.show_accelerators_page = show_accelerators_page()
+#root.ChooseAccelerators = ChooseAccelerators()
 
 app = cherrypy.tree.mount(root, script_name='/')
 

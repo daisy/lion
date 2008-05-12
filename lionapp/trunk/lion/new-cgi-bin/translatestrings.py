@@ -13,7 +13,7 @@ class TranslateStrings(TranslationPage):
         # the other pages (mnemonics, accelerators) will need this sql:
         #"mnemonics": """ and %(table)s.role="MNEMONIC" """, 
         #"accelerators": """ and %(table)s.role="ACCELERATOR" """}
-
+    
     def make_table(self, view_filter):
         """Make the form for main page"""
         table = self.user["users.langid"].replace("-", "_")
@@ -49,7 +49,6 @@ class TranslateStrings(TranslationPage):
     	    t.width = self.textbox_columns
     	    t.height = self.textbox_rows
     	    t.langid = self.user["users.langid"]
-    	    t.handler = self.handler
             form += str(t)
         form += "</table>"
         return form, len(rows)

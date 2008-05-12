@@ -12,7 +12,6 @@ VIEW_DESCRIPTIONS = {"all": "all items",
 #the redundant t.attribute value-setting
 class TranslationPage():
     """The base class for a page of items to be translated"""
-    handler = "save_string"
     view_description = None
     about = None
     title = None
@@ -47,6 +46,10 @@ class TranslationPage():
         return str(t)
     index.exposed = True
     
+    def change_view(self, viewfilter):
+        return self.index(viewfilter)
+    change_view.exposed = True
+    
     def save_string(self, translation, remarks, status, xmlid, langid):
         table = langid.replace("-", "_")
         db = connect_to_lion_db("rw")
@@ -69,7 +72,8 @@ class TranslationPage():
         elif view_filter =="todo":
             sql = "and %s.textflag=2" % table
         elif view_filter == "newtodo":
-            sql = "and (%s.textflag=2 or %s.textflag=3)" % table
+            sql = "and (%(table)s.textflag=2 or %(table)s.textflag=3)" % \
+                {"table": table}
         else:
             sql = ""
         return sql

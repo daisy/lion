@@ -40,8 +40,6 @@ class ChooseMnemonics(TranslationPage):
         num_rows = 0
         # each mnemonic group gets its own section
         for g in mnem_groups:
-            # the title of each section
-            form += """<h2 id="group_%s">GROUP #%s</h2>""" % (str(g[0]), str(group_number))
             request = """SELECT %(fields)s FROM %(table)s, eng_US WHERE %(table)s.\
                 xmlid=eng_US.xmlid AND %(table)s.mnemonicgroup=%(mnem_group)d \
                  AND %(table)s.role="MNEMONIC" %(where_flags)s""" % \
@@ -51,29 +49,31 @@ class ChooseMnemonics(TranslationPage):
             cursor.execute(request)
             rows = cursor.fetchall()
             num_rows += len(rows)
-            form += "<table>"
-            for r in rows:
-                data = dict(zip(template_fields, r))
-                local_ref = self.build_mnemonic_string(cursor, table,
-                    data["target"], data["textstring"])
-                eng_ref = self.build_mnemonic_string(cursor, "eng_US", 
-                        data["target"], data["ref_string"])
-                # override some values
-                data["ref_string"] = local_ref
-                data["our_remarks"] = "This is for a %(item)s.  In English, it is \
-                    used like this: \"%(example)s\"" \
-                    % {"item": self.ROLE_DESCRIPTIONS[data["role"]], 
-                        "example": eng_ref}
+            if len(rows) > 0:
+                # the title of each section
+                form += """<h2 id="group_%s">GROUP #%s</h2>""" % (str(g[0]), str(group_number))
+                form += "<table>"
+                for r in rows:
+                    data = dict(zip(template_fields, r))
+                    local_ref = self.build_mnemonic_string(cursor, table,
+                        data["target"], data["textstring"])
+                    eng_ref = self.build_mnemonic_string(cursor, "eng_US", 
+                            data["target"], data["ref_string"])
+                    # override some values
+                    data["ref_string"] = local_ref
+                    data["our_remarks"] = "This is for a %(item)s.  In English, it is \
+                        used like this: \"%(example)s\"" \
+                        % {"item": self.ROLE_DESCRIPTIONS[data["role"]], 
+                            "example": eng_ref}
                 
-                t = Template(file="./templates/tablerow.tmpl", searchList=data)
-                t.instructions = self.instructions
-                t.width = self.textbox_columns
-                t.height = self.textbox_rows
-                t.langid = self.user["users.langid"]
-                t.handler = self.handler
-                form += str(t)
-            form += "</table>"
-            group_number += 1
+                    t = Template(file="./templates/tablerow.tmpl", searchList=data)
+                    t.instructions = self.instructions
+                    t.width = self.textbox_columns
+                    t.height = self.textbox_rows
+                    t.langid = self.user["users.langid"]
+                    form += str(t)
+                form += "</table>"
+                group_number += 1
         #end for
         cursor.close()
         db.close()
