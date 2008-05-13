@@ -10,27 +10,27 @@ class FillRC():
         self.session = DBSession(True, False, "amis")
         self.table = self.session.make_table_name(langid)
     
-    def get_textstring(self, strid):
+    def __get_textstring(self, strid):
         self.session.execute_query("SELECT textstring FROM %s WHERE xmlid='%s'" % (self.table, strid))
         row = self.session.cursor.fetchone()
         if row == None or len(row) == 0: return None
         else: return row[0]
     
-    def get_mnemonic(self, strid):
+    def __get_mnemonic(self, strid):
         self.session.execute_query("SELECT textstring FROM %s WHERE role='MNEMONIC' AND target='%s'" \
             % (self.table, strid))
         row = self.session.cursor.fetchone()
         if row == None or len(row) == 0: return None
         else: return row[0]
     
-    def get_accelerator(self, strid):
+    def __get_accelerator(self, strid):
         self.session.execute_query("SELECT textstring FROM %s WHERE role='ACCELERATOR' AND target='%s'" \
             % (self.table, strid))
         row = self.session.cursor.fetchone()
         if row == None or len(row) == 0: return None
         else: return row[0]
     
-    def apply_mnemonic(self, caption, mnemonic):
+    def __apply_mnemonic(self, caption, mnemonic):
         if mnemonic == None or len(mnemonic) == 0:
             return caption
         pos = caption.lower().find(mnemonic.lower())
@@ -40,18 +40,23 @@ class FillRC():
             return "%s&%s" % (caption[0:pos], caption[pos::])
     
     def menu(self, strid, accel=True):
-        caption = self.get_textstring(strid)
+        """Build a menu label"""
+        caption = self.__get_textstring(strid)
         if caption == None or len(caption) == 0:
             self.session.warn("No caption for %s" % strid)
             return ""
-        mnemonic = self.get_mnemonic(strid)
-        caption = self.apply_mnemonic(caption, mnemonic)
+        mnemonic = self.__get_mnemonic(strid)
+        caption = self.__apply_mnemonic(caption, mnemonic)
         if accel == True:
-            accelerator = self.get_accelerator(strid)    
+            accelerator = self.__get_accelerator(strid)    
             if accelerator != None and len(accelerator) > 0:
                 caption += "\\t%s" % accelerator
         return caption
 
+    def s(self, strid):
+        """Get a string (including mnemonic, if exists)"""
+        return menu(strid, False)
+    
 
 def main():
     # these are template keywords

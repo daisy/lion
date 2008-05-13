@@ -1,5 +1,4 @@
 #import amis_export
-
 // Microsoft Visual C++ generated resource script.
 //
 $ms_include "resource.h"
@@ -261,136 +260,136 @@ END
 
 IDD_SEARCHDAISY DIALOGEX 0, 0, 312, 287
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Search for DAISY Books"
+CAPTION "$rc.s("t167")"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    LTEXT           "You can search your computer for DAISY books. Enter a path or browse for a folder to search, then press Search to begin searching.",IDC_SEARCHINSTRUCTIONS,7,7,298,30
+    LTEXT           "$rc.s("t168")",IDC_SEARCHINSTRUCTIONS,7,7,298,30
     EDITTEXT        IDC_SEARCHPATH,7,39,245,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Browse...",IDC_BROWSE,260,39,45,13
-    PUSHBUTTON      "&Search",IDC_STARTSEARCH,103,63,50,15
-    CTEXT           "Ready",IDC_SEARCHING,7,92,298,13,NOT WS_VISIBLE
+    PUSHBUTTON      "$rc.s("t260")",IDC_BROWSE,260,39,45,13
+    PUSHBUTTON      "$rc.s("t170")",IDC_STARTSEARCH,103,63,50,15
+    CTEXT           "$rc.s("t176")",IDC_SEARCHING,7,92,298,13,NOT WS_VISIBLE
     LISTBOX         IDC_FILESFOUND,7,105,298,156,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "&Open",IDC_OPENBOOK,103,266,50,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,158,266,50,14
-    PUSHBUTTON      "S&top",IDC_STOPSEARCH,158,63,50,15
+    PUSHBUTTON      "$rc.s("t183")",IDC_OPENBOOK,103,266,50,14
+    PUSHBUTTON      "$rc.s("t264")",IDCANCEL,158,266,50,14
+    PUSHBUTTON      "$rc.s("t173")",IDC_STOPSEARCH,158,63,50,15
 END
 
 IDD_GOTOPAGE DIALOGEX 0, 0, 154, 73
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Go To Page"
+CAPTION "$rc.s("t231")"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    LTEXT           "Enter the number or label of the page that you want to go to.",IDC_GOTOPAGE_CAPTION,7,7,140,20
+    LTEXT           "$rc.s("t236")",IDC_GOTOPAGE_CAPTION,7,7,140,20
     EDITTEXT        IDC_PAGENUM,7,27,86,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,23,52,50,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,82,52,50,14
+    DEFPUSHBUTTON   "$rc.s("t262")",IDOK,23,52,50,14
+    PUSHBUTTON      "$rc.s("t264")",IDCANCEL,82,52,50,14
 END
 
 IDD_FIND DIALOGEX 0, 0, 192, 78
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Find in Text"
+CAPTION "$rc.s("t146")"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    LTEXT           "Search the text of the book in either direction",IDC_FIND_DESCRIPTION,7,7,178,8
+    LTEXT           "$rc.s("t147")",IDC_FIND_DESCRIPTION,7,7,178,8
     EDITTEXT        IDC_SEARCHSTRING,7,22,178,13,ES_AUTOHSCROLL
-    CONTROL         "Find previous",IDC_FINDPREVIOUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,41,58,10
-    DEFPUSHBUTTON   "OK",IDOK,42,57,50,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,99,57,50,14
+    CONTROL         "$rc.s("t152")",IDC_FINDPREVIOUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,41,58,10
+    DEFPUSHBUTTON   "$rc.s("t262")",IDOK,42,57,50,14
+    PUSHBUTTON      "$rc.s("t264")",IDCANCEL,99,57,50,14
 END
 
 IDD_CDSEARCH DIALOGEX 0, 0, 253, 180
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Multiple books found"
+CAPTION "$rc.s("t154")"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    LTEXT           "More than one book was found on this CD. Please select a book from the list below.",IDC_MULTIVOLCD_INSTRUCTIONS,7,7,239,25
+    LTEXT           "$rc.s("t155")",IDC_MULTIVOLCD_INSTRUCTIONS,7,7,239,25
     LISTBOX         IDC_BOOKLIST,7,32,239,125,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "&Open",IDC_OPENBOOK,73,159,50,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,130,159,50,14
+    PUSHBUTTON      "$rc.s("t157")",IDC_OPENBOOK,73,159,50,14
+    PUSHBUTTON      "$rc.s("t264")",IDCANCEL,130,159,50,14
 END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 179, 122
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "About AMIS"
+CAPTION "$rc.s("161")"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     ICON            IDI_AMIS,IDC_AMISICON,11,17,21,20
-    LTEXT           "AMIS: \nAdaptive Multimedia Information System",IDC_AMISNAME,40,10,132,31,SS_NOPREFIX
-    LTEXT           "Version 3.0 beta 2",IDC_VERSION,39,44,128,8
-    LTEXT           "Release Date: 14 May 2008",IDC_VERSIONNOTE,40,59,124,11
-    LTEXT           "Copyright © 2008 DAISY for All",IDC_COPYRIGHT,40,75,132,16
-    DEFPUSHBUTTON   "OK",IDOK,65,101,50,14,WS_GROUP
+    LTEXT           "$rc.s("t163")",IDC_AMISNAME,40,10,132,31,SS_NOPREFIX
+    LTEXT           "$rc.s("t164")",IDC_VERSION,39,44,128,8
+    LTEXT           "$rc.s("t165")",IDC_VERSIONNOTE,40,59,124,11
+    LTEXT           "$rc.s("t166")",IDC_COPYRIGHT,40,75,132,16
+    DEFPUSHBUTTON   "$rc.s("t262")",IDOK,65,101,50,14,WS_GROUP
 END
 
 IDD_PUBLICATIONSUMMARY DIALOGEX 0, 0, 322, 186
 STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Publication Summary"
+CAPTION "$rc.s("t238")"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
-    LTEXT           "Information about this publication and your current position:",IDC_PUBLICATIONSUMMARYCAPTION,6,7,309,17
+    LTEXT           "$rc.s("t214")",IDC_PUBLICATIONSUMMARYCAPTION,6,7,309,17
     CONTROL         "",IDC_SUMMARYLIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,6,25,309,137
-    DEFPUSHBUTTON   "OK",IDOK,137,164,50,14
+    DEFPUSHBUTTON   "$rc.s("t262")",IDOK,137,164,50,14
 END
 
 IDD_OPENURL DIALOGEX 0, 0, 265, 63
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Open URL"
+CAPTION "$rc.s("t368")"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Enter the URL of the book you want to open:",IDC_OPENURL_CAPTION,7,7,146,8
+    LTEXT           "$rc.s("t369")",IDC_OPENURL_CAPTION,7,7,146,8
     EDITTEXT        IDC_URL,7,26,251,12,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,79,42,50,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,133,42,50,14
+    DEFPUSHBUTTON   "$rc.s("t262")",IDOK,79,42,50,14
+    PUSHBUTTON      "$rc.s("t264")",IDCANCEL,133,42,50,14
 END
 
 IDD_PREFERENCES DIALOGEX 0, 0, 256, 223
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Preferences"
+CAPTION "$rc.s("t218")"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "Use self-voicing",IDC_ISSELFVOICING,"Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP,7,7,241,10
-    LTEXT           "Select TTS voice:",IDC_SELTTSLABEL,7,22,242,8
+    CONTROL         "$rc.s("t220")",IDC_ISSELFVOICING,"Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP,7,7,241,10
+    LTEXT           "$rc.s("t221")",IDC_SELTTSLABEL,7,22,242,8
     COMBOBOX        IDC_TTSVOICES,7,35,108,88,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Highlight text as it is read aloud",IDC_HIGHLIGHTTEXT,
+    CONTROL         "$rc.s("t346")",IDC_HIGHLIGHTTEXT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,59,242,10
-    CONTROL         "Load the most recently read book on startup",IDC_LOADLASTBOOK,
+    CONTROL         "$rc.s("t225")",IDC_LOADLASTBOOK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,76,242,10
-    CONTROL         "Start in basic view mode",IDC_STARTINBASICVIEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,94,242,10
-    CONTROL         "Pause audio when switching applications",IDC_PAUSEONLOSTFOCUS,
+    CONTROL         "$rc.s("t223")",IDC_STARTINBASICVIEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,94,242,10
+    CONTROL         "$rc.s("t347")",IDC_PAUSEONLOSTFOCUS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,112,242,10
-    CONTROL         "Disable the screensaver while reading",IDC_DISABLESCREENSAVER,
+    CONTROL         "$rc.s("t348")",IDC_DISABLESCREENSAVER,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,130,242,10
-    LTEXT           "You are currently using AMIS in:",IDC_CURRLANG,7,153,242,8
+    LTEXT           "$rc.s("t349")",IDC_CURRLANG,7,153,242,8
     COMBOBOX        IDC_INSTALLEDLANGUAGES,7,166,108,88,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     ICON            IDI_LANGICON,IDC_LANGICON,127,164,20,20
-    DEFPUSHBUTTON   "OK",IDOK,57,202,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,112,202,50,14
+    DEFPUSHBUTTON   "$rc.s("t262")",IDOK,57,202,50,14
+    PUSHBUTTON      "$rc.s("t264")",IDCANCEL,112,202,50,14
 END
 
 IDD_TEXTSTYLE DIALOGEX 0, 0, 172, 149
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Text Style"
+CAPTION "$rc.s("t358")"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Sidebar font:",IDC_FONTLABEL,7,7,155,12
+    LTEXT           "$rc.s("t360")",IDC_FONTLABEL,7,7,155,12
     COMBOBOX        IDC_FONT,7,20,155,63,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Highlighted text color:",IDC_HIGHLIGHTFOREGROUNDLABEL,7,45,155,11
+    LTEXT           "$rc.s("t362")",IDC_HIGHLIGHTFOREGROUNDLABEL,7,45,155,11
     COMBOBOX        IDC_HIGHLIGHTFOREGROUND,7,57,155,63,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Highlight background color:",IDC_HIGHLIGHTBACKGROUNDLABEL,7,83,156,8
+    LTEXT           "$rc.s("t364")",IDC_HIGHLIGHTBACKGROUNDLABEL,7,83,156,8
     COMBOBOX        IDC_HIGHLIGHTBACKGROUND,7,98,156,52,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,30,128,50,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,94,128,50,14
+    DEFPUSHBUTTON   "$rc.s("t262")",IDOK,30,128,50,14
+    PUSHBUTTON      "$rc.s("t264")",IDCANCEL,94,128,50,14
 END
 
 IDD_READING_OPTIONS DIALOGEX 0, 0, 236, 191
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Reading Options"
+CAPTION "$rc.s("t187")"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "This book contains the following special types of items. Checked items will be played.  Unchecked items will be skipped.",IDC_READING_OPTIONS_INSTRUCTIONS,7,6,222,26
+    LTEXT           "$rc.s("t188")",IDC_READING_OPTIONS_INSTRUCTIONS,7,6,222,26
     LISTBOX         IDC_OPTIONS_LIST,7,33,222,134,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,65,170,50,14
-    PUSHBUTTON      "&Cancel",IDCANCEL,121,170,50,14
+    DEFPUSHBUTTON   "$rc.s("t262")",IDOK,65,170,50,14
+    PUSHBUTTON      "$rc.s("t264")",IDCANCEL,121,170,50,14
 END
 
 
@@ -510,7 +509,7 @@ END
 STRINGTABLE 
 BEGIN
     AFX_IDS_APP_TITLE       "AMIS"
-    AFX_IDS_IDLEMESSAGE     "Ready"
+    AFX_IDS_IDLEMESSAGE     "$rc.s("t280")"
 END
 
 STRINGTABLE 
@@ -532,34 +531,34 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_PROPSHT_CAPTION     "Preferences"
-    IDS_META_TITLE          "Title:"
-    IDS_META_AUTHOR         "Author:"
-    IDS_META_PUBLISHER      "Publisher:"
-    IDS_META_DESCRIPTION    "Description:"
-    IDS_META_NARRATOR       "Narrator:"
-    IDS_META_TOTAL_DURATION "Total duration:"
-    IDS_META_TOTAL_PAGES    "Total pages:"
-    IDS_META_DATE           "Date:"
-    IDS_META_FORMAT         "Format:"
+    IDS_PROPSHT_CAPTION     "NOT USED (said Preferences)"
+    IDS_META_TITLE          "$rc.s("t240")"
+    IDS_META_AUTHOR         "$rc.s("t241")"
+    IDS_META_PUBLISHER      "$rc.s("t242")"
+    IDS_META_DESCRIPTION    "$rc.s("t243")"
+    IDS_META_NARRATOR       "$rc.s("t351")"
+    IDS_META_TOTAL_DURATION "$rc.s("t249")"
+    IDS_META_TOTAL_PAGES    "$rc.s("t352")"
+    IDS_META_DATE           "$rc.s("t353")"
+    IDS_META_FORMAT         "$rc.s("t354")"
 END
 
 STRINGTABLE 
 BEGIN
-    IDS_SELFOLDER_TITLE     "Select a Folder"
-    IDS_SELFOLDER_INSTR     "Select a folder from the directory below."
+    IDS_SELFOLDER_TITLE     "$rc.s("t282")"
+    IDS_SELFOLDER_INSTR     "$rc.s("t283")"
 END
 
 STRINGTABLE 
 BEGIN
-    IDS_FOLDERDOESNOTEXIST  "The folder %s does not exist. Do you want the folder to be created?"
+    IDS_FOLDERDOESNOTEXIST  "$rc.s("t285")"
 END
 
 STRINGTABLE 
 BEGIN
-    IDS_FOLDERINVALID       "This folder name is invalid. Please choose another."
-    IDS_FOLDERCANTBECREATED "This folder can not be created. Please double check."
-    IDS_FILE_OPEN_DAISY_BOOKS "DAISY Books"
+    IDS_FOLDERINVALID       "$rc.s("t286")"
+    IDS_FOLDERCANTBECREATED "$rc.s("t287")"
+    IDS_FILE_OPEN_DAISY_BOOKS "$rc.s("t284")"
 END
 
 STRINGTABLE 
@@ -574,20 +573,20 @@ END
 
 STRINGTABLE 
 BEGIN
-    ID_AMIS_BIGGER_FONT     "Increase the font size."
-    ID_AMIS_SMALLER_FONT    "Reduce the font size."
-    ID_AMIS_PLAYPAUSE       "Start or pause synchronized playback."
-    ID_AMIS_ESCAPE          "Jump out of the currently playing item or structure."
-    ID_AMIS_FASTER          "Increase the playback rate."
-    ID_AMIS_SLOWER          "Slow down the playback rate."
-    ID_AMIS_RESET_SPEED     "Reset the playback rate to normal."
-    ID_AMIS_INCREASE_VOLUME "Gradually raise the volume."
-    ID_AMIS_DECREASE_VOLUME "Gradually lower the volume."
-    ID_AMIS_PREVIOUS_SECTION "Go to the previous section."
-    ID_AMIS_NEXT_SECTION    "Go to the next section."
-    ID_AMIS_PREVIOUS_PHRASE "Go to the previous phrase."
-    ID_AMIS_NEXT_PHRASE     "Go to the next phrase."
-    ID_AMIS_PREVIOUS_PAGE   "Go to the previous page."
+    ID_AMIS_BIGGER_FONT     "$rc.s("t39")"
+    ID_AMIS_SMALLER_FONT    "$rc.s("t338")"
+    ID_AMIS_PLAYPAUSE       "$rc.s("t48")"
+    ID_AMIS_ESCAPE          "$rc.s("t56")"
+    ID_AMIS_FASTER          "$rc.s("t60")"
+    ID_AMIS_SLOWER          "$rc.s("t64")"
+    ID_AMIS_RESET_SPEED     "$rc.s("t68")"
+    ID_AMIS_INCREASE_VOLUME "$rc.s("t72")"
+    ID_AMIS_DECREASE_VOLUME "$rc.s("t76")"
+    ID_AMIS_PREVIOUS_SECTION "$rc.s("t83")"
+    ID_AMIS_NEXT_SECTION    "$rc.s("t87")"
+    ID_AMIS_PREVIOUS_PHRASE "$rc.s("t95")"
+    ID_AMIS_NEXT_PHRASE     "$rc.s("t98")"
+    ID_AMIS_PREVIOUS_PAGE   "$rc.s("t101")"
 END
 
 STRINGTABLE 
