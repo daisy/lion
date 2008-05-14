@@ -1,8 +1,9 @@
 import sys
-import MySQLdb
-import cherrypy
 import os
 os.sys.path.append("./templates")
+os.sys.path.append("/home/daisyfor/src/CherryPy-3.0.3/")
+import MySQLdb
+import cherrypy
 import util
 import translatestrings
 import choosemnemonics

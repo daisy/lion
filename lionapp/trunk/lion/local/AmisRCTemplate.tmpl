@@ -179,7 +179,7 @@ BEGIN
             MENUITEM "$rc.menu("t17")",                       ID_AMIS_RECENT_BOOKS_EMPTY, INACTIVE
         END
         MENUITEM SEPARATOR
-        MENUITEM "$rc.menu("t320")",               ID_AMIS_EXIT
+        MENUITEM "$rc.menu("t20")",               ID_AMIS_EXIT
     END
     POPUP "$rc.menu("t26", False)"
     BEGIN
@@ -207,7 +207,7 @@ BEGIN
         MENUITEM "$rc.menu("t71")",   ID_AMIS_INCREASE_VOLUME
         MENUITEM "$rc.menu("t75")", ID_AMIS_DECREASE_VOLUME
     END
-    POPUP "$rc.menu("81", False)"
+    POPUP "$rc.menu("t81", False)"
     BEGIN
         MENUITEM "$rc.menu("t82")",       ID_AMIS_PREVIOUS_SECTION
         MENUITEM "$rc.menu("t86")",         ID_AMIS_NEXT_SECTION
@@ -310,7 +310,7 @@ END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 179, 122
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "$rc.s("161")"
+CAPTION "$rc.s("t161")"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     ICON            IDI_AMIS,IDC_AMISICON,11,17,21,20
@@ -455,43 +455,43 @@ IDI_LANGICON            ICON                    "flag.ico"
 
 IDR_AMISTYPE ACCELERATORS 
 BEGIN
-    "D",            ID_AMIS_ADD_BOOKMARK,   VIRTKEY, CONTROL, NOINVERT
+    $rc.k("t118"),            ID_AMIS_ADD_BOOKMARK, $rc.masks("t118")
     "Q",            ID_AMIS_DECREASE_SECTION_DEPTH, VIRTKEY, CONTROL, NOINVERT
-    VK_DOWN,        ID_AMIS_DECREASE_VOLUME, VIRTKEY, CONTROL, NOINVERT
-    VK_DOWN,        ID_AMIS_DECREASE_UI_VOLUME, VIRTKEY, SHIFT, CONTROL, NOINVERT
-    VK_ESCAPE,      ID_AMIS_ESCAPE,         VIRTKEY, NOINVERT
-    VK_F4,          ID_AMIS_EXIT,           VIRTKEY, ALT, NOINVERT
+    $rc.k("t77"),        ID_AMIS_DECREASE_VOLUME, $rc.masks("t77")
+    $rc.k("t407"),        ID_AMIS_DECREASE_UI_VOLUME, $rc.masks("t407")
+    $rc.k("t57"),      ID_AMIS_ESCAPE,         $rc.masks("t57")
+    $rc.k("t22"),          ID_AMIS_EXIT,  $rc.masks("t22")
     VK_ADD,         ID_AMIS_FASTER,         VIRTKEY, CONTROL, NOINVERT
-    VK_OEM_PLUS,    ID_AMIS_FASTER,         VIRTKEY, CONTROL, NOINVERT
-    "F",            ID_AMIS_FIND_IN_TEXT,   VIRTKEY, CONTROL, NOINVERT
+    $rc.k("t61"),    ID_AMIS_FASTER,         $rc.masks("t61")
+    $rc.k("t111"),            ID_AMIS_FIND_IN_TEXT,   $rc.masks("t111")
     VK_F3,          ID_AMIS_FIND_NEXT_IN_TEXT, VIRTKEY, NOINVERT
     VK_F3,          ID_AMIS_FIND_PREVIOUS_IN_TEXT, VIRTKEY, SHIFT, NOINVERT
-    "N",            ID_AMIS_FOCUS_ON_SIDEBAR, VIRTKEY, CONTROL, NOINVERT
-    "T",            ID_AMIS_FOCUS_ON_TEXT,  VIRTKEY, CONTROL, NOINVERT
-    "G",            ID_AMIS_GOTO_PAGE,      VIRTKEY, CONTROL, NOINVERT
+    $rc.k("t401"),            ID_AMIS_FOCUS_ON_SIDEBAR, $rc.masks("t401")
+    $rc.k("t404"),            ID_AMIS_FOCUS_ON_TEXT,  $rc.masks("t404")
+    $rc.k("t108"),            ID_AMIS_GOTO_PAGE,      $rc.masks("t108")
     "P",            ID_AMIS_INCREASE_SECTION_DEPTH, VIRTKEY, CONTROL, NOINVERT
-    VK_UP,          ID_AMIS_INCREASE_VOLUME, VIRTKEY, CONTROL, NOINVERT
-    VK_UP,          ID_AMIS_INCREASE_UI_VOLUME, VIRTKEY, SHIFT, CONTROL, NOINVERT
-    "L",            ID_AMIS_LOAD_CD,        VIRTKEY, CONTROL, NOINVERT
-    VK_RIGHT,       ID_AMIS_NEXT_PAGE,      VIRTKEY, CONTROL, NOINVERT
-    VK_RIGHT,       ID_AMIS_NEXT_PHRASE,    VIRTKEY, NOINVERT
-    VK_DOWN,        ID_AMIS_NEXT_SECTION,   VIRTKEY, NOINVERT
-    "O",            ID_AMIS_OPEN_FILE,      VIRTKEY, CONTROL, NOINVERT
-    "U",            ID_AMIS_OPEN_URL,       VIRTKEY, CONTROL, NOINVERT
-    VK_SPACE,       ID_AMIS_PLAYPAUSE,      VIRTKEY, NOINVERT
-    VK_LEFT,        ID_AMIS_PREVIOUS_PAGE,  VIRTKEY, CONTROL, NOINVERT
-    VK_LEFT,        ID_AMIS_PREVIOUS_PHRASE, VIRTKEY, NOINVERT
-    VK_UP,          ID_AMIS_PREVIOUS_SECTION, VIRTKEY, NOINVERT
+    $rc.k("t73"),          ID_AMIS_INCREASE_VOLUME, $rc.masks("t73")
+    $rc.k("t410"),          ID_AMIS_INCREASE_UI_VOLUME, $rc.masks("t410")
+    $rc.k("t8"),            ID_AMIS_LOAD_CD,        $rc.masks("t8")
+    $rc.k("t105"),       ID_AMIS_NEXT_PAGE,      $rc.masks("t105")
+    $rc.k("t99"),       ID_AMIS_NEXT_PHRASE,    $rc.masks("t99")
+    $rc.k("t88"),        ID_AMIS_NEXT_SECTION,   $rc.masks("t88")
+    $rc.k("t4"),            ID_AMIS_OPEN_FILE,      $rc.masks("t4")
+    $rc.k("t329"),            ID_AMIS_OPEN_URL,       $rc.masks("t329")
+    $rc.k("t53"),       ID_AMIS_PLAYPAUSE,      $rc.masks("t53")
+    $rc.k("t102"),        ID_AMIS_PREVIOUS_PAGE,  $rc.masks("t102")
+    $rc.k("t96"),        ID_AMIS_PREVIOUS_PHRASE, $rc.masks("t96")
+    $rc.k("t84"),          ID_AMIS_PREVIOUS_SECTION, $rc.masks("t84")
     "E",            ID_AMIS_RESET_HIGHLIGHT_COLORS, VIRTKEY, SHIFT, CONTROL, NOINVERT
-    "0",            ID_AMIS_RESET_SPEED,    VIRTKEY, CONTROL, NOINVERT
+    $rc.k("t69"),            ID_AMIS_RESET_SPEED,    $rc.masks("t69")
     VK_F1,          ID_AMIS_SHOW_HELP_CONTENTS, VIRTKEY, NOINVERT
-    VK_OEM_MINUS,   ID_AMIS_SLOWER,         VIRTKEY, CONTROL, NOINVERT
+    $rc.k("t65"),   ID_AMIS_SLOWER,         $rc.masks("t65")
     VK_SUBTRACT,    ID_AMIS_SLOWER,         VIRTKEY, CONTROL, NOINVERT
     "F",            ID_AMIS_TOGGLE_AUDIO_CONTENT_PLAYBACK, VIRTKEY, SHIFT, CONTROL, NOINVERT
-    "G",            ID_AMIS_TOGGLE_AUDIO_SELFVOICING_PLAYBACK, VIRTKEY, SHIFT, CONTROL, NOINVERT
-    VK_F11,         ID_AMIS_TOGGLE_VIEW,    VIRTKEY, NOINVERT
-    VK_DOWN,        ID_AMIS_DECREASE_CONTENT_VOLUME, VIRTKEY, SHIFT, CONTROL, ALT, NOINVERT
-    VK_UP,          ID_AMIS_INCREASE_CONTENT_VOLUME, VIRTKEY, SHIFT, CONTROL, ALT, NOINVERT
+    $rc.k("t398"),            ID_AMIS_TOGGLE_AUDIO_SELFVOICING_PLAYBACK, $rc.masks("t398")
+    $rc.k("t32"),         ID_AMIS_TOGGLE_VIEW,    $rc.masks("t32")
+    $rc.k("t413"),        ID_AMIS_DECREASE_CONTENT_VOLUME, $rc.masks("t413")
+    $rc.k("t416"),          ID_AMIS_INCREASE_CONTENT_VOLUME, $rc.masks("t416")
 END
 
 
@@ -591,61 +591,61 @@ END
 
 STRINGTABLE 
 BEGIN
-    ID_AMIS_NEXT_PAGE       "Go to the next page."
-    ID_AMIS_GOTO_PAGE       "Go to a specific page."
-    ID_AMIS_FIND_IN_TEXT    "Search for a word or phrase in the text."
-    ID_AMIS_ADD_BOOKMARK    "Bookmark your current position."
+    ID_AMIS_NEXT_PAGE       "$rc.s("t104")"
+    ID_AMIS_GOTO_PAGE       "$rc.s("t107")"
+    ID_AMIS_FIND_IN_TEXT    "$rc.s("t110")"
+    ID_AMIS_ADD_BOOKMARK    "$rc.s("t117")"
     ID_AMIS_SHOW_READING_OPTIONS 
-                            "View the skippable items for this publication."
+                            "$rc.s("t124")"
     ID_AMIS_SHOW_PUBLICATION_SUMMARY 
-                            "Get all summary info for this publication."
-    ID_AMIS_SHOW_HELP_CONTENTS "Get help using AMIS"
-    ID_AMIS_ABOUT           "Find out about AMIS and DAISY-for-All."
+                            "$rc.s("t344")"
+    ID_AMIS_SHOW_HELP_CONTENTS "$rc.s("t139")"
+    ID_AMIS_ABOUT           "$rc.s("t142")"
 END
 
 STRINGTABLE 
 BEGIN
-    ID_AMIS_OPEN_FILE       "Open a Daisy book from the local file system"
-    ID_AMIS_CLOSE_BOOK      "Close the publication."
-    ID_AMIS_LOAD_CD         "Load a DAISY book from CD ROM"
-    ID_AMIS_SEARCH_LOCAL_DRIVES "Search local drives for DAISY books"
-    ID_AMIS_SHOW_PREFERENCES "This is the application preferences dialog."
-    ID_AMIS_EXIT            "Exit AMIS"
-    ID_AMIS_TOGGLE_SIDEBAR  "Turn the sidebar on or off."
-    ID_AMIS_TOGGLE_VIEW     "Switch the view to basic mode."
+    ID_AMIS_OPEN_FILE       "$rc.s("t3")"
+    ID_AMIS_CLOSE_BOOK      "$rc.s("t332")"
+    ID_AMIS_LOAD_CD         "$rc.s("t7")"
+    ID_AMIS_SEARCH_LOCAL_DRIVES "$rc.s("t11")"
+    ID_AMIS_SHOW_PREFERENCES "$rc.s("t14")"
+    ID_AMIS_EXIT            "$rc.s("t21")"
+    ID_AMIS_TOGGLE_SIDEBAR  "$rc.s("t28")"
+    ID_AMIS_TOGGLE_VIEW     "$rc.s("t31")"
 END
 
 STRINGTABLE 
 BEGIN
-    IDS_META_FEATURES       "Features:"
-    IDS_META_CURRENT_PAGE   "Current page:"
-    IDS_META_CURRENT_SECTION "Current section:"
-    IDS_META_MAX_SECTION_DEPTH "Max section depth:"
-    IDS_META_TOC_ENTRIES    "TOC entries:"
-    IDS_META_SECTION_CONTENTS_LIST """%d subsections, %d pages"""
-    IDS_META_SECTION_CONTENTS "Section contents:"
-    IDS_NOT_AVAILABLE       "Not available"
-    IDS_SEARCHING           "Searching..."
-    IDS_SEARCH_STOPPED      "Search stopped"
-    IDS_NO_FILES_FOUND      "No files found"
-    IDS_ONE_FILE_FOUND      "One file found"
-    IDS_FILES_FOUND         "%d files found"
-    IDS_NO_BOOKS_ON_CD      "No DAISY books were found on this CD-ROM."
-    IDS_PLEASE_RESTART      "Please restart to change the language of AMIS."
+    IDS_META_FEATURES       "$rc.s("t355")"
+    IDS_META_CURRENT_PAGE   "$rc.s("t356")"
+    IDS_META_CURRENT_SECTION "$rc.s("t215")"
+    IDS_META_MAX_SECTION_DEPTH "$rc.s("t245")"
+    IDS_META_TOC_ENTRIES    "$rc.s("t244")"
+    IDS_META_SECTION_CONTENTS_LIST "$rc.join_and_prefix_with_int_token(("t217", "t216"))"
+    IDS_META_SECTION_CONTENTS "$rc.s("t390")"
+    IDS_NOT_AVAILABLE       "$rc.s("t288")"
+    IDS_SEARCHING           "$rc.s("t177")"
+    IDS_SEARCH_STOPPED      "$rc.s("t178")"
+    IDS_NO_FILES_FOUND      "$rc.s("t179")"
+    IDS_ONE_FILE_FOUND      "$rc.s("t180")"
+    IDS_FILES_FOUND         "$rc.join_and_prefix_with_int_token(("t181",))"
+    IDS_NO_BOOKS_ON_CD      "$rc.s("t326")"
+    IDS_PLEASE_RESTART      "$rc.s("t325")"
 END
 
 STRINGTABLE 
 BEGIN
     IDS_ERROR_OPENING_RELOADING 
-                            "The book could not be opened.  AMIS will re-open your previous book."
-    IDS_ERROR_OPENING       "The book could not be opened."
-    IDS_NAVIGATION          "Navigation"
-    IDS_SECTIONS            "Sections"
-    IDS_PAGES               "Pages"
-    IDS_FOOTNOTES           "Footnotes"
-    IDS_PRODUCER_NOTES      "Producer notes"
-    IDS_SIDEBARS            "Sidebars"
-    IDS_GROUPED_ITEMS       "Grouped items"
+                            "$rc.s("t382")"
+    IDS_ERROR_OPENING       "$rc.s("t314")"
+    IDS_NAVIGATION          "$rc.s("t272")"
+    IDS_SECTIONS            "$rc.s("t273")"
+    IDS_PAGES               "$rc.s("t274")"
+    IDS_FOOTNOTES           "$rc.s("t275")"
+    IDS_PRODUCER_NOTES      "$rc.s("t276")"
+    IDS_SIDEBARS            "$rc.s("t277")"
+    IDS_GROUPED_ITEMS       "$rc.s("t278")"
 END
 
 $ms_endif    // English (U.S.) resources
