@@ -122,7 +122,7 @@ class FillRC():
         """put the int token before each string"""
         val = ""
         for st in strlist:
-            val += "%%d %s " % (st)
+            val += "%%d %s " % (self.s(st))
         return val
     
     def k(self, strid):

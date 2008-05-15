@@ -456,7 +456,7 @@ IDI_LANGICON            ICON                    "flag.ico"
 IDR_AMISTYPE ACCELERATORS 
 BEGIN
     $rc.k("t118"),            ID_AMIS_ADD_BOOKMARK, $rc.masks("t118")
-    "Q",            ID_AMIS_DECREASE_SECTION_DEPTH, VIRTKEY, CONTROL, NOINVERT
+    $rc.k("t419"),            ID_AMIS_DECREASE_SECTION_DEPTH, $rc.masks("t419")
     $rc.k("t77"),        ID_AMIS_DECREASE_VOLUME, $rc.masks("t77")
     $rc.k("t407"),        ID_AMIS_DECREASE_UI_VOLUME, $rc.masks("t407")
     $rc.k("t57"),      ID_AMIS_ESCAPE,         $rc.masks("t57")
@@ -464,12 +464,12 @@ BEGIN
     VK_ADD,         ID_AMIS_FASTER,         VIRTKEY, CONTROL, NOINVERT
     $rc.k("t61"),    ID_AMIS_FASTER,         $rc.masks("t61")
     $rc.k("t111"),            ID_AMIS_FIND_IN_TEXT,   $rc.masks("t111")
-    VK_F3,          ID_AMIS_FIND_NEXT_IN_TEXT, VIRTKEY, NOINVERT
-    VK_F3,          ID_AMIS_FIND_PREVIOUS_IN_TEXT, VIRTKEY, SHIFT, NOINVERT
+    $rc.k("t422"),          ID_AMIS_FIND_NEXT_IN_TEXT, $rc.masks("t422")
+    $rc.k("t425"),          ID_AMIS_FIND_PREVIOUS_IN_TEXT, $rc.masks("t425")
     $rc.k("t401"),            ID_AMIS_FOCUS_ON_SIDEBAR, $rc.masks("t401")
     $rc.k("t404"),            ID_AMIS_FOCUS_ON_TEXT,  $rc.masks("t404")
     $rc.k("t108"),            ID_AMIS_GOTO_PAGE,      $rc.masks("t108")
-    "P",            ID_AMIS_INCREASE_SECTION_DEPTH, VIRTKEY, CONTROL, NOINVERT
+    $rc.k("t428"),            ID_AMIS_INCREASE_SECTION_DEPTH, $rc.masks("t428")
     $rc.k("t73"),          ID_AMIS_INCREASE_VOLUME, $rc.masks("t73")
     $rc.k("t410"),          ID_AMIS_INCREASE_UI_VOLUME, $rc.masks("t410")
     $rc.k("t8"),            ID_AMIS_LOAD_CD,        $rc.masks("t8")
@@ -482,12 +482,12 @@ BEGIN
     $rc.k("t102"),        ID_AMIS_PREVIOUS_PAGE,  $rc.masks("t102")
     $rc.k("t96"),        ID_AMIS_PREVIOUS_PHRASE, $rc.masks("t96")
     $rc.k("t84"),          ID_AMIS_PREVIOUS_SECTION, $rc.masks("t84")
-    "E",            ID_AMIS_RESET_HIGHLIGHT_COLORS, VIRTKEY, SHIFT, CONTROL, NOINVERT
+    $rc.k("t431"),            ID_AMIS_RESET_HIGHLIGHT_COLORS, $rc.masks("t431")
     $rc.k("t69"),            ID_AMIS_RESET_SPEED,    $rc.masks("t69")
-    VK_F1,          ID_AMIS_SHOW_HELP_CONTENTS, VIRTKEY, NOINVERT
+    $rc.k("t432"),          ID_AMIS_SHOW_HELP_CONTENTS, $rc.masks("t432")
     $rc.k("t65"),   ID_AMIS_SLOWER,         $rc.masks("t65")
     VK_SUBTRACT,    ID_AMIS_SLOWER,         VIRTKEY, CONTROL, NOINVERT
-    "F",            ID_AMIS_TOGGLE_AUDIO_CONTENT_PLAYBACK, VIRTKEY, SHIFT, CONTROL, NOINVERT
+    $rc.k("t433"),            ID_AMIS_TOGGLE_AUDIO_CONTENT_PLAYBACK, $rc.masks("t433")
     $rc.k("t398"),            ID_AMIS_TOGGLE_AUDIO_SELFVOICING_PLAYBACK, $rc.masks("t398")
     $rc.k("t32"),         ID_AMIS_TOGGLE_VIEW,    $rc.masks("t32")
     $rc.k("t413"),        ID_AMIS_DECREASE_CONTENT_VOLUME, $rc.masks("t413")
@@ -668,7 +668,7 @@ $ms_ifdef _WIN32
 LANGUAGE 9, 1
 $ms_pragma code_page(1252)
 $ms_endif //_WIN32
-$ms_include "res\AmisGuiMFC2.rc2"  // non-Microsoft Visual C++ edited resources
+$ms_include "res\AmisLangpack.rc2"  // non-Microsoft Visual C++ edited resources
 $ms_include "afxres.rc"         // Standard components
 $ms_endif
 
