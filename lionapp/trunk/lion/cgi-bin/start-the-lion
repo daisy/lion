@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd ./templates
+cheetah compile *.tmpl
+cd ../
+python main.py
