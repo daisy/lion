@@ -51,9 +51,9 @@ die just yet."""
         """Connect to the database."""
         if not self.connected:
             self.trace_msg("Connecting to the database...")
-            self.db = connect_to_db("admin")
+            #self.db = connect_to_db("admin")
             #self.db = connect_to_remote_db("admin")
-            #self.db = connect_to_local_db("admin")
+            self.db = connect_to_local_db("admin")
             self.cursor = self.db.cursor()
             self.connected = True
             self.trace_msg("... connected")
@@ -117,7 +117,7 @@ die just yet."""
     def strings(self):
         """Export strings to stdout"""
         self.trace_msg("Export strings to stdout")
-        self.execute_query("""SELECT textstring FROM daisyfor_amisl10n.eng_US \
+        self.execute_query("""SELECT textstring FROM eng_US \
             where (role="STRING" or role="MENUITEM" or role="DIALOG" or \
             role="CONTROL") and translate=1""")
         strings = self.cursor.fetchall()
