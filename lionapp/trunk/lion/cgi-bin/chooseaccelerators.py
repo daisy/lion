@@ -117,7 +117,11 @@ class ChooseAccelerators(TranslationPage):
             self.warning_message = "There is a conflict because two commands are using the same keyboard shortcut."
             conflict_found = True
             print "CONFLICT!"
+        else:
+            conflict_found = False
+            self.warning_message = ""
         self.show_no_conflicts = not conflict_found
+        
         return self.index(self.last_view)
     check_conflicts.exposed = True
     

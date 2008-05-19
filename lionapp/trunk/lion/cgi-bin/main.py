@@ -21,6 +21,7 @@ class Login(login.login):
         if util.login(username, password) == None:
             self.message = "There was an error logging in.  Try again?"
             self.title = "Login error -- try again" 
+            self.targetid = ""
             return self.respond()
         else:
             t = xhtml.xhtml()
@@ -51,7 +52,14 @@ root.style = "./style/"
 app = cherrypy.tree.mount(root, script_name='/')
 
 if __name__ == '__main__':
-    import os.path
-    cherrypy.config.update(os.path.join(os.path.dirname(__file__), 'cherrypy.conf'))
-    cherrypy.server.quickstart()
-    cherrypy.engine.start()
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    # Set up site-wide config first so we get a log if errors occur.
+    cherrypy.config.update({'environment': 'production',
+        'log.error_file': 'site.log',
+        'log.screen': True,
+        'server.socket_host': '192.168.1.146',
+        'server.socket_port': 8080,
+        'server.thread_pool': 10})
+    conf = {'/style': {'tools.staticdir.on': True,
+                'tools.staticdir.dir': os.path.join(current_dir,'style')}}
+    cherrypy.quickstart(root, '/', config=conf)

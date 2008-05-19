@@ -3,11 +3,12 @@ Template variables:
 	title = page title
 	body = page body
 *#
-#set $base_url = "http://192.168.1.146/style/"
+#set $base_url = "http://192.168.1.146:8080/style/"
 #set $css = $base_url + "l10n.css"
 #set $icon = $base_url + "lionicon.ico"
 #set $logo = $base_url + "lion144.png"
-
+#def targetid
+#end def
 <?xml version="1.0"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -17,9 +18,16 @@ Template variables:
     	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     	<link href="$css" rel="stylesheet" type="text/css"/>
 		<link rel="icon" href="$icon"/>
-		
+		<script language="javascript">
+			function scroll() 
+			{
+				var the_id = "$targetid";
+				if (the_id.length > 0)
+					window.location.hash = the_id;
+			}
+		</script>
   	</head>
-  	<body>
+  	<body onload="scroll()">
 		<div id="header">
 			<img src="$logo" 
 				alt="logo for the DAISY Lion" height="91.5" width="108"/>
