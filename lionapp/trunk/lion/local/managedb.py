@@ -114,14 +114,14 @@ die just yet."""
     def export(self, file, langid):
         self.dbio.export(self, file, langid)
 
-    def strings(self):
+    def strings(self, langid):
         """Export strings to stdout"""
         self.trace_msg("Export strings to stdout")
-        self.execute_query("""SELECT textstring FROM eng_US \
+        self.execute_query("""SELECT textstring FROM """ + langid + """
             where (role="STRING" or role="MENUITEM" or role="DIALOG" or \
             role="CONTROL") and translate=1""")
         strings = self.cursor.fetchall()
-        print """<?xml version="1.0"?>\n<strings>"""
+        print """<?xml version="1.0"?>\n<strings langid=\"""" + langid + "\">"
         for string in strings:
             print "<s>" + string[0] + "</s>"
         print "</strings>"
@@ -316,7 +316,7 @@ def main():
         elif opt in ("--keys"): actualkeys = arg
         elif opt in ("--add_accelerator"): add_accel = True
         elif opt in ("-s", "--strings"):
-            action = lambda s, f, l: s.strings()
+            action = lambda s, f, l: s.strings(l)
     session = DBSession(trace, force, app)
     if add_language == True:
         session.add_language(langid, langname, username, password, realname, email)
