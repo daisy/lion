@@ -3,6 +3,10 @@
 
 from managedb import *
 from AmisRCTemplate import *
+import amis_import
+from xml.dom import minidom, Node
+import os
+import codecs
 
 class FillRC():
     # note that VK_ADD and VK_SUBTRACT (number pad +/-) are permanently mapped
@@ -173,6 +177,35 @@ class FillRC():
         val = "VIRTKEY, %sNOINVERT" % maskstring
         return val
 
+def export_xml(file, table):
+    session = DBSession(True, False, "amis")
+    session.execute_query("SELECT xmlid, textstring, actualkeys, role FROM %s" % table)
+    doc = minidom.parse(file)
+    for xmlid, textstring, actualkeys, role in session.cursor:
+        elm = amis_import.get_element_by_id(doc, "text", xmlid)
+        if elm == None: 
+            session.warn("Text element %s not found." % xmlid)
+            continue
+        
+        if elm.firstChild.nodeType == Node.TEXT_NODE:
+            print textstring
+            if role == "ACCELERATOR":
+                elm.firstChild.data = textstring
+                elm.parentNode.setAttribute("keys", actualkeys)
+            elif role != "ACCELERATOR":
+                elm.firstChild.data = textstring.decode("cp1252")
+            else:
+                session.warn("Text element %s has no contents." % xmlid)
+    
+    outpath = os.path.join("./", table + ".xml")
+    print outpath
+    outfile = open(outpath, "w")
+    #outfile.write(codecs.BOM_UTF8)
+    outfile.write(doc.toxml().encode("cp1252"))   
+    outfile.write("\n")
+    outfile.close()
+    
+    
 def main():
     # these are template keywords
     # the microsoft #xyz statements had to be replaced with $ms_xyz in the template
@@ -190,8 +223,9 @@ def main():
     rc = FillRC("eng-US")
     t = AmisRCTemplate(searchList=msterms)
     t.rc = rc
-    print t.respond()
+    #print t.respond()
     
+    export_xml("/Users/marisa/Projects/amis/amisapp/trunk/amis/src/DefaultLangpack/amisAccessibleUi.xml", "spa_ES")
     
 
 if __name__ == "__main__": main()
