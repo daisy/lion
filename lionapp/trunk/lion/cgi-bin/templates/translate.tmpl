@@ -17,6 +17,9 @@ Template variables:
 #def title
 AMIS translation for $language: $section section
 #end def
+#def usepages
+False
+#end def
 #def body
 <h1>$title</h1>
 <div id="navigation">
@@ -76,4 +79,11 @@ AMIS translation for $language: $section section
 ## the big table
 <div>$form</div>
 
+#if $usepages == True:
+#if $pagenum==1:
+<p><a href="change_page?pagenum=2">Page 2</a></p>
+#else
+<p><a href="change_page?pagenum=1">Page 1</a></p>
+#end if
+#end if
 #end def

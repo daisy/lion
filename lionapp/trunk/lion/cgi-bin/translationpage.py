@@ -15,7 +15,7 @@ class TranslationPage(translate.translate):
     warning_message = ""
     check_conflict = False
     show_no_conflicts = False
-    
+    pagenum = 0
     def index(self, view, id_anchor = ""):
         """Show the big table of translate-able items"""
         self.last_view = view
@@ -25,7 +25,7 @@ class TranslationPage(translate.translate):
         self.user = user
         self.language = user["languages.langname"]
         self.view_description = VIEW_DESCRIPTIONS[view]
-        self.form, self.count = self.make_table(view)
+        self.form, self.count = self.make_table(view, self.pagenum)
         print "made table"
         self.targetid = id_anchor
         return self.respond()
@@ -70,3 +70,8 @@ class TranslationPage(translate.translate):
         # get the textstring and remarks from the english table
         if table != "": table = "%s." % table
         return []
+    
+    def change_page(self, pagenum):
+        self.pagenum = pagenum
+        return self.index("all")
+    change_page.exposed = True

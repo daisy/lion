@@ -14,10 +14,12 @@ class TranslateStrings(TranslationPage):
         self.warning_links = None
         self.check_conflict = False
         self.warning_message = None
+        self.pagenum = 1
+        self.usepages = True
         #this is weird but necessary .. otherwise cheetah complains
         TranslationPage.__init__(self)
     
-    def make_table(self, view_filter):
+    def make_table(self, view_filter, pagenum):
         """Make the form for main page"""
         table = self.user["users.langid"].replace("-", "_")
         langid = self.user["users.langid"]
@@ -44,12 +46,23 @@ class TranslateStrings(TranslationPage):
         db.close()
         
         form = "<table>"
+        start = 0
+        end = 0
+        count = 0
+        if pagenum == 1:
+            start = 0
+            end = len(rows) / 2
+        else:
+            start = len(rows) / 2 + 1
+            end = len(rows)
         for r in rows:
-            t = tablerow.tablerow(searchList=dict(zip(template_fields, r)))
-            t.instructions = self.instructions
-    	    t.width = self.textbox_columns
-    	    t.height = self.textbox_rows
-    	    t.langid = self.user["users.langid"]
-            form += t.respond()
+            if count >= start and count <= end:
+                t = tablerow.tablerow(searchList=dict(zip(template_fields, r)))
+                t.instructions = self.instructions
+    	        t.width = self.textbox_columns
+    	        t.height = self.textbox_rows
+    	        t.langid = self.user["users.langid"]
+                form += t.respond()
+                count += 1
         form += "</table>"
-        return form, len(rows)
+        return form, count
