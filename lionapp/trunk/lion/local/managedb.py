@@ -123,7 +123,7 @@ die just yet."""
         strings = self.cursor.fetchall()
         print """<?xml version="1.0"?>\n<strings langid=\"""" + langid + "\">"
         for string in strings:
-            print "<s>" + string[0] + "</s>"
+            print "<s>" + string[0].encode("utf-8") + "</s>"
         print "</strings>"
 
     def process_changes(self, langid, removed_ids):
