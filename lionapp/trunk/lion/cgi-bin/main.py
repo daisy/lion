@@ -58,7 +58,7 @@ if __name__ == '__main__':
     cherrypy.config.update({'environment': 'production',
         'log.error_file': 'site.log',
         'log.screen': True,
-        'server.socket_host': 'localhost',
+        'server.socket_host': '192.168.1.146',
         'server.socket_port': 8080,
         'server.thread_pool': 10,
         'tools.encode.on':True,

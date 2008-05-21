@@ -123,6 +123,16 @@ die just yet."""
         for string in strings:
             print "<s>" + string[0].encode("utf-8") + "</s>"
         print "</strings>"
+    
+    def all_strings(self, langid):
+        """Export all strings to stdout"""
+        self.trace_msg("Export strings to stdout")
+        self.execute_query("""SELECT textstring FROM """ + langid)
+        strings = self.cursor.fetchall()
+        print """<?xml version="1.0"?>\n<strings langid=\"""" + langid + "\">"
+        for string in strings:
+            print "<s>" + string[0].encode("utf-8") + "</s>"
+        print "</strings>"
 
     def process_changes(self, langid, removed_ids):
         """Process the textflag values (2: changed, 3: new)
@@ -226,7 +236,9 @@ Usage:
                                                  Remove an item from all tables
   %(script)s --add_accelerator --langid=id --textstring=string --stringid=id
 --refid=id --keys=accelerator                    Add an accelerator to all tables
-
+  %(script)s --strings --langid=id               Output XML of strings, not including keyboard shortcuts
+  %(script)s --all_strings --langid=id           Output XML of strings, including keyboard shortcuts
+  
 Other options:
   --application, -a: which application module to use (e.g. "amis" or "obi")
   --trace, -t: trace mode (send trace messages to stderr.)
@@ -283,7 +295,7 @@ def main():
                 "trace", "add_language", "remove_language", "langname=", 
                 "username=", "password=", "realname=", "email=", "force", 
                 "stringid=", "text=", "remove_item", "add_string", "refid=", 
-                "keys=", "add_accelerator", "strings"])
+                "keys=", "add_accelerator", "strings", "all_strings"])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
@@ -315,6 +327,8 @@ def main():
         elif opt in ("--add_accelerator"): add_accel = True
         elif opt in ("-s", "--strings"):
             action = lambda s, f, l: s.strings(l)
+        elif opt in ("--all_strings"):
+            action = lambda s, f, l: s.all_strings(l)
     session = DBSession(trace, force, app)
     if add_language == True:
         session.add_language(langid, langname, username, password, realname, email)
