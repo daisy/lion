@@ -60,7 +60,9 @@ if __name__ == '__main__':
         'log.screen': True,
         'server.socket_host': 'localhost',
         'server.socket_port': 8080,
-        'server.thread_pool': 10})
+        'server.thread_pool': 10,
+        'tools.encode.on':True,
+        'tools.encode.encoding':'utf8'})
     conf = {'/style': {'tools.staticdir.on': True,
                 'tools.staticdir.dir': os.path.join(current_dir,'style')}}
     cherrypy.quickstart(root, '/', config=conf)

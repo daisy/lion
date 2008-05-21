@@ -53,6 +53,8 @@ def connect_to_lion_db(user):
         print "Error connecting to the database"
         sys.exit()
     else:
+        cursor = db.cursor()
+        cursor.execute("SET collation_connection = utf8_unicode_ci")
         return db
 
 
