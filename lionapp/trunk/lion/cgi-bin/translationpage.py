@@ -72,6 +72,7 @@ class TranslationPage(translate.translate):
         return []
     
     def change_page(self, pagenum):
-        self.pagenum = pagenum
-        return self.index("all")
+        print "change page %d" % int(pagenum)
+        self.pagenum = int(pagenum)
+        return self.index(self.last_view)
     change_page.exposed = True

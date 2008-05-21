@@ -223,9 +223,9 @@ def main():
     rc = FillRC("eng-US")
     t = AmisRCTemplate(searchList=msterms)
     t.rc = rc
-    #print t.respond()
+    print t.respond()
     
-    export_xml("/Users/marisa/Projects/amis/amisapp/trunk/amis/src/DefaultLangpack/amisAccessibleUi.xml", "spa_ES")
+    #export_xml("/Users/marisa/Projects/amis/amisapp/trunk/amis/src/DefaultLangpack/amisAccessibleUi.xml", "spa_ES")
     
 
 if __name__ == "__main__": main()

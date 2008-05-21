@@ -48,7 +48,7 @@ def connect_to_lion_db(user):
     """connect to the database
        one day, this function should be replaced with the DBSession class.
     """
-    db = connect_to_local_db(user)
+    db = db_connect(user)
     if db == None:
         print "Error connecting to the database"
         sys.exit()
