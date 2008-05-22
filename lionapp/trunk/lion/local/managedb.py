@@ -109,9 +109,12 @@ die just yet."""
         removed_ids = self.dbio.get_removed_ids(doc)
         self.process_changes(langid, removed_ids)
     
-    def export(self, file, langid):
-        self.dbio.export(self, file, langid)
-
+    def export_xml(self, file, langid):
+        print self.dbio.export_xml(self, file, langid)
+    
+    def export_rc(self, langid):
+        print self.dbio.export_rc(self, langid)
+    
     def strings(self, langid):
         """Export strings to stdout"""
         self.trace_msg("Export strings to stdout")
@@ -224,7 +227,8 @@ Usage:
 
   %(script)s --help                              Show this help message.
   %(script)s --import --langid=id --file=file    Import file into table id.
-  %(script)s --export --langid=id --file=file    Export to XML
+  %(script)s --export_xml --langid=id --file=file    Export to XML
+  %(script)s --export_rc --langid=id --file=file    Export to RC
   %(script)s --add_language --langid=id --langname=langname \
 --username=username --password=password --email=email \
 --realname=realname                              
@@ -263,7 +267,6 @@ def main():
     force = False
     # if the action is add/remove a language/string/accelerator, the parameters are different
     add_language = False  
-    remove_language = False
     add_string = False
     remove_item = False
     add_accel = False
@@ -274,7 +277,7 @@ def main():
     try:
         """
         a: - application
-        e  - export
+        e  - export_xml
         F: - file
         h  - help
         i  - import
@@ -291,18 +294,20 @@ def main():
         s  - strings export
         """
         opts, args = getopt.getopt(os.sys.argv[1:], "a:eF:hil:tn:u:p:r:e:fARs",
-            ["application=", "export", "file=", "help", "import", "langid=",
+            ["application=", "export_xml", "file=", "help", "import", "langid=",
                 "trace", "add_language", "remove_language", "langname=", 
                 "username=", "password=", "realname=", "email=", "force", 
                 "stringid=", "text=", "remove_item", "add_string", "refid=", 
-                "keys=", "add_accelerator", "strings", "all_strings"])
+                "keys=", "add_accelerator", "strings", "all_strings", "export_rc"])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
     for opt, arg in opts:
         if opt in ("-a", "--application"): app = arg
-        elif opt in ("-e", "--export"):
-            action = lambda s, f, l: s.export(f, l)
+        elif opt in ("-e", "--export_xml"):
+            action = lambda s, f, l: s.export_xml(f, l)
+        elif opt in ("--export_rc"):
+            action = lambda s, f, l: s.export_rc(l)
         elif opt in ("-F", "--file"): file = arg
         elif opt in ("-h", "--help"):
             action = lambda s, f, l: usage()
@@ -311,7 +316,8 @@ def main():
         elif opt in ("-l", "--langid"): langid = arg
         elif opt in ("-t", "--trace"): trace = True
         elif opt in ("-A", "--add_language"): add_language = True
-        elif opt in ("-R", "--remove_language"):remove_language = True
+        elif opt in ("-R", "--remove_language"):
+            action = lambda s, f, l: s.remove_language(l)
         elif opt in ("-n", "--langname"): langname = arg
         elif opt in ("-u", "--username"): username = arg
         elif opt in ("-p", "--password"): password = arg
@@ -332,8 +338,6 @@ def main():
     session = DBSession(trace, force, app)
     if add_language == True:
         session.add_language(langid, langname, username, password, realname, email)
-    elif remove_language == True:
-        session.remove_language(langid)
     elif add_string == True:
         session.add_string(langid, textstring, stringid)
     elif remove_item == True:

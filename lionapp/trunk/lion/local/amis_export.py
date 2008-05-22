@@ -41,9 +41,9 @@ class FillRC():
         "f11": "VK_F11",
         "f12": "VK_F12"}
     
-    def __init__(self, langid):
+    def __init__(self, session, langid):
         self.langid = langid
-        self.session = DBSession(True, False, "amis")
+        self.session = session
         self.table = self.session.make_table_name(langid)
     
     def __get_textstring(self, strid):
@@ -177,7 +177,8 @@ class FillRC():
         val = "VIRTKEY, %sNOINVERT" % maskstring
         return val
 
-def export_xml(file, table):
+def export_xml(session, file, langid):
+    table = session.make_table_name(langid)
     session = DBSession(True, False, "amis")
     session.execute_query("SELECT xmlid, textstring, actualkeys, role FROM %s" % table)
     doc = minidom.parse(file)
@@ -193,20 +194,20 @@ def export_xml(file, table):
                 elm.firstChild.data = textstring
                 elm.parentNode.setAttribute("keys", actualkeys)
             elif role != "ACCELERATOR":
-                elm.firstChild.data = textstring.decode("cp1252")
+                elm.firstChild.data = textstring
             else:
                 session.warn("Text element %s has no contents." % xmlid)
     
-    outpath = os.path.join("./", table + ".xml")
-    print outpath
-    outfile = open(outpath, "w")
+    #outpath = os.path.join("./", table + ".xml")
+    #outfile = open(outpath, "w")
     #outfile.write(codecs.BOM_UTF8)
-    outfile.write(doc.toxml().encode("cp1252"))   
-    outfile.write("\n")
-    outfile.close()
+    #outfile.write(doc.toxml().encode("utf-8"))   
+    #outfile.write("\n")
+    #outfile.close()
+    return doc.toxml().encode("utf-8")
+
     
-    
-def main():
+def export_rc(session, langid):
     # these are template keywords
     # the microsoft #xyz statements had to be replaced with $ms_xyz in the template
     # because "#" is a special character for cheetah (the templating system)
@@ -220,12 +221,7 @@ def main():
         "ms_pragma": "#pragma",
         "ms_else": "#else"}
     
-    rc = FillRC("eng-US")
+    rc = FillRC(session, langid)
     t = AmisRCTemplate(searchList=msterms)
     t.rc = rc
-    print t.respond()
-    
-    #export_xml("/Users/marisa/Projects/amis/amisapp/trunk/amis/src/DefaultLangpack/amisAccessibleUi.xml", "spa_ES")
-    
-
-if __name__ == "__main__": main()
+    return t.respond()

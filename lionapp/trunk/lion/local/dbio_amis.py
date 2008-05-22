@@ -1,5 +1,5 @@
 import amis_import
-
+import amis_export
 #note that this is also defined for the web scripts
 #we could share when the managedb stuff goes online instead of locally
 XHTML_TEMPLATE = """
@@ -49,37 +49,14 @@ def get_removed_ids(doc):
     """Items that have been removed are specified in the document root's 
     "removed" attribute"""
     return amis_import.process_removals(doc)
+    
+def export_xml(session, file, langid):
+    session.trace_msg("XML Export for %s to %s" % (langid, file))
+    return amis_export.export_xml(session, file, langid)
 
-    
-def export_xhtml(session, langid):
-    """return a string of xhtml generated from the database
-       each text string will be an h1 with the xml id from the database.  
-       E.g.:
-       <h1 id="t1">File...</h1>
-       <h1 id="t2">F</h1>
-       <h1 id="t3">Alt + F</h1>
-       ...
-    """
-    thislang = session.check_language(langid)
-    if thislang == None:
-        session.die("Language does not exist.")
-    body = ""
-    table = session.make_table_name(langid)
-    request = "SELECT xmlid, textstring from %s" % table
-    session.execute_query(request)
-    for id, txt in session.cursor:
-        body += """<h1 id="%s">%s</h1>""" % (id, txt)
-    return XHTML_TEMPLATE % {"TITLE": thislang, "BODY": body}
-    
-def export(session, file, langid):
-    session.trace_msg("Export for %s to %s" % (langid, file))
-      
-    #export the XHTML list of all the text prompts
-    xhtml_contents = export_xhtml(session, langid)
-    filename = file + ".html"
-    outfile = open(filename, 'w')
-    outfile.write(xhtml_contents)
-    outfile.close
+def export_rc(session, langid):
+    session.trace_msg("RC Export for %s" % (langid))
+    return amis_export.export_rc(session, langid)
 
 # add or remove a single string from the master table
 def add_string(session, langid, textstring, stringid):
