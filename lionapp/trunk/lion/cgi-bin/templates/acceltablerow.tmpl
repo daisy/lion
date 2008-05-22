@@ -67,6 +67,9 @@ Identical to tablerow except for the dataentry part.This should really be derive
 	<input type="submit" value="Save" style="align: bottom"/>
 	<input type="hidden" name="xmlid" value="$xmlid"/>
 	<input type="hidden" name="langid" value="$langid"/>
+	#if len($thekeys) == 0:
+	<input type="hidden" name="thekeys" value="XXXX"/>
+	#end if
 </td>
 </form>
 </tr>

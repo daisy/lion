@@ -142,7 +142,11 @@ class ChooseAccelerators(TranslationPage):
         table = langid.replace("-", "_")
         db = util.connect_to_lion_db("rw")
         cursor = db.cursor()
-        actualkeys = keymask + thekeys
+        if thekeys != "XXXX":
+            actualkeys = keymask + thekeys
+        else:
+            actualkeys = keymask
+        
         request = """UPDATE %(table)s SET textflag="%(status)s", \
             textstring="%(textstring)s", remarks="%(remarks)s", actualkeys="%(actualkeys)s" WHERE \
             xmlid="%(xmlid)s" """ % \
