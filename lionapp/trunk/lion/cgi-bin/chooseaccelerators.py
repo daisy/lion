@@ -18,7 +18,7 @@ class ChooseAccelerators(TranslationPage):
         #this is weird but necessary .. otherwise cheetah complains
         TranslationPage.__init__(self)    
 
-    def make_table(self, view_filter, pagenum=0):
+    def make_table(self, view_filter, pagenum):
         """Make the form for main page"""
         table = self.user["users.langid"].replace("-", "_")
         langid = self.user["users.langid"]

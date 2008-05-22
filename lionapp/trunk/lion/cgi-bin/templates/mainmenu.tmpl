@@ -10,14 +10,18 @@ Template variables:
 #def title
 Main menu
 #end def
+#def translate_for_keyboard
+False
+#end def
 #def body
 <h1>Welcome</h1>
 <p>Hello $user. You are working on $language.</p>
 <h1>Actions</h1>
 <ul>
 	<li><a href="../TranslateStrings?view=all">Translate strings</a></li>
-	<!--<li><a href="../ChooseAccelerators?view=all">Assign keyboard shortcuts</a></li>
+	#if $translate_for_keyboard == True:
+	<li><a href="../ChooseAccelerators?view=all">Assign keyboard shortcuts</a></li>
 	<li><a href="../ChooseMnemonics?view=all">Choose mnemonics</a> (single-letter shortcuts)</li>
--->
+	#end if
 </ul>
 #end def

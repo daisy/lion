@@ -66,7 +66,7 @@ def get_user():
     db = connect_to_lion_db("ro")
     cursor = db.cursor()
     fields = ["users.username", "users.realname", "users.password", "users.email", "users.langid", \
-    "users.lastactivity", "users.svnpath", "users.sessionid", "languages.langname"]
+    "users.lastactivity", "users.svnpath", "users.sessionid", "languages.langname", "languages.translate_for_keyboard"]
     request = """
     SELECT %s FROM users, languages WHERE users.username="%s" AND users.sessionid="%s" AND users.langid = languages.langid""" % \
         (",".join(fields), username, sessionid)

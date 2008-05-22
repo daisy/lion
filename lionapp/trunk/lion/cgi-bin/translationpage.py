@@ -24,6 +24,7 @@ class TranslationPage(translate.translate):
             return error.error().respond()
         self.user = user
         self.language = user["languages.langname"]
+        self.translate_for_keyboard = user["languages.translate_for_keyboard"]
         self.view_description = VIEW_DESCRIPTIONS[view]
         self.form, self.count = self.make_table(view, self.pagenum)
         print "made table"

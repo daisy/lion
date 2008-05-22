@@ -39,6 +39,7 @@ class MainMenu(mainmenu.mainmenu):
         else:
             self.user = user["users.realname"]
             self.language = user["languages.langname"]
+            self.translate_for_keyboard = user["languages.translate_for_keyboard"]
             return self.respond()
     index.exposed = True
 
