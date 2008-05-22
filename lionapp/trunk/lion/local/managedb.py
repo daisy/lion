@@ -127,15 +127,26 @@ die just yet."""
             print "<s>" + string[0].encode("utf-8") + "</s>"
         print "</strings>"
     
+    def get_all_strings(self, langid):
+        """Get all strings from the DB for a langid and return a handy list."""
+        self.execute_query("SELECT textstring FROM " + langid)
+        return map(lambda s: s[0], self.cursor.fetchall())
+
     def all_strings(self, langid):
         """Export all strings to stdout"""
         self.trace_msg("Export strings to stdout")
-        self.execute_query("""SELECT textstring FROM """ + langid)
-        strings = self.cursor.fetchall()
+        strings = self.get_all_strings(langid)
         print """<?xml version="1.0"?>\n<strings langid=\"""" + langid + "\">"
         for string in strings:
-            print "<s>" + string[0].encode("utf-8") + "</s>"
+            print "<s>" + string + "</s>"
         print "</strings>"
+
+    def audio_prompts(self, langid, ncx):
+        """Fill up the database with prompts file names. We use the NCX file
+        from the Obi export and match the navPoint text label with textstrins
+        in the DB."""
+        self.trace_msg("Getting audio prompts from NCX")
+        strings = self.get_all_strings(langid)
 
     def process_changes(self, langid, removed_ids):
         """Process the textflag values (2: changed, 3: new)
@@ -298,7 +309,8 @@ def main():
                 "trace", "add_language", "remove_language", "langname=", 
                 "username=", "password=", "realname=", "email=", "force", 
                 "stringid=", "text=", "remove_item", "add_string", "refid=", 
-                "keys=", "add_accelerator", "strings", "all_strings", "export_rc"])
+                "keys=", "add_accelerator", "strings", "all_strings",
+                "export_rc", "audio_prompts="])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
@@ -335,6 +347,8 @@ def main():
             action = lambda s, f, l: s.strings(l)
         elif opt in ("--all_strings"):
             action = lambda s, f, l: s.all_strings(l)
+        elif opt in ("--audio_prompts"):
+            action = lambda s, f, l: s.audio_prompts(l, arg)
     session = DBSession(trace, force, app)
     if add_language == True:
         session.add_language(langid, langname, username, password, realname, email)
