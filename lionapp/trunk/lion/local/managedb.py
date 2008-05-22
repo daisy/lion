@@ -146,7 +146,28 @@ die just yet."""
         from the Obi export and match the navPoint text label with textstrins
         in the DB."""
         self.trace_msg("Getting audio prompts from NCX")
-        strings = self.get_all_strings(langid)
+        try:
+            dom = minidom.parse(ncx)
+        except Exception, e:
+            self.die("""Couldn't open "%s" (%s)""" % (ncx, e))
+        self.execute_query("SELECT id, textstring FROM " +
+                self.make_table_name(langid))
+        strings = self.cursor.fetchall()
+        labels = dom.getElementsByTagNameNS(
+            "http://www.daisy.org/z3986/2005/ncx/", "navLabel")
+        self.trace_msg("Got %d labels for %d strings" %
+            (labels.__len__(), strings.__len__()))
+        for label, string in zip(labels, strings):
+            text = label.getElementsByTagNameNS(
+                "http://www.daisy.org/z3986/2005/ncx/", "text")[0].firstChild.data
+            audio_src = label.getElementsByTagNameNS(
+                "http://www.daisy.org/z3986/2005/ncx/", "audio")[0].getAttribute("src")
+            if string[1] == text:
+                self.execute_query("""UPDATE %s SET audiouri="%s" WHERE id=%d""" %
+                        (self.make_table_name(langid), audio_src, string[0]))
+            else:
+                self.warn("""No match between string="%s" and label="%s"?!""" %
+                        (string[1], text))
 
     def process_changes(self, langid, removed_ids):
         """Process the textflag values (2: changed, 3: new)
@@ -348,7 +369,8 @@ def main():
         elif opt in ("--all_strings"):
             action = lambda s, f, l: s.all_strings(l)
         elif opt in ("--audio_prompts"):
-            action = lambda s, f, l: s.audio_prompts(l, arg)
+            ncx = arg
+            action = lambda s, f, l: s.audio_prompts(l, ncx)
     session = DBSession(trace, force, app)
     if add_language == True:
         session.add_language(langid, langname, username, password, realname, email)
