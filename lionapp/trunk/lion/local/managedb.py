@@ -118,7 +118,8 @@ die just yet."""
     def strings(self, langid):
         """Export strings to stdout"""
         self.trace_msg("Export strings to stdout")
-        self.execute_query("""SELECT textstring FROM """ + langid + """
+        table = self.make_table_name(langid)
+        self.execute_query("""SELECT textstring FROM """ + table + """
             where (role="STRING" or role="MENUITEM" or role="DIALOG" or \
             role="CONTROL") and translate=1""")
         strings = self.cursor.fetchall()
@@ -129,7 +130,8 @@ die just yet."""
     
     def get_all_strings(self, langid):
         """Get all strings from the DB for a langid and return a handy list."""
-        self.execute_query("SELECT textstring FROM " + langid)
+        table = self.make_table_name(langid)
+        self.execute_query("SELECT textstring FROM " + table)
         return map(lambda s: s[0], self.cursor.fetchall())
 
     def all_strings(self, langid):
@@ -163,7 +165,7 @@ die just yet."""
             audio_src = label.getElementsByTagNameNS(
                 "http://www.daisy.org/z3986/2005/ncx/", "audio")[0].getAttribute("src")
             if string[1] == text:
-                self.execute_query("""UPDATE %s SET audiouri="%s" WHERE id=%d""" %
+                self.execute_query("""UPDATE %s SET audiouri="%s", audioflag=1 WHERE id=%d""" %
                         (self.make_table_name(langid), audio_src, string[0]))
             else:
                 self.warn("""No match between string="%s" and label="%s"?!""" %

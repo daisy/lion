@@ -2,7 +2,8 @@
 # eventually it should be hooked into the managedb functions
 
 from managedb import *
-from AmisRCTemplate import *
+#from amis_templates import AmisRCTemplate
+import amis_templates.AmisRCTemplate
 import amis_import
 from xml.dom import minidom, Node
 import os
@@ -179,24 +180,28 @@ class FillRC():
 
 def export_xml(session, file, langid):
     table = session.make_table_name(langid)
-    session = DBSession(True, False, "amis")
-    session.execute_query("SELECT xmlid, textstring, actualkeys, role FROM %s" % table)
+    session = DBSession(False, False, "amis")
+    session.execute_query("SELECT xmlid, textstring, actualkeys, role, audiouri FROM %s" % table)
     doc = minidom.parse(file)
-    for xmlid, textstring, actualkeys, role in session.cursor:
+    for xmlid, textstring, actualkeys, role, audiouri in session.cursor:
         elm = amis_import.get_element_by_id(doc, "text", xmlid)
         if elm == None: 
-            session.warn("Text element %s not found." % xmlid)
+            session.trace_msg("Text element %s not found." % xmlid)
             continue
         
         if elm.firstChild.nodeType == Node.TEXT_NODE:
-            print textstring
             if role == "ACCELERATOR":
                 elm.firstChild.data = textstring
                 elm.parentNode.setAttribute("keys", actualkeys)
-            elif role != "ACCELERATOR":
-                elm.firstChild.data = textstring
             else:
-                session.warn("Text element %s has no contents." % xmlid)
+                elm.firstChild.data = textstring
+            
+            audio_elm = get_audio_sibling(elm)
+            if audio_elm != None:
+                audio_elm.setAttribute("src", "./audio/" + audiouri)
+                audio_elm.setAttribute("from", "")
+        else:
+            session.warn("Text element %s has no contents." % xmlid)
     
     #outpath = os.path.join("./", table + ".xml")
     #outfile = open(outpath, "w")
@@ -206,7 +211,14 @@ def export_xml(session, file, langid):
     #outfile.close()
     return doc.toxml().encode("utf-8")
 
-    
+def get_audio_sibling(elm):
+    """Get the audio sibling for this text element"""
+    audios = elm.parentNode.getElementsByTagName("audio")
+    if audios != None and len(audios) > 0:
+        return audios[0]
+    else:
+        return None
+
 def export_rc(session, langid):
     # these are template keywords
     # the microsoft #xyz statements had to be replaced with $ms_xyz in the template
@@ -222,6 +234,6 @@ def export_rc(session, langid):
         "ms_else": "#else"}
     
     rc = FillRC(session, langid)
-    t = AmisRCTemplate(searchList=msterms)
+    t = amis_templates.AmisRCTemplate.AmisRCTemplate(searchList=msterms)
     t.rc = rc
     return t.respond()
