@@ -168,7 +168,7 @@ die just yet."""
                 self.execute_query("""UPDATE %s SET audiouri="%s", audioflag=1 WHERE id=%d""" %
                         (self.make_table_name(langid), audio_src, string[0]))
             else:
-                self.warn("""No match between string="%s" and label="%s"?!""" %
+                self.warn("""No match between db string="%s" and ncx label="%s"?!""" %
                         (string[1], text))
 
     def process_changes(self, langid, removed_ids):
