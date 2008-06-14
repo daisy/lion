@@ -51,7 +51,7 @@ BEGIN
     "LANGUAGE 9, 1\r\n"
     "$ms_pragma code_page(1252)\r\n"
     "$ms_endif //_WIN32\r\n"
-    "$ms_include ""res\\AmisGuiMFC2.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "$ms_include ""res\\AmisLangpack.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
     "$ms_include ""afxres.rc""         // Standard components\r\n"
     "$ms_endif\r\n"
     "\0"
@@ -268,7 +268,7 @@ BEGIN
     PUSHBUTTON      "$rc.s("t260")",IDC_BROWSE,260,39,45,13
     PUSHBUTTON      "$rc.s("t170")",IDC_STARTSEARCH,103,63,50,15
     CTEXT           "$rc.s("t176")",IDC_SEARCHING,7,92,298,13,NOT WS_VISIBLE
-    LISTBOX         IDC_FILESFOUND,7,105,298,156,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_FILESFOUND,7,105,298,156,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "$rc.s("t183")",IDC_OPENBOOK,103,266,50,14
     PUSHBUTTON      "$rc.s("t264")",IDCANCEL,158,266,50,14
     PUSHBUTTON      "$rc.s("t173")",IDC_STOPSEARCH,158,63,50,15
@@ -303,7 +303,7 @@ CAPTION "$rc.s("t154")"
 FONT 8, "MS Sans Serif", 0, 0, 0x0
 BEGIN
     LTEXT           "$rc.s("t155")",IDC_MULTIVOLCD_INSTRUCTIONS,7,7,239,25
-    LISTBOX         IDC_BOOKLIST,7,32,239,125,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LISTBOX         IDC_BOOKLIST,7,32,239,125,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "$rc.s("t157")",IDC_OPENBOOK,73,159,50,14
     PUSHBUTTON      "$rc.s("t264")",IDCANCEL,130,159,50,14
 END
