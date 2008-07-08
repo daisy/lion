@@ -128,3 +128,15 @@ def add_accelerator(session, langid, textstring, stringid, refid, keys):
     session.trace_msg("Remember to change the next-id value in the AMIS XML file.")
     return True
 
+def change_item(session, langid, textstring, stringid):
+    """Change the item at stringid to the given text"""
+    # make sure the item exists
+    if session.check_string_id(langid, stringid) == None:
+        session.die("String with ID %s does not exist" % stringid)
+        return False
+    
+    table = session.make_table_name(langid)
+    session.execute_query("""UPDATE %(table)s SET textstring="%(textstring)s",\
+        textflag=2 WHERE xmlid="%(xmlid)s" """ %\
+        {"table": table, "textstring": textstring, "xmlid": stringid})
+    return True

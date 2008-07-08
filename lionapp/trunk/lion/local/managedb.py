@@ -253,7 +253,14 @@ die just yet."""
         if success == True:
             self.process_changes(langid, None)
     
-    
+    def change_item(self, langid, textstring, stringid):
+        """Change the text of the item at the given ID.  Reflect the change in the other tables.
+        Assumed: the language given by langid is the master language"""
+        success = self.dbio.change_item(self, langid, textstring, stringid)
+        if success == True:
+            self.process_changes(langid, None)
+        
+
 def usage(code=0):
     """Print usage information and exits with an error code."""
     print """
@@ -268,14 +275,16 @@ Usage:
 --realname=realname                              
                                                  Add a new language
   %(script)s --remove_language --langid=id       Remove a language
-  %(script)s --add_string --langid=id --textstring=string --stringid=id 
+  %(script)s --add_string --langid=id --text=string --stringid=id 
                                                  Add a string to all tables
   %(script)s --remove_string --langid=id --stringid=id
                                                  Remove an item from all tables
-  %(script)s --add_accelerator --langid=id --textstring=string --stringid=id
+  %(script)s --add_accelerator --langid=id --text=string --stringid=id
 --refid=id --keys=accelerator                    Add an accelerator to all tables
   %(script)s --strings --langid=id               Output XML of strings, not including keyboard shortcuts
   %(script)s --all_strings --langid=id           Output XML of strings, including keyboard shortcuts
+  %(script)s --change_item --langid=id --text=string --stringid=id  
+                                                Change an item in the master table and reflect the change elsewhere 
   
 Other options:
   --application, -a: which application module to use (e.g. "amis" or "obi")
@@ -308,6 +317,7 @@ def main():
     stringid = None
     refid = None
     actualkeys = None
+    change_item = False
     try:
         """
         a: - application
@@ -333,7 +343,7 @@ def main():
                 "username=", "password=", "realname=", "email=", "force", 
                 "stringid=", "text=", "remove_item", "add_string", "refid=", 
                 "keys=", "add_accelerator", "strings", "all_strings",
-                "export_rc", "audio_prompts="])
+                "export_rc", "audio_prompts=", "change_item"])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
@@ -366,6 +376,7 @@ def main():
         elif opt in ("--refid"): refid = arg
         elif opt in ("--keys"): actualkeys = arg
         elif opt in ("--add_accelerator"): add_accel = True
+        elif opt in ("--change_item"): change_item = True
         elif opt in ("-s", "--strings"):
             action = lambda s, f, l: s.strings(l)
         elif opt in ("--all_strings"):
@@ -382,6 +393,8 @@ def main():
         session.remove_item(langid, stringid)
     elif add_accel == True:
         session.add_accelerator(langid, textstring, stringid, refid, actualkeys)
+    elif change_item == True:
+        session.change_item(langid, textstring, stringid)
     else:
         action(session, file, langid)
 

@@ -183,6 +183,9 @@ def export_xml(session, file, langid):
     session = DBSession(False, False, "amis")
     session.execute_query("SELECT xmlid, textstring, actualkeys, role, audiouri FROM %s" % table)
     doc = minidom.parse(file)
+    if doc == None:
+        session.die("Document could not be parsed.")
+    
     for xmlid, textstring, actualkeys, role, audiouri in session.cursor:
         elm = amis_import.get_element_by_id(doc, "text", xmlid)
         if elm == None: 
