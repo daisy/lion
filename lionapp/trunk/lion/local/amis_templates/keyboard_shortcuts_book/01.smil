@@ -3,23 +3,20 @@
 <smil>
 	<head>
 		<meta name="dc:format" content="Daisy 2.02"/>
-		<meta name="title" content="Climbing the Highest Mountain"/>
-		<meta name="dc:title" content="Climbing the Highest Mountain"/>
+		<meta name="title" content="AMIS Keyboard Shortcuts"/>
+		<meta name="dc:title" content="AMIS Keyboard Shortcuts"/>
 		<meta name="ncc:totalElapsedTime" content="00:00:00"/>
-		<meta name="ncc:timeInThisSmil" content="00:00:30"/>
-		<meta name="ncc:generator" content="Skippability Tweaker 0.1.53"/>
+		<meta name="ncc:timeInThisSmil" content="00:00:00"/>
 		<layout>
 			<region id="txtView"/>
 		</layout>
-		<meta name="dc:identifier" content="skipdemo-amsterdam"/>
+		<meta name="dc:identifier" content="amis-keyboard-shortcuts-$langid"/>
 	</head>
 	<body>
-		<seq dur="30.076s">
-			<par endsync="last">
-				<text src="ncconlydemo.html#bagw_0001" id="bagw_0001"/>
-				<seq>
-					<audio src="bagw0019.mp3" clip-begin="npt=0.000s" clip-end="npt=2.035s" id="qwrt_0001"/>
-				</seq>
+		<seq dur="00.000s">
+			<par endsync="last" id="par01">
+				<text src="shortcuts.html#txt01"/>
+				<audio src="$get_audio($t1)"/>
 			</par>
 			<par endsync="last">
 				<text src="ncconlydemo.html#bagw_0001" id="xbag_0001"/>
