@@ -1,0 +1,47 @@
+#*
+	$title
+	$langid
+	$menus
+	$other_shortcuts
+	$organized_by_menu
+	$title
+*#
+
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>$title</title>
+		<meta name="dc:identifier" content="amis-keyboard-shortcuts-$langid"/>
+		<link rel="stylesheet" type="text/css" href="style.css"/>
+		<meta name="ncc:charset" content="utf-8"/>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+	</head>
+	<body>
+		<h1 class="title" id="title">$title</h1>
+		<p id="summary">Commands for AMIS and corresponding keyboard shortcuts are given below.  Some commands have only single-letter shortcuts to be used once inside the menu.  Other commands have multi-key combinations.</a></p>
+			
+		<h1 id="menus">$organized_by_menu</h1>
+		
+		#for menu in menus:
+			<h2 id="$menu.text_id">$menu.text ($menu.shortcut)</h2>
+			<ul>
+			#for menuitem in menu:
+				<li><span id="$menuitem.text_id()">$menuitem.text:</span>
+					<span id="$menuitem.shortcut_id()">$menuitem.shortcut</span>
+				</li>
+			#end for	
+			</ul>
+		#end for
+		
+		<h1 id="other">$other_shortcuts</h1>
+		<ul>
+			#for item in other:
+				<li>
+					<span id="$menuitem.text_id()">$menuitem.text:</span>
+					<span id="$menuitem.shortcut_id()">$menuitem.shortcut</span>
+				</li>
+			#end for	
+		</ul>	
+	</body>
+</html>

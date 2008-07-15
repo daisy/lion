@@ -1,3 +1,11 @@
+#*
+	$menus
+	$title
+	$langid
+	$organized_by_menu
+	$other_shortcuts
+*#
+
 <?xml version="1.0" encoding="windows-1252"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -19,51 +27,25 @@
 	</head>
 	<body>
 		
-		<h1 class="title" id="nav01">
-			<a href="01.smil#par01">Keyboard Shortcuts</a>
+		<h1 class="title" id="nav1">
+			<a href="1.smil#par1">$title</a>
 		</h1>
 		
-		<h1 id="nav02">
-			<a href="02.smil#par01">Organized by menu</a>
+		<h1 id="nav2">
+			<a href="2.smil#par1">$organized_by_menu</a>
 		</h1>
 		
-		<!--FILE-->
-		<h2 id="nav03">
-			<a href="03.smil#par01">$t1</a>
-		</h2>
+		#count = 3
+		#for menu in menus:
+			<h2 id="nav$count">
+				<a href="$count.smil#par1">$menu[0].text</a>
+			</h2>
+			#count = count + 1
+		#end for
 		
-		<!--VIEW-->
-		<h2 id="nav04">
-			<a href="04.smil#par01">$t26</a>
-		</h2>
 		
-		<!--PLAY-->
-		<h2 id="nav05">
-			<a href="05.smil#par01">$t46</a>
-		</h2>
-		
-		<!--NAVIGATE-->
-		<h2 id="nav06">
-			<a href="06.smil#par01">$t81</a>
-		</h2>
-		
-		<!--BOOKMARKS-->
-		<h2 id="nav07">
-			<a href="07.smil#par01">$t115</a>
-		</h2>
-		
-		<!--INFO-->
-		<h2 id="nav08">
-			<a href="08.smil#par01">$t122</a>
-		</h2>
-		
-		<!--HELP-->
-		<h2 id="nav09">
-			<a href="09.smil#par01">$t137</a>
-		</h2>
-
-		<h1 id="nav10">
-			<a href="10.smil#par01">Other shortcuts (not in menu)</a>
+		<h1 id="nav$count">
+			<a href="$count.smil#par1">$other_shortcuts</a>
 		</h1>
 		
 		

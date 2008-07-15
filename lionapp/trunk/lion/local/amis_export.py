@@ -9,6 +9,26 @@ from xml.dom import minidom, Node
 import os
 import codecs
 
+def __get_textstring(strid):
+    self.session.execute_query("SELECT textstring FROM %s WHERE xmlid='%s'" % (self.table, strid))
+    row = self.session.cursor.fetchone()
+    if row == None or len(row) == 0: return None
+    else: return row[0]
+
+def __get_mnemonic(strid):
+    self.session.execute_query("SELECT textstring FROM %s WHERE role='MNEMONIC' AND target='%s'" \
+        % (self.table, strid))
+    row = self.session.cursor.fetchone()
+    if row == None or len(row) == 0: return None
+    else: return row[0]
+
+def __get_accelerator(strid):
+    self.session.execute_query("SELECT textstring FROM %s WHERE role='ACCELERATOR' AND target='%s'" \
+        % (self.table, strid))
+    row = self.session.cursor.fetchone()
+    if row == None or len(row) == 0: return None
+    else: return row[0]
+
 class FillRC():
     # note that VK_ADD and VK_SUBTRACT (number pad +/-) are permanently mapped
     # to the +/- keys in the template
@@ -46,26 +66,6 @@ class FillRC():
         self.langid = langid
         self.session = session
         self.table = self.session.make_table_name(langid)
-    
-    def __get_textstring(self, strid):
-        self.session.execute_query("SELECT textstring FROM %s WHERE xmlid='%s'" % (self.table, strid))
-        row = self.session.cursor.fetchone()
-        if row == None or len(row) == 0: return None
-        else: return row[0]
-    
-    def __get_mnemonic(self, strid):
-        self.session.execute_query("SELECT textstring FROM %s WHERE role='MNEMONIC' AND target='%s'" \
-            % (self.table, strid))
-        row = self.session.cursor.fetchone()
-        if row == None or len(row) == 0: return None
-        else: return row[0]
-    
-    def __get_accelerator(self, strid):
-        self.session.execute_query("SELECT textstring FROM %s WHERE role='ACCELERATOR' AND target='%s'" \
-            % (self.table, strid))
-        row = self.session.cursor.fetchone()
-        if row == None or len(row) == 0: return None
-        else: return row[0]
     
     def __apply_mnemonic(self, caption, mnemonic):
         if mnemonic == None or len(mnemonic) == 0:
@@ -240,3 +240,61 @@ def export_rc(session, langid):
     t = amis_templates.AmisRCTemplate.AmisRCTemplate(searchList=msterms)
     t.rc = rc
     return t.respond()
+
+
+def __calculate_menus(session, langid, xmlfile):
+    doc = minidom.parse(xmlfile)
+    if doc == None:
+        session.die("Document could not be parsed.")
+    
+    # get the menu structure from the XML file
+    toplevel = []
+    elms = doc.getElementsByTagName("container")
+    for elm in elms:
+        if elm.parentNode.tagName == "containers":
+            toplevel.add(elm)
+    
+    menus = []
+    for elm in toplevel:
+        menu = []
+        menu.add(elm)
+        for node in elm.childNodes:
+            if node.tagName == "action" or node.tagName == "container":
+                menu.add(node)
+        menus.add(__make_menu(menu))
+    
+    return menus
+    # toplevel = ["t1", "t26", "t46", "t81", "t115", "t122", "t137"]
+    
+def __make_menu(elms):
+    """return an object with text, shortcut, textid, and shortcutid"""
+    # the menu list represents the menuheader followed by all its first-level children
+    # there is no need to go any deeper
+    menulist = []
+    for elm in elms:
+        caption = elm.getElementsByTagName("caption")
+        text = caption.getElementsByTagName("text")
+        menuitem.textid = text.getAttribute("id")
+        menulist.add(menuitem)
+    
+    # now we have all the ids in the menulist
+    # use the DB to get the rest of the data
+    for item in menulist:
+        textstring = __get_textstring(item.textid)
+        item.text = textstring
+        shortcut = __get_accelerator(item.textid)
+        if shortcut == None:
+            shortcut = __get_mnemonic(item.textid)
+        item.shortcut = shortcut
+        item.shortcutid = item.textid + "s"
+
+def export_keyboard_shortcuts(session, langid, xmlfile):
+    """Fill in the templates for the keyboard shortcuts book"""
+    menus = calculate_menus(session, langid, xmlfile)
+    
+    # fill in the NCC template
+    
+    # fill in the text template
+    
+    # for each menu item, fill in a smil template.  watch the numbering.
+    
