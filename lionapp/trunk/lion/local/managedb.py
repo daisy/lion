@@ -115,6 +115,9 @@ die just yet."""
     def export_rc(self, langid):
         print self.dbio.export_rc(self, langid)
     
+    def export_keys_book(self, file, langid):
+        self.dbio.export_keys_book(self, file, langid)
+    
     def strings(self, langid):
         """Export strings to stdout"""
         self.trace_msg("Export strings to stdout")
@@ -343,7 +346,7 @@ def main():
                 "username=", "password=", "realname=", "email=", "force", 
                 "stringid=", "text=", "remove_item", "add_string", "refid=", 
                 "keys=", "add_accelerator", "strings", "all_strings",
-                "export_rc", "audio_prompts=", "change_item"])
+                "export_rc", "audio_prompts=", "change_item", "export_keys_book"])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
@@ -384,6 +387,9 @@ def main():
         elif opt in ("--audio_prompts"):
             ncx = arg
             action = lambda s, f, l: s.audio_prompts(l, ncx)
+        elif opt in ("--export_keys_book"):
+            action = lambda s, f, l: s.export_keys_book(f, l)
+    
     session = DBSession(trace, force, app)
     if add_language == True:
         session.add_language(langid, langname, username, password, realname, email)

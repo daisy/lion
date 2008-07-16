@@ -8,24 +8,27 @@ import amis_import
 from xml.dom import minidom, Node
 import os
 import codecs
+import amis_templates.keyboard_shortcuts_book.ncc
+import amis_templates.keyboard_shortcuts_book.smil
+import amis_templates.keyboard_shortcuts_book.xhtml_daisy_text
 
-def __get_textstring(strid):
-    self.session.execute_query("SELECT textstring FROM %s WHERE xmlid='%s'" % (self.table, strid))
-    row = self.session.cursor.fetchone()
+def __get_textstring(session, table, strid):
+    session.execute_query("SELECT textstring FROM %s WHERE xmlid='%s'" % (table, strid))
+    row = session.cursor.fetchone()
     if row == None or len(row) == 0: return None
     else: return row[0]
 
-def __get_mnemonic(strid):
-    self.session.execute_query("SELECT textstring FROM %s WHERE role='MNEMONIC' AND target='%s'" \
-        % (self.table, strid))
-    row = self.session.cursor.fetchone()
+def __get_mnemonic(session, table, strid):
+    session.execute_query("SELECT textstring FROM %s WHERE role='MNEMONIC' AND target='%s'" \
+        % (table, strid))
+    row = session.cursor.fetchone()
     if row == None or len(row) == 0: return None
     else: return row[0]
 
-def __get_accelerator(strid):
-    self.session.execute_query("SELECT textstring FROM %s WHERE role='ACCELERATOR' AND target='%s'" \
-        % (self.table, strid))
-    row = self.session.cursor.fetchone()
+def __get_accelerator(session, table, strid):
+    session.execute_query("SELECT textstring FROM %s WHERE role='ACCELERATOR' AND target='%s'" \
+        % (table, strid))
+    row = session.cursor.fetchone()
     if row == None or len(row) == 0: return None
     else: return row[0]
 
@@ -107,14 +110,14 @@ class FillRC():
     
     def menu(self, strid, accel=True):
         """Build a menu label"""
-        caption = self.__get_textstring(strid)
+        caption = self.__get_textstring(self.session, self.table, strid)
         if caption == None or len(caption) == 0:
             self.session.warn("No caption for %s" % strid)
             return ""
-        mnemonic = self.__get_mnemonic(strid)
+        mnemonic = self.__get_mnemonic(self.session, self.table, strid)
         caption = self.__apply_mnemonic(caption, mnemonic)
         if accel == True:
-            accelerator = self.__get_accelerator(strid)    
+            accelerator = self.__get_accelerator(self.session, self.table, strid)    
             if accelerator != None and len(accelerator) > 0:
                 caption += "\\t%s" % accelerator
         return caption
@@ -244,6 +247,7 @@ def export_rc(session, langid):
 
 def __calculate_menus(session, langid, xmlfile):
     doc = minidom.parse(xmlfile)
+    table = session.make_table_name(langid)
     if doc == None:
         session.die("Document could not be parsed.")
     
@@ -252,49 +256,86 @@ def __calculate_menus(session, langid, xmlfile):
     elms = doc.getElementsByTagName("container")
     for elm in elms:
         if elm.parentNode.tagName == "containers":
-            toplevel.add(elm)
+            toplevel.append(elm)
     
     menus = []
     for elm in toplevel:
         menu = []
-        menu.add(elm)
+        menu.append(elm)
         for node in elm.childNodes:
-            if node.tagName == "action" or node.tagName == "container":
-                menu.add(node)
-        menus.add(__make_menu(menu))
+            if node.nodeType == Node.ELEMENT_NODE and (node.tagName == "action" or node.tagName == "container") \
+                and not ("BASE_ID" in node.getAttribute("mfcid")):
+                menu.append(node)
+        menus.append(__make_menu(session, table, menu))
     
     return menus
     # toplevel = ["t1", "t26", "t46", "t81", "t115", "t122", "t137"]
-    
-def __make_menu(elms):
+
+class MenuItem():
+    def __init__(self):
+        self.text = ""
+        self.textid = ""
+        self.shortcut = ""
+        self.shortcutid = ""
+        self.audiofile = ""
+
+def __make_menu(session, table, elms):
     """return an object with text, shortcut, textid, and shortcutid"""
     # the menu list represents the menuheader followed by all its first-level children
     # there is no need to go any deeper
+    
+    #for el in elms:
+       # print el.toxml()
+        
     menulist = []
     for elm in elms:
         caption = elm.getElementsByTagName("caption")
-        text = caption.getElementsByTagName("text")
-        menuitem.textid = text.getAttribute("id")
-        menulist.add(menuitem)
+        text = caption[0].getElementsByTagName("text")
+        audio = caption[0].getElementsByTagName("audio")
+        menuitem = MenuItem()
+        menuitem.textid = text[0].getAttribute("id")
+        menuitem.audiofile = audio[0].getAttribute("src")
+        menulist.append(menuitem)
     
     # now we have all the ids in the menulist
     # use the DB to get the rest of the data
     for item in menulist:
-        textstring = __get_textstring(item.textid)
+        textstring = __get_textstring(session, table, item.textid)
         item.text = textstring
-        shortcut = __get_accelerator(item.textid)
+        shortcut = __get_accelerator(session, table, item.textid)
         if shortcut == None:
-            shortcut = __get_mnemonic(item.textid)
+            shortcut = __get_mnemonic(session, table, item.textid)
         item.shortcut = shortcut
         item.shortcutid = item.textid + "s"
+    
+    return menulist
 
-def export_keyboard_shortcuts(session, langid, xmlfile):
+def export_keys_book(session, xmlfile, langid):
     """Fill in the templates for the keyboard shortcuts book"""
-    menus = calculate_menus(session, langid, xmlfile)
+    menus = __calculate_menus(session, langid, xmlfile)
+    
+    print "MENUS"
+    print "----"
+    for menu in menus:
+        for m in menu:
+            print m.text
+            print m.textid
+            print m.shortcut
+            print m.shortcutid
+            print ""
+    print ""
     
     # fill in the NCC template
+    nav = amis_templates.keyboard_shortcuts_book.ncc.ncc()
+    nav.menus = menus
+    nav.title = "AMIS Keyboard Shortcuts"
+    nav.langid = "eng-US"
+    nav.organized_by_menu = "Organized by menu"
+    nav.other_shortcuts = "Other shortcuts"
+    
+    print nav.respond()
+    return None
     
     # fill in the text template
     
     # for each menu item, fill in a smil template.  watch the numbering.
-    

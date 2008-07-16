@@ -6,6 +6,7 @@
 	$other_shortcuts
 *#
 
+#import amis_export
 <?xml version="1.0" encoding="windows-1252"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -35,17 +36,17 @@
 			<a href="2.smil#par1">$organized_by_menu</a>
 		</h1>
 		
-		#count = 3
-		#for menu in menus:
+		#set $count=3
+		#for $menu in $menus:
 			<h2 id="nav$count">
-				<a href="$count.smil#par1">$menu[0].text</a>
+				<a href="${count}.smil#par1">$menu[0].text</a>
 			</h2>
-			#count = count + 1
+			#set $count += 1
 		#end for
 		
 		
 		<h1 id="nav$count">
-			<a href="$count.smil#par1">$other_shortcuts</a>
+			<a href="${count}.smil#par1">$other_shortcuts</a>
 		</h1>
 		
 		

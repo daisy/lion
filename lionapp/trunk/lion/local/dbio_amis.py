@@ -58,6 +58,10 @@ def export_rc(session, langid):
     session.trace_msg("RC Export for %s" % (langid))
     return amis_export.export_rc(session, langid)
 
+def export_keys_book(session, file, langid):
+    session.trace_msg ("Keyboard shortcuts book export for %s" % (langid))
+    return amis_export.export_keys_book(session, file, langid)
+
 # add or remove a single string from the master table
 def add_string(session, langid, textstring, stringid):
     """Add a new string to all tables
