@@ -283,10 +283,7 @@ def __make_menu(session, table, elms):
     """return an object with text, shortcut, textid, and shortcutid"""
     # the menu list represents the menuheader followed by all its first-level children
     # there is no need to go any deeper
-    
-    #for el in elms:
-       # print el.toxml()
-        
+            
     menulist = []
     for elm in elms:
         caption = elm.getElementsByTagName("caption")
@@ -296,6 +293,7 @@ def __make_menu(session, table, elms):
         menuitem.textid = text[0].getAttribute("id")
         menuitem.audiofile = audio[0].getAttribute("src")
         menulist.append(menuitem)
+    #TODO: get the audio for the mnemonics/accelerators
     
     # now we have all the ids in the menulist
     # use the DB to get the rest of the data
@@ -314,17 +312,8 @@ def export_keys_book(session, xmlfile, langid):
     """Fill in the templates for the keyboard shortcuts book"""
     menus = __calculate_menus(session, langid, xmlfile)
     
-    print "MENUS"
-    print "----"
-    for menu in menus:
-        for m in menu:
-            print m.text
-            print m.textid
-            print m.shortcut
-            print m.shortcutid
-            print ""
-    print ""
-    
+    # TODO: fill in "others" list
+    others_ids = [""]
     # fill in the NCC template
     nav = amis_templates.keyboard_shortcuts_book.ncc.ncc()
     nav.menus = menus
@@ -333,9 +322,16 @@ def export_keys_book(session, xmlfile, langid):
     nav.organized_by_menu = "Organized by menu"
     nav.other_shortcuts = "Other shortcuts"
     
-    print nav.respond()
-    return None
+    navstring = nav.respond()
     
     # fill in the text template
-    
+    txt = amis_templates.keyboard_shortcuts_book.xhtml_daisy_text.xhtml_daisy_text()
+    txt.title = "AMIS Keyboard Shortcuts"
+    txt.langid = "eng-US"
+    txt.menus = menus
+    txt.other_shortcuts = "Other shortcuts"
+    txt.organized_by_menu = "Organized by menu"
+    txt.others = None
+    print txt.respond()
+	
     # for each menu item, fill in a smil template.  watch the numbering.

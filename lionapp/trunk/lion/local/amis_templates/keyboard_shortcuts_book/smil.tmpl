@@ -21,8 +21,12 @@
 			#count = 1
 			#for item in menuitems:
 				<par endsync="last" id="par$count">
-					<text src="$item.text"/>
-					<audio src="$item.audio"/>
+					<text src="${textfile}#$item.textid"/>
+					<audio src="$item.audiofile"/>
+				</par>
+				<par endsync="last" id="par${count}_s">
+					<text src="${textfile}#item.shortcutid"/>
+					<audio src="$item.shortcutaudio"/>
 				</par>
 				#count = count + 1
 			#end for	
