@@ -1,16 +1,14 @@
-# for now, this file can be run on its own
-# eventually it should be hooked into the managedb functions
-
-from managedb import *
-#from amis_templates import AmisRCTemplate
-import amis_templates.AmisRCTemplate
-import amis_import
-from xml.dom import minidom, Node
 import os
+os.sys.path.append("../../")
+import managedb
+from managedb import *
+from xml.dom import minidom, Node
 import codecs
-import amis_templates.keyboard_shortcuts_book.ncc
-import amis_templates.keyboard_shortcuts_book.smil
-import amis_templates.keyboard_shortcuts_book.xhtml_daisy_text
+import amis_import
+import templates.AmisRCTemplate
+import templates.ncc
+import templates.smil
+import templates.xhtml_daisy_text
 
 def __get_textstring(session, table, strid):
     session.execute_query("SELECT textstring FROM %s WHERE xmlid='%s'" % (table, strid))
