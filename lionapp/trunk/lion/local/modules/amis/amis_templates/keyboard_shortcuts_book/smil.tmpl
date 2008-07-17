@@ -1,0 +1,35 @@
+#*
+	$menuitems
+*#
+
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE smil PUBLIC "-//W3C//DTD SMIL 1.0//EN" "http://www.w3.org/TR/REC-smil/SMIL10.dtd">
+<smil>
+	<head>
+		<meta name="dc:format" content="Daisy 2.02"/>
+		<meta name="title" content="AMIS Keyboard Shortcuts"/>
+		<meta name="dc:title" content="AMIS Keyboard Shortcuts"/>
+		<meta name="ncc:totalElapsedTime" content="00:00:00"/>
+		<meta name="ncc:timeInThisSmil" content="00:00:00"/>
+		<layout>
+			<region id="txtView"/>
+		</layout>
+		<meta name="dc:identifier" content="amis-keyboard-shortcuts-$langid"/>
+	</head>
+	<body>
+		<seq dur="00.000s">
+			#count = 1
+			#for item in menuitems:
+				<par endsync="last" id="par$count">
+					<text src="${textfile}#$item.textid"/>
+					<audio src="$item.audiofile"/>
+				</par>
+				<par endsync="last" id="par${count}_s">
+					<text src="${textfile}#item.shortcutid"/>
+					<audio src="$item.shortcutaudio"/>
+				</par>
+				#count = count + 1
+			#end for	
+		</seq>
+	</body>
+</smil>
