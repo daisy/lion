@@ -15,50 +15,48 @@ XHTML_TEMPLATE = """
   <body>%(BODY)s</body>
 </html>"""
 
-def import_from_xml(session, doc, langid):
-    """Import a document object (from minidom) into a table."""
-    session.trace_msg("IMPORT FROM AMIS.")
-    table = session.make_table_name(langid)
+class LionIO:
+    def import_from_xml(session, doc, langid):
+        """Import a document object (from minidom) into a table."""
+        session.trace_msg("IMPORT FROM AMIS.")
+        table = session.make_table_name(langid)
     
-    # clear the table
-    session.execute_query("DELETE FROM %s" % table)
+        # clear the table
+        session.execute_query("DELETE FROM %s" % table)
     
-    # add all the text item data to the table
-    for elem in doc.getElementsByTagName("text"):
-        data = amis_import.parse_text_element(session, elem)
-        if data:
-            textstring, audiouri, xmlid, textflag, audioflag = data
-            # keys = the actual keys associated with a command
-            keys = elem.parentNode.tagName == "accelerator" and \
-                elem.parentNode.getAttribute("keys") or "NULL"
+        # add all the text item data to the table
+        for elem in doc.getElementsByTagName("text"):
+            data = amis_import.parse_text_element(session, elem)
+            if data:
+                textstring, audiouri, xmlid, textflag, audioflag = data
+                # keys = the actual keys associated with a command
+                keys = elem.parentNode.tagName == "accelerator" and \
+                    elem.parentNode.getAttribute("keys") or "NULL"
         
-        session.execute_query(
-        """INSERT INTO %(table)s (textstring, textflag, audioflag, audiouri, xmlid,
-        actualkeys) VALUES ("%(textstring)s", "%(textflag)d", "%(audioflag)d",
-        "%(audiouri)s", "%(xmlid)s", "%(keys)s")""" % \
-        {"table": table, "textstring": textstring, "textflag": textflag,
-            "audioflag": audioflag, "audiouri": audiouri, "xmlid": xmlid,
-            "keys": keys})
+            session.execute_query(
+            """INSERT INTO %(table)s (textstring, textflag, audioflag, audiouri, xmlid,
+            actualkeys) VALUES ("%(textstring)s", "%(textflag)d", "%(audioflag)d",
+            "%(audiouri)s", "%(xmlid)s", "%(keys)s")""" % \
+            {"table": table, "textstring": textstring, "textflag": textflag,
+                "audioflag": audioflag, "audiouri": audiouri, "xmlid": xmlid,
+                "keys": keys})
     
-    # specify relationships 
-    amis_import.set_roles(doc, session, table)
-    amis_import.find_mnemonic_groups(doc, session, table)
-    amis_import.find_accelerator_targets(doc, session, table)
+        # specify relationships 
+        amis_import.set_roles(doc, session, table)
+        amis_import.find_mnemonic_groups(doc, session, table)
+        amis_import.find_accelerator_targets(doc, session, table)
 
-def get_removed_ids(doc):
-    """Items that have been removed are specified in the document root's 
-    "removed" attribute"""
-    return amis_import.process_removals(doc)
+    def get_removed_ids_after_import(doc):
+        """Items that have been removed are specified in the document root's 
+        "removed" attribute"""
+        return amis_import.process_removals(doc)
     
-def export_xml(session, file, langid):
-    session.trace_msg("XML Export for %s to %s" % (langid, file))
-    return amis_export.export_xml(session, file, langid)
-
-def export_rc(session, langid):
-    session.trace_msg("RC Export for %s" % (langid))
-    return amis_export.export_rc(session, langid)
-
-def export_keys_book(session, file, langid):
-    session.trace_msg ("Keyboard shortcuts book export for %s" % (langid))
-    return amis_export.export_keys_book(session, file, langid)
-
+    def export(self, session, file, langid, export_type):
+        if export_type == 1:
+            return amis_export.export_xml(session, file, langid)
+        elif export_type == 2:
+            return amis_export.export_rc(session, langid)
+        elif export_type == 3:
+            return amis_export.export_keys_book(session, xmlfile, langid)
+        
+    

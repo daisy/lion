@@ -180,6 +180,7 @@ class FillRC():
         return val
 
 def export_xml(session, file, langid):
+    session.trace_msg("XML Export for %s to %s" % (langid, file))
     table = session.make_table_name(langid)
     session = DBSession(False, False, "amis")
     session.execute_query("SELECT xmlid, textstring, actualkeys, role, audiouri FROM %s" % table)
@@ -207,12 +208,6 @@ def export_xml(session, file, langid):
         else:
             session.warn("Text element %s has no contents." % xmlid)
     
-    #outpath = os.path.join("./", table + ".xml")
-    #outfile = open(outpath, "w")
-    #outfile.write(codecs.BOM_UTF8)
-    #outfile.write(doc.toxml().encode("utf-8"))   
-    #outfile.write("\n")
-    #outfile.close()
     return doc.toxml().encode("utf-8")
 
 def get_audio_sibling(elm):
@@ -227,6 +222,7 @@ def export_rc(session, langid):
     # these are template keywords
     # the microsoft #xyz statements had to be replaced with $ms_xyz in the template
     # because "#" is a special character for cheetah (the templating system)
+    session.trace_msg("RC Export for %s" % (langid))
     msterms = {"ms_include": "#include",
         "ms_define": "#define",
         "ms_if": "#if",
@@ -308,6 +304,8 @@ def __make_menu(session, table, elms):
 
 def export_keys_book(session, xmlfile, langid):
     """Fill in the templates for the keyboard shortcuts book"""
+    session.trace_msg ("Keyboard shortcuts book export for %s" % (langid))
+    
     menus = __calculate_menus(session, langid, xmlfile)
     
     # TODO: fill in "others" list

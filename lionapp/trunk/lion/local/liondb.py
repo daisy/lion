@@ -2,15 +2,17 @@ import getopt
 import os
 from xml.dom import minidom
 import addremove_language
+from dbsession import DBSession
 
 class LionDB(DBSession):
     def __init__(self, app=None):
         if app:
             # Import the application module
-            module = "modules." + app + ".lionio_" + app
-            self.trace_msg("import %s" % module)
+            module_name = "modules." + app + ".lionio_" + app
+            self.trace_msg("import %s" % module_name)
             try:
-                self.dbio = __import__(module)
+                module = __import__(module_name, globals(), locals(), [''], -1)
+                self.dbio = module.LionIO()
             except Exception, e :
                 self.die("""Unknown application "%s" (%s)""" % (app, e))
     
@@ -55,16 +57,7 @@ class LionDB(DBSession):
     
     def export(self, file, langid, export_type):
         print self.dbio.export(self, file, langid, export_type)
-    """
-    def export_xml(self, file, langid):
-        print self.dbio.export_xml(self, file, langid)
     
-    def export_rc(self, langid):
-        print self.dbio.export_rc(self, langid)
-    
-    def export_keys_book(self, file, langid):
-        self.dbio.export_keys_book(self, file, langid)
-    """
     def print_all_strings(self, langid):
         """Export all strings to stdout"""
         self.trace_msg("Export all strings to stdout")
