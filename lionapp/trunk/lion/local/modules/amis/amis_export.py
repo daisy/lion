@@ -1,7 +1,6 @@
 import os
 os.sys.path.append("../../")
-import managedb
-from managedb import *
+from liondb import *
 from xml.dom import minidom, Node
 import codecs
 import amis_import
@@ -314,7 +313,7 @@ def export_keys_book(session, xmlfile, langid):
     nav = amis_templates.keyboard_shortcuts_book.ncc.ncc()
     nav.menus = menus
     nav.title = "AMIS Keyboard Shortcuts"
-    nav.langid = "eng-US"
+    nav.langid = langid
     nav.organized_by_menu = "Organized by menu"
     nav.other_shortcuts = "Other shortcuts"
     
@@ -323,7 +322,7 @@ def export_keys_book(session, xmlfile, langid):
     # fill in the text template
     txt = amis_templates.keyboard_shortcuts_book.xhtml_daisy_text.xhtml_daisy_text()
     txt.title = "AMIS Keyboard Shortcuts"
-    txt.langid = "eng-US"
+    txt.langid = langid
     txt.menus = menus
     txt.other_shortcuts = "Other shortcuts"
     txt.organized_by_menu = "Organized by menu"

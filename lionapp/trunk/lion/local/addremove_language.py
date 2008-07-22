@@ -48,7 +48,7 @@ def _add_language_to_database(session, langid, langname, username, password, rea
     
     # create the new table as a copy of the english table
     table = session.make_table_name(langid)
-    session.execute_query("CREATE TABLE %s SELECT * from eng_US" % table)
+    session.execute_query("CREATE TABLE %s SELECT * from %s" % (table, session.get_masterlang_table()))
     
     # flag all "TODO" and clear some fields
     session.execute_query("UPDATE %s SET textflag=3, audioflag=3, \

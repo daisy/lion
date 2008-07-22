@@ -1,12 +1,19 @@
-import getopt
-import os
 from xml.dom import minidom
+from ConfigParser import ConfigParser
 import addremove_language
 from dbsession import DBSession
 
 class LionDB(DBSession):
-    def __init__(self, app=None):
+    def __init__(self, trace=False, force=False, app=None):
         if app:
+            self.trace = trace
+            self.force = force
+            self.config = ConfigParser()
+            self.config.read("lion.cfg")
+            self.masterlang = self.config.get("main", "masterlang")
+            self.trace_msg(self.masterlang)
+            
+            DBSession.__init__(self, trace, force)
             # Import the application module
             module_name = "modules." + app + ".lionio_" + app
             self.trace_msg("import %s" % module_name)
@@ -44,6 +51,9 @@ class LionDB(DBSession):
         """Formalize our way of naming a table based on language ID"""
         return langid.replace("-", "_")
 
+    def get_masterlang_table(self):
+        return make_table_name(self.masterlang)
+    
     def import_xml(self, file, langid):
         """Import from XML to the database."""
         if not file: die("No XML file given.")
@@ -58,7 +68,7 @@ class LionDB(DBSession):
     def export(self, file, langid, export_type):
         print self.dbio.export(self, file, langid, export_type)
     
-    def print_all_strings(self, langid):
+    def all_strings(self, langid):
         """Export all strings to stdout"""
         self.trace_msg("Export all strings to stdout")
         table = self.make_table_name(langid)
@@ -66,21 +76,21 @@ class LionDB(DBSession):
             where (role="STRING" or role="MENUITEM" or role="DIALOG" or \
             role="CONTROL") and translate=1""")
         strings = self.cursor.fetchall()
-        print __stringlist_to_xml(strings)
+        print self.__stringlist_to_xml(strings, langid)
     
-    def print_textstrings(self, langid):
+    def textstrings(self, langid):
         """Export all strings to stdout"""
         self.trace_msg("Export strings to stdout")
         table = self.make_table_name(langid)
         self.execute_query("SELECT textstring FROM " + table)
         strings = self.cursor.fetchall()
-        print __stringlist_to_xml(strings)
+        print self.__stringlist_to_xml(strings, langid)
     
-    def __stringlist_to_xml(self, results):
+    def __stringlist_to_xml(self, results, langid):
         """Get all strings that have the given roles"""
         output = """<?xml version="1.0"?>\n<strings langid=\"""" + langid + "\">"
         for item in results:
-            output += "<s>" + string[0].encode("utf-8") + "</s>"
+            output += "<s>" + item[0].encode("utf-8") + "</s>"
         output += "</strings>"
         return output
     
@@ -255,4 +265,5 @@ class LionDB(DBSession):
         # re-added to all tables each time anything changes
         self.execute_query("UPDATE %s SET textflag=1 WHERE textflag=2 \
             or textflag=3" % table)
+            
 
