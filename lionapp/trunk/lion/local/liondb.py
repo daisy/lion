@@ -14,12 +14,18 @@ class LionDB(DBSession):
             self.trace_msg(self.masterlang)
             
             DBSession.__init__(self, trace, force)
-            # Import the application module
+            
+            # Import the application module, which lives here:
+            # top-level/modules/APP/lionio_APP.someclass
+            # someclass is defined in the config file and it inherits from LionIOModule
             module_name = "modules." + app + ".lionio_" + app
             self.trace_msg("import %s" % module_name)
             try:
                 module = __import__(module_name, globals(), locals(), [''], -1)
-                self.dbio = module.LionIO()
+                classname = module + "." + self.config.read(app, "dbioclass")
+                obj = eval(classname)
+                self.dbio = obj()
+            
             except Exception, e :
                 self.die("""Unknown application "%s" (%s)""" % (app, e))
     
@@ -60,8 +66,7 @@ class LionDB(DBSession):
         if not self.check_language(langid):
             die("No table for language %s." % langid)
         self.trace_msg("Import from " + file + " for " + langid)
-        doc = minidom.parse(file)
-        self.dbio.import_from_xml(self, doc, langid)
+        self.dbio.import_from_xml(self, file, langid)
         removed_ids = self.dbio.get_removed_ids(doc)
         self.process_changes(langid, removed_ids)
     

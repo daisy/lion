@@ -9,6 +9,8 @@ import templates.ncc
 import templates.smil
 import templates.xhtml_daisy_text
 
+# put these three in liondb
+
 def __get_textstring(session, table, strid):
     session.execute_query("SELECT textstring FROM %s WHERE xmlid='%s'" % (table, strid))
     row = session.cursor.fetchone()
