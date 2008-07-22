@@ -221,7 +221,26 @@ class LionDB(DBSession):
             {"table": table, "textstring": textstring, "xmlid": stringid})
         __process_changes(langid, None)
     
-    
+    def get_textstring(self, table, strid):
+        self.execute_query("SELECT textstring FROM %s WHERE xmlid='%s'" % (table, strid))
+        row = self.cursor.fetchone()
+        if row == None or len(row) == 0: return None
+        else: return row[0]
+
+    def get_mnemonic(self, table, strid):
+        self.execute_query("SELECT textstring FROM %s WHERE role='MNEMONIC' AND target='%s'" \
+            % (table, strid))
+        row = self.cursor.fetchone()
+        if row == None or len(row) == 0: return None
+        else: return row[0]
+
+    def get_accelerator(self, table, strid):
+        self.execute_query("SELECT textstring FROM %s WHERE role='ACCELERATOR' AND target='%s'" \
+            % (table, strid))
+        row = self.cursor.fetchone()
+        if row == None or len(row) == 0: return None
+        else: return row[0]
+
     def __process_changes(self, langid, removed_ids):
         """Process the textflag values (2: changed, 3: new)
         and remove the IDs from all tables"""

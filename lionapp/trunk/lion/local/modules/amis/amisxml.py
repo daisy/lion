@@ -170,3 +170,10 @@ class AmisUiDoc(minidom.Document):
         """Escape double quotes inside a double-quoted string.""" 
         return str.replace("\"", "\\\"")
     
+    def get_audio_sibling(self, elm):
+        """Get the audio sibling for this text element"""
+        audios = elm.parentNode.getElementsByTagName("audio")
+        if audios != None and len(audios) > 0:
+            return audios[0]
+        else:
+            return None
