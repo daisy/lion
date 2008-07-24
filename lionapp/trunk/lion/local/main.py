@@ -62,6 +62,7 @@ def main():
     refid = None
     actualkeys = None
     change_item = False
+    output_folder = None
     try:
         opts, args = getopt.getopt(os.sys.argv[1:], "a:eF:hil:tn:u:p:r:e:fARs",
             ["application=", "export_xml", "file=", "help", "import", "langid=",
@@ -69,7 +70,8 @@ def main():
                 "username=", "password=", "realname=", "email=", "force", 
                 "stringid=", "text=", "remove_item", "add_string", "refid=", 
                 "keys=", "add_accelerator", "textstrings", "all_strings",
-                "export_rc", "audio_prompts=", "change_item", "export_keys_book"])
+                "export_rc", "audio_prompts=", "change_item", "export_keys_book",
+                "output_folder"])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
@@ -88,7 +90,7 @@ def main():
         elif opt in ("-t", "--trace"): trace = True
         elif opt in ("--refid"): refid = arg
         elif opt in ("--keys"): actualkeys = arg
-        
+        elif opt in ("--output_folder"): output_folder = arg
         elif opt in ("-e", "--export_xml"):
             action = lambda s, f, l: s.export_xml(f, l)
         elif opt in ("--export_rc"):
@@ -113,7 +115,7 @@ def main():
             ncx = arg
             action = lambda s, f, l: s.audio_prompts(l, ncx)
         elif opt in ("--export_keys_book"):
-            action = lambda s, f, l: s.export_keys_book(f, l)
+            action = lambda s, f, l: s.export_keys_book(f, l, output_folder)
     
     session = LionDB(trace, force, app)
     if add_language == True:

@@ -1,54 +1,60 @@
 #*
-	$title
+	$title_chapter
 	$langid
 	$menus
-	$other_shortcuts
-	$organized_by_menu
-	$others
+	$organized_by_menu_chapter
+	$other_commands_chapter
 *#
+#import os
+#os.path.append("../")
+#import keys_book
 
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>$title</title>
+		<title>$title_chapter[0].caption.text</title>
 		<meta name="dc:identifier" content="amis-keyboard-shortcuts-$langid"/>
 		<link rel="stylesheet" type="text/css" href="style.css"/>
 		<meta name="ncc:charset" content="utf-8"/>
 		<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
 	</head>
 	<body>
-		<h1 class="title" id="title">$title</h1>
-		<p id="summary">Commands for AMIS and corresponding keyboard shortcuts are given below.  Some commands have only single-letter shortcuts to be used once inside the menu.  Other commands have multi-key combinations.</a></p>
+		<h1 class="title" id="$title_chapter[0].caption.id">$title_chapter[0].caption.text</h1>
+		<p id="$title_chapter[1].caption.id">$title_chapter[1].caption.text</p>
 			
-		<h1 id="menus">$organized_by_menu</h1>
+		<h1 id="$organized_by_menu_chapter[0].caption.id">$organized_by_menu_chapter[0].caption.text</h1>
 		
 		#for $menu in $menus:
 			#set $first = True
 			#for menuitem in menu:
 				#if $first == True:
-					<h2 id="$menuitem.textid">$menuitem.text ($menuitem.shortcut)</h2>
+					<h2 id="$menuitem.caption.id">$menuitem.caption.text ($menuitem.shortcut.text)</h2>
 					<ul>
 					#set first = False
 				#else:
-				<li><span id="$menuitem.textid">$menuitem.text:</span>
-					<span id="$menuitem.shortcutid">$menuitem.shortcut</span>
-				</li>
+					<li>
+						<span id="$menuitem.caption.id">$menuitem.caption.text:</span>
+						<span id="$menuitem.shortcut.id">$menuitem.shortcut.text</span>
+					</li>
 				#end if
 			#end for	
 			</ul>
 		#end for
 		
-		<h1 id="other">$other_shortcuts</h1>
-		<ul>
-			#if $others != None
-			#for $item in $others:
+		#set $first = True		
+		#for $item in $other_commands_chapter: 
+			#if $first == True:
+				<h1 id="$item.caption.id">$item.caption.text</h1>
+				<ul>
+				#set $first = False
+			#else:
 				<li>
-					<span id="$menuitem.textid">$item.text:</span>
-					<span id="$menuitem.shortcutid">$item.shortcut</span>
+					<span id="$menuitem.caption.id">$item.caption.text:</span>
+					<span id="$menuitem.shortcut.id">$item.shortcut.text</span>
 				</li>
-			#end for	
 			#end if
+		#end for
 		</ul>	
 	</body>
 </html>

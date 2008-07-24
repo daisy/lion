@@ -4,7 +4,7 @@ from DB.connect import *        # Harcoded DB connection info, not stored in SVN
 
 class DBSession:
     """A session with the DB."""
-
+    
     def __init__(self, trace, force):
         self.trace = trace      # trace flag
         self.warnings = 0       # warnings during operation

@@ -5,15 +5,14 @@ from dbsession import DBSession
 
 class LionDB(DBSession):
     def __init__(self, trace=False, force=False, app=None):
+        DBSession.__init__(self, trace, force)
+        
         if app:
-            self.trace = trace
-            self.force = force
             self.config = ConfigParser()
             self.config.read("lion.cfg")
             self.masterlang = self.config.get("main", "masterlang")
             self.trace_msg(self.masterlang)
             
-            DBSession.__init__(self, trace, force)
             
             # Import the application module, which lives here:
             # top-level/modules/APP/lionio_APP.someclass
@@ -72,6 +71,9 @@ class LionDB(DBSession):
     
     def export(self, file, langid, export_type):
         print self.dbio.export(self, file, langid, export_type)
+    
+    def export_keys_book(self, file, langid, output_folder):
+        self.dbio.export(self, file, langid, 3, output_folder)
     
     def all_strings(self, langid):
         """Export all strings to stdout"""
@@ -222,12 +224,14 @@ class LionDB(DBSession):
         __process_changes(langid, None)
     
     def get_textstring(self, table, strid):
+        """Get the text string for the string given by strid"""
         self.execute_query("SELECT textstring FROM %s WHERE xmlid='%s'" % (table, strid))
         row = self.cursor.fetchone()
         if row == None or len(row) == 0: return None
         else: return row[0]
 
     def get_mnemonic(self, table, strid):
+        """Get the text string of the mnemonic for the string given by strid"""
         self.execute_query("SELECT textstring FROM %s WHERE role='MNEMONIC' AND target='%s'" \
             % (table, strid))
         row = self.cursor.fetchone()
@@ -235,12 +239,37 @@ class LionDB(DBSession):
         else: return row[0]
 
     def get_accelerator(self, table, strid):
+        """Get the text string of the accelerator for the string given by strid"""
         self.execute_query("SELECT textstring FROM %s WHERE role='ACCELERATOR' AND target='%s'" \
             % (table, strid))
         row = self.cursor.fetchone()
         if row == None or len(row) == 0: return None
         else: return row[0]
-
+    
+    def get_audiouri(self, table, strid):
+        """get the audio clip for the string given by strid"""
+        self.execute_query("SELECT audiouri FROM %s WHERE xmlid='%s'" \
+            % (table, strid))
+        row = self.cursor.fetchone()
+        if row == None or len(row) == 0: return None
+        else: return row[0]
+    
+    def get_accelerator_id(self, table, strid):
+        """get the ID of the accelerator for the string given by strid"""
+        self.execute_query("SELECT xmlid FROM %s WHERE role='ACCELERATOR' AND target='%s'" \
+            % (table, strid))
+        row = self.cursor.fetchone()
+        if row == None or len(row) == 0: return None
+        else: return row[0]
+    
+    def get_mnemonic_id(self, table, strid):
+        """get the ID of the mnemonic for the string given by strid"""
+        self.execute_query("SELECT xmlid FROM %s WHERE role='MNEMONIC' AND target='%s'" \
+            % (table, strid))
+        row = self.cursor.fetchone()
+        if row == None or len(row) == 0: return None
+        else: return row[0]
+    
     def __process_changes(self, langid, removed_ids):
         """Process the textflag values (2: changed, 3: new)
         and remove the IDs from all tables"""

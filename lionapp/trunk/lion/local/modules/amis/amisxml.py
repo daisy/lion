@@ -5,7 +5,7 @@ class AmisUiDoc(minidom.Document):
     to the amisAccessibleUi.xml document.  It doesn't make any changes to the Lion DB or 
     to the document itself."""
     
-    self.session = None
+    session = None
     
     def set_session(self, session):
         """You have to call this function first!  Ideally session would be a constructor argument, 
@@ -127,7 +127,6 @@ class AmisUiDoc(minidom.Document):
                 <promptItem ... can be either with a refid or with nested text
 
         ignore all other cases.
-
         """
         #the obvious case #1
         text = self.get_first_child_with_tagname(elm, "text")
@@ -177,3 +176,19 @@ class AmisUiDoc(minidom.Document):
             return audios[0]
         else:
             return None
+    
+    def get_all_text_ids(self):
+        """a simple utility that returns a list of all the id values
+        on text elements"""
+        texts = self.getElementsByTagName("text")
+        textids = []
+        for t in texts:
+            a = t.getAttribute("id")
+            if a != None:
+                textids.append(a)
+        
+        return textids
+    
+
+        
+        

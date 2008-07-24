@@ -19,11 +19,10 @@ class AmisLionIO (lion_module.LionIOModule):
         "removed" attribute"""
         return self.importer.process_removals(self.doc)
     
-    def export(self, session, file, langid, export_type):
+    def export(self, session, file, langid, export_type, output_folder = ""):
         if export_type == 1:
             return amis_export.export_xml(session, file, langid)
         elif export_type == 2:
             return amis_export.export_rc(session, langid)
         elif export_type == 3:
-            return amis_export.export_keys_book(session, xmlfile, langid)
-        
+            return amis_export.export_keys_book(session, file, langid, output_folder)
