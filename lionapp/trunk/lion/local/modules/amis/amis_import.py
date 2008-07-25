@@ -2,22 +2,23 @@ from amisxml import AmisUiDoc
 from xml.dom import Node
 import os
 from liondb import LionDB       # the session object
+from xml.dom import minidom, Node
 
 class AmisImport():
     
-    def __init__(self, session, amisxml):
-        self.doc = amisxml  # the xml document
+    def __init__(self, session):
+        self.doc = None
         self.session = session
     
-    def import_from_xml(self, filepath, langid):
-        self.session.trace_msg("IMPORT FROM AMIS.")
+    def import_xml(self, filepath, langid):
+        self.session.trace_msg("Amis import from XML.  File = %s, Language = %s." % (filepath, langid))
         self.table = self.session.make_table_name(langid)
         # clear the tables
-        self.session.execute_query("DELETE FROM %s" % table)
+        self.session.execute_query("DELETE FROM %s" % self.table)
         
         # use our implementation of minidom.Document instead
-        xml.dom.minidom.Document = amisxml.AmisUiDoc
-        self.doc = minidom.parse(file)
+        minidom.Document = AmisUiDoc
+        self.doc = minidom.parse(filepath)
         self.doc.set_session(self.session)
         
         # add all the text item data to the table
@@ -44,7 +45,7 @@ class AmisImport():
         
     def __set_roles(self):
         """Set role for text elements"""
-        self.session.execute_query("SELECT id, xmlid, textstring FROM %s" % table)
+        self.session.execute_query("SELECT id, xmlid, textstring FROM %s" % self.table)
         for id, xmlid, textstring in self.session.cursor:
             elem = self.doc.get_element_by_id("text", xmlid)
             if elem:
@@ -99,13 +100,13 @@ class AmisImport():
         for elem in self.doc.getElementsByTagName("dialog"):
             items = self.doc.get_items_in_dialog(elem)
             self.__get_mnemonics_and_write_data(items, groupid)
-            if session.trace == True:
+            if self.session.trace == True:
                 print "group id = %d" % groupid
                 printelements(items)
             groupid += 1
 
 
-    def process_removals(self):
+    def get_idlist_for_removal(self):
         """Flag items as removed"""
         ui = self.doc.getElementsByTagName("ui")[0]
         ids_to_remove = ui.getAttribute("removed").split(" ")

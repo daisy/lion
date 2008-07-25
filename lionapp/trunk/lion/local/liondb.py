@@ -67,9 +67,9 @@ class LionDB(DBSession):
         if not self.check_language(langid):
             die("No table for language %s." % langid)
         self.trace_msg("Import from " + file + " for " + langid)
-        self.dbio.import_from_xml(self, file, langid)
-        removed_ids = self.dbio.get_removed_ids(doc)
-        self.process_changes(langid, removed_ids)
+        self.dbio.import_xml(self, file, langid)
+        removed_ids = self.dbio.get_removed_ids_after_import()
+        self.__process_changes(langid, removed_ids)
     
     def export(self, file, langid, option, extra):
         print self.dbio.export(self, file, langid, option, extra)
@@ -156,7 +156,7 @@ class LionDB(DBSession):
             3, "%(xmlid)s", "STRING")""" % \
             {"table": table, "textstring": textstring, "xmlid": stringid})
         self.trace_msg("Remember to change the next-id value in the AMIS XML file.")
-        __process_changes(langid, None)
+        self.__process_changes(langid, None)
 
     def remove_item(self, langid, stringid):
         """Remove a string from all the tables
@@ -183,7 +183,7 @@ class LionDB(DBSession):
                 WHERE xmlid="%(xmlid)s" """ % \
                 {"table": table, "xmlid": stringid})
 
-        __process_changes(langid, removed_ids)
+        self.__process_changes(langid, removed_ids)
 
     def add_accelerator(self, langid, textstring, stringid, refid, keys):
         """Add an accelerator to all language tables.  
@@ -206,7 +206,7 @@ class LionDB(DBSession):
             {"table": table, "textstring": textstring, "xmlid": stringid,
                 "keys": keys, "refid": refid})
         self.trace_msg("Remember to change the next-id value in the AMIS XML file.")
-        __process_changes(langid, None)
+        self.__process_changes(langid, None)
 
     def change_item(self, langid, textstring, stringid):
         """Change the text of the item at the given ID.  Reflect the change in the other tables.
@@ -220,7 +220,7 @@ class LionDB(DBSession):
         self.execute_query("""UPDATE %(table)s SET textstring="%(textstring)s",\
             textflag=2 WHERE xmlid="%(xmlid)s" """ %\
             {"table": table, "textstring": textstring, "xmlid": stringid})
-        __process_changes(langid, None)
+        self.__process_changes(langid, None)
     
     def get_textstring(self, table, strid):
         """Get the text string for the string given by strid"""
