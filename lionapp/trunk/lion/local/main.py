@@ -11,8 +11,8 @@ Usage:
   %(script)s --help                              Show this help message.
   %(script)s --import --langid=id --file=file    Import file into table id.
   
-  %(script)s --export_xml --langid=id --file=file    Export to XML
-  %(script)s --export_rc --langid=id --file=file    Export to RC
+  %(script)s --export --langid=id --file=file --export_type=1|2|3|etc --export_param=extra information    
+                                                Export
   
   %(script)s --add_language --langid=id --langname=langname \
 --username=username --password=password --email=email \
@@ -25,7 +25,7 @@ Usage:
                                                  Remove an item from all tables
   %(script)s --add_accelerator --langid=id --text=string --stringid=id
 --refid=id --keys=accelerator                    Add an accelerator to all tables
-  %(script)s --strings --langid=id               Output XML of strings, not including keyboard shortcuts
+  %(script)s --textstrings --langid=id               Output XML of strings, not including keyboard shortcuts
   %(script)s --all_strings --langid=id           Output XML of strings, including keyboard shortcuts
   %(script)s --change_item --langid=id --text=string --stringid=id  
                                                 Change an item in the master table and reflect the change elsewhere 
@@ -52,70 +52,65 @@ def main():
     email = None
     realname = None
     force = False
+    textstring = None
+    stringid = None
+    refid = None
+    actualkeys = None
+    export_extra_param = None
+    export_type = None
     # if the action is add/remove a language/string/accelerator, the parameters are different
     add_language = False  
     add_string = False
     remove_item = False
     add_accel = False
-    textstring = None
-    stringid = None
-    refid = None
-    actualkeys = None
     change_item = False
-    output_folder = None
+    export = False
+    
     try:
-        opts, args = getopt.getopt(os.sys.argv[1:], "a:eF:hil:tn:u:p:r:e:fARs",
-            ["application=", "export_xml", "file=", "help", "import", "langid=",
+        opts, args = getopt.getopt(os.sys.argv[1:], "a:ef:hil:e",
+            ["application=", "export", "file=", "help", "import", "langid=",
                 "trace", "add_language", "remove_language", "langname=", 
                 "username=", "password=", "realname=", "email=", "force", 
                 "stringid=", "text=", "remove_item", "add_string", "refid=", 
-                "keys=", "add_accelerator", "textstrings", "all_strings",
-                "export_rc", "audio_prompts=", "change_item", "export_keys_book",
-                "output_folder"])
+                "keys=", "add_accelerator", "textstrings", "all_strings", 
+                "audio_prompts", "change_item", "export_param=", "export_type="])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
     for opt, arg in opts:
         if opt in ("-a", "--application"): app = arg
-        elif opt in ("-n", "--langname"): langname = arg
-        elif opt in ("-u", "--username"): username = arg
-        elif opt in ("-p", "--password"): password = arg
-        elif opt in ("-r", "--realname"): realname = arg
-        elif opt in ("-e", "--email"): email = arg
-        elif opt in ("-f", "--force"): force = True
+        elif opt in ("--langname"): langname = arg
+        elif opt in ("--username"): username = arg
+        elif opt in ("--password"): password = arg
+        elif opt in ("--realname"): realname = arg
+        elif opt in ("--email"): email = arg
+        elif opt in ("--force"): force = True
         elif opt in ("--stringid"): stringid = arg
         elif opt in ("--text"): textstring = arg
-        elif opt in ("-F", "--file"): file = arg
+        elif opt in ("-f", "--file"): file = arg
         elif opt in ("-l", "--langid"): langid = arg
-        elif opt in ("-t", "--trace"): trace = True
+        elif opt in ("--trace"): trace = True
         elif opt in ("--refid"): refid = arg
         elif opt in ("--keys"): actualkeys = arg
-        elif opt in ("--output_folder"): output_folder = arg
-        elif opt in ("-e", "--export_xml"):
-            action = lambda s, f, l: s.export_xml(f, l)
-        elif opt in ("--export_rc"):
-            action = lambda s, f, l: s.export_rc(l)
+        elif opt in ("--export_param"): output_folder = arg
+        elif opt in ("-e", "--export"): export = True
         elif opt in ("-h", "--help"):
             action = lambda s, f, l: usage()
         elif opt in ("-i", "--import"):
             action = lambda s, f, l: s.import_xml(f, l)
-        elif opt in ("-A", "--add_language"): add_language = True
-        elif opt in ("-R", "--remove_language"):
+        elif opt in ("--add_language"): add_language = True
+        elif opt in ("--remove_language"):
             action = lambda s, f, l: s.remove_language(l)
-        
         elif opt in ("--remove_item"): remove_item = True
         elif opt in ("--add_string"): add_string = True
         elif opt in ("--add_accelerator"): add_accel = True
         elif opt in ("--change_item"): change_item = True
-        elif opt in ("-s", "--textstrings"):
+        elif opt in ("--textstrings"):
             action = lambda s, f, l: s.textstrings(l)
         elif opt in ("--all_strings"):
             action = lambda s, f, l: s.all_strings(l)
         elif opt in ("--audio_prompts"):
-            ncx = arg
-            action = lambda s, f, l: s.audio_prompts(l, ncx)
-        elif opt in ("--export_keys_book"):
-            action = lambda s, f, l: s.export_keys_book(f, l, output_folder)
+            action = lambda s, f, l: s.audio_prompts(l, f)
     
     session = LionDB(trace, force, app)
     if add_language == True:
@@ -128,6 +123,8 @@ def main():
         session.add_accelerator(langid, textstring, stringid, refid, actualkeys)
     elif change_item == True:
         session.change_item(langid, textstring, stringid)
+    elif export == True:
+        session.export(file, langid, export_type)
     else:
         action(session, file, langid)
 

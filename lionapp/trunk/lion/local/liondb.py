@@ -2,6 +2,7 @@ from xml.dom import minidom
 from ConfigParser import ConfigParser
 import addremove_language
 from dbsession import DBSession
+import modules.lion_module
 
 class LionDB(DBSession):
     def __init__(self, trace=False, force=False, app=None):
@@ -70,10 +71,7 @@ class LionDB(DBSession):
         self.process_changes(langid, removed_ids)
     
     def export(self, file, langid, export_type):
-        print self.dbio.export(self, file, langid, export_type)
-    
-    def export_keys_book(self, file, langid, output_folder):
-        self.dbio.export(self, file, langid, 3, output_folder)
+        return self.dbio.export(self, file, langid, export_type)
     
     def all_strings(self, langid):
         """Export all strings to stdout"""

@@ -6,7 +6,7 @@ import lion_module
 
 class AmisLionIO (lion_module.LionIOModule):
     """The AMIS-specific implementation of lion_module.LionIOModule"""
-    self.importer = None
+    importer = None
     
     def import_from_xml(self, session, filepath, langid):
         """Import a document object (from minidom) into a table."""

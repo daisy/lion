@@ -4,7 +4,7 @@ from liondb import *
 import codecs
 import amisxml
 import fill_rc
-import keys_book
+#import keys_book
 
 def export_xml(session, file, langid):
     session.trace_msg("XML Export for %s to %s" % (langid, file))
@@ -64,5 +64,5 @@ def export_rc(session, langid):
 def export_keys_book(session, xmlfile, langid, folder):
     """Fill in the templates for the keyboard shortcuts book"""
     session.trace_msg ("Keyboard shortcuts book export for %s" % (langid))
-    keys_book.export_keys_book(session, xmlfile, langid, folder)
+    #keys_book.export_keys_book(session, xmlfile, langid, folder)
     session.trace_msg("Saved in %s.  Just add the audio clips!" % folder)
