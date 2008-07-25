@@ -5,13 +5,14 @@ import amisxml
 import fill_rc
 import keys_book
 import templates.AmisRCTemplate
+from xml.dom import minidom, Node
 
 def export_xml(session, file, langid):
     session.trace_msg("XML Export for %s to %s" % (langid, file))
     # use our dom instead
-    xml.dom.minidom.Document = amisxml.AmisUiDoc
+    minidom.Document = amisxml.AmisUiDoc
     doc = minidom.parse(file)
-    doc.set_session(self.session)
+    doc.set_session(session)
     if doc == None:
         session.die("Document could not be parsed.")
     
