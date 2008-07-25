@@ -1,16 +1,14 @@
-from amis_import import AmisImport
+import amis_import
 import amis_export
-import os
-os.sys.path.append("../")
-import lion_module
+import modules.lion_module
 
-class AmisLionIO (lion_module.LionIOModule):
+class AmisLionIO (modules.lion_module.LionIOModule):
     """The AMIS-specific implementation of lion_module.LionIOModule"""
     importer = None
     
     def import_from_xml(self, session, filepath, langid):
         """Import a document object (from minidom) into a table."""
-        self.importer = AmisImport()
+        self.importer = amis_import.AmisImport()
         self.session = session
         self.importer.import_from_xml(session, filepath, langid)
         
@@ -25,4 +23,8 @@ class AmisLionIO (lion_module.LionIOModule):
         elif export_type == 2:
             return amis_export.export_rc(session, langid)
         elif export_type == 3:
+            sz = len(output_folder)
+            # make sure the folder path ends with a slash
+            if sz > 0 and output_folder[sz-1] != '/':
+                output_folder.append('/')
             return amis_export.export_keys_book(session, file, langid, output_folder)

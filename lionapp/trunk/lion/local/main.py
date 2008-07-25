@@ -11,8 +11,8 @@ Usage:
   %(script)s --help                              Show this help message.
   %(script)s --import --langid=id --file=file    Import file into table id.
   
-  %(script)s --export --langid=id --file=file --export_type=1|2|3|etc --export_param=extra information    
-                                                Export
+  %(script)s --export --option=1|2|3etc --langid=id --file=file --extra=output folder (for multi-file output)    
+                                                Export (option to specify a number giving the export type)
   
   %(script)s --add_language --langid=id --langname=langname \
 --username=username --password=password --email=email \
@@ -56,8 +56,8 @@ def main():
     stringid = None
     refid = None
     actualkeys = None
-    export_extra_param = None
-    export_type = None
+    extra = None
+    option = 0
     # if the action is add/remove a language/string/accelerator, the parameters are different
     add_language = False  
     add_string = False
@@ -68,15 +68,16 @@ def main():
     
     try:
         opts, args = getopt.getopt(os.sys.argv[1:], "a:ef:hil:e",
-            ["application=", "export", "file=", "help", "import", "langid=",
+            ["application=", "option=", "export", "file=", "help", "import", "langid=",
                 "trace", "add_language", "remove_language", "langname=", 
                 "username=", "password=", "realname=", "email=", "force", 
                 "stringid=", "text=", "remove_item", "add_string", "refid=", 
                 "keys=", "add_accelerator", "textstrings", "all_strings", 
-                "audio_prompts", "change_item", "export_param=", "export_type="])
+                "audio_prompts", "change_item", "extra="])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
+    
     for opt, arg in opts:
         if opt in ("-a", "--application"): app = arg
         elif opt in ("--langname"): langname = arg
@@ -92,8 +93,9 @@ def main():
         elif opt in ("--trace"): trace = True
         elif opt in ("--refid"): refid = arg
         elif opt in ("--keys"): actualkeys = arg
-        elif opt in ("--export_param"): output_folder = arg
+        elif opt in ("--extra"): extra = arg
         elif opt in ("-e", "--export"): export = True
+        elif opt in ("--option"): option = int(arg)
         elif opt in ("-h", "--help"):
             action = lambda s, f, l: usage()
         elif opt in ("-i", "--import"):
@@ -124,7 +126,7 @@ def main():
     elif change_item == True:
         session.change_item(langid, textstring, stringid)
     elif export == True:
-        session.export(file, langid, export_type)
+        session.export(file, langid, option, extra)
     else:
         action(session, file, langid)
 

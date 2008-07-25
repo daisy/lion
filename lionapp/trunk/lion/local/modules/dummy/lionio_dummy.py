@@ -1,8 +1,7 @@
 import sys
-sys.path.append("/Users/marisa/Projects/lion/lionapp/trunk/lion/local")
 import modules.lion_module
 
-class DummyLionIO (lion_module.LionIOModule):
+class DummyLionIO (modules.lion_module.LionIOModule):
     """a dumb test"""
     def import_from_xml(self, session, filepath, langid):
         return "dummy import"
@@ -12,3 +11,7 @@ class DummyLionIO (lion_module.LionIOModule):
     
     def export(self, session, file, langid, export_type, output_folder = ""):
         return "dummy export"
+
+if __name__ == "__main__":
+    obj = DummyLionIO()
+    print obj.import_from_xml(1, 2, 3)

@@ -1,7 +1,6 @@
 from amisxml import AmisUiDoc
 from xml.dom import Node
 import os
-os.sys.path.append("../../")
 from liondb import LionDB       # the session object
 
 class AmisImport():

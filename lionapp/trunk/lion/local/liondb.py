@@ -22,12 +22,13 @@ class LionDB(DBSession):
             self.trace_msg("import %s" % module_name)
             try:
                 module = __import__(module_name, globals(), locals(), [''], -1)
-                classname = module + "." + self.config.read(app, "dbioclass")
-                obj = eval(classname)
+                classname = self.config.get(app, "lioniomodule")
+                lioniomodule = module_name + "." + classname    
+                obj = eval(lioniomodule)
                 self.dbio = obj()
             
             except Exception, e :
-                self.die("""Unknown application "%s" (%s)""" % (app, e))
+                self.die("""Could not load module for application "%s" (%s)""" % (app, e))
     
     def check_language(self, langid):
         """Check the existence of a table for the given language id."""
@@ -70,8 +71,8 @@ class LionDB(DBSession):
         removed_ids = self.dbio.get_removed_ids(doc)
         self.process_changes(langid, removed_ids)
     
-    def export(self, file, langid, export_type):
-        return self.dbio.export(self, file, langid, export_type)
+    def export(self, file, langid, option, extra):
+        print self.dbio.export(self, file, langid, option, extra)
     
     def all_strings(self, langid):
         """Export all strings to stdout"""

@@ -1,5 +1,4 @@
 import os
-os.sys.path.append("../../")
 from liondb import *
 
 class FillRC():

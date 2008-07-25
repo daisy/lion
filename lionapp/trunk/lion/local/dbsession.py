@@ -1,6 +1,7 @@
 import os
 os.sys.path.append("../")
-from DB.connect import *        # Harcoded DB connection info, not stored in SVN
+
+import DB.connect  # Harcoded DB connection info, not stored in SVN
 
 class DBSession:
     """A session with the DB."""
@@ -34,7 +35,7 @@ class DBSession:
         """Connect to the database."""
         if not self.connected:
             self.trace_msg("Connecting to the database...")
-            self.db = db_connect("admin")
+            self.db = DB.connect.db_connect("admin")
             self.cursor = self.db.cursor()
             self.connected = True
             self.trace_msg("... connected")
