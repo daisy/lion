@@ -7,10 +7,7 @@ import os
 import datetime
 import MySQLdb
 import cherrypy
-sys.path.append("/home/marisa")
-sys.path.append("../")
 from DB.connect import *
-
 
 def get_uuid():
     """Get a uuid from the os to act as a session id."""
