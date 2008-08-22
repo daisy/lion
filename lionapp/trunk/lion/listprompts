@@ -1,0 +1,14 @@
+#!/bin/bash
+
+echo "Creating amisprompts.html"
+python managedb.py --strings > strings.xml
+xsltproc xhtml.xslt strings.xml > amisprompts.html
+
+echo "Creating amisprompts.pdf"
+xsltproc fo.xslt strings.xml > strings.fo
+~/Projects/fop-0.94/fop strings.fo amisprompts.pdf
+
+rm -f strings.xml
+rm -f strings.fo
+
+echo "Done"
