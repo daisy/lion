@@ -1,3 +1,4 @@
+import MySQLdb
 import util
 from templates import translate, error
 
@@ -43,7 +44,7 @@ class TranslationPage(translate.translate):
         request = """UPDATE %(table)s SET textflag="%(status)s", \
             textstring="%(translation)s", remarks="%(remarks)s" WHERE \
             xmlid="%(xmlid)s" """ % \
-            {"table": table, "status": status, "translation": translation, \
+            {"table": table, "status": status, "translation": MySQLdb.escape_string(translation), \
                 "remarks": remarks, "xmlid": xmlid}
         cursor.execute(request)
         cursor.close()

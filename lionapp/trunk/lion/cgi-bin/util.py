@@ -7,6 +7,8 @@ import os
 import datetime
 import MySQLdb
 import cherrypy
+# not needed on the server:
+sys.path.append("../")
 from DB.connect import *
 
 def get_uuid():

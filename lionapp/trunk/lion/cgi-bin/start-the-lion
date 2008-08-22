@@ -7,4 +7,6 @@ echo "Removing backup files"
 rm -fv *.bak
 cd ../
 echo "Starting..."
+# for the server, use this instead:
+# nohup python main.py &
 python main.py
