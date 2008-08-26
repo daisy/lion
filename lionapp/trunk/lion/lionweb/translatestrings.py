@@ -45,28 +45,12 @@ class TranslateStrings(TranslationPage):
         cursor.close()
         db.close()
         
-        start = 0
-        end = 0
-        count = 0
-        num_shown = 0
-        if pagenum == 1:
-            start = 0
-            end = len(rows)/2
-            print "page 1"
-        else:
-            start = len(rows)/2
-            end = len(rows)
-            print "page 2"
-        form = "<table>"
         for r in rows:
-            if count >= start and count < end:
-                t = tablerow.tablerow(searchList=dict(zip(template_fields, r)))
-                t.instructions = self.instructions
-    	        t.width = self.textbox_columns
-    	        t.height = self.textbox_rows
-    	        t.langid = self.user["users.langid"]
-                form = form + t.respond()
-                num_shown = num_shown + 1
-            count = count + 1
+            t = tablerow.tablerow(searchList=dict(zip(template_fields, r)))
+            t.instructions = self.instructions
+    	    t.width = self.textbox_columns
+    	    t.height = self.textbox_rows
+    	    t.langid = self.user["users.langid"]
+            form = form + t.respond()
         form = form + "</table>"
-        return form, num_shown
+        return form, len(rows)

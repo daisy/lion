@@ -1,32 +1,29 @@
-The AMIS Localization Web Tools
-==
+The DAISY Lion
+==============
+For creating and maintaining localized versions of DAISY software products, the DAISY Lion contains the following:
 
-For localizing AMIS via a web interface, the following tools have been created:
+	1. A MySQL database that stores the translation data.  The database name is "lionutf8".
+	2. A web interface for users to edit text strings and choose mnemonics and accelerators.  This is in the folder "lionweb".
+	3. Scripts for adding new accounts and administering the dataset.  These are in the folder "managedb".
+	4. Application-specific modules for database IO.  See "managedb/modules".
 
-	1. A database that stores the translation data
-	2. Scripts that import and export XML to and from the database
-	3. Scripts that export XML to a templated Microsoft RC file
-	4. Various administrative scripts
-	5. A web interface for users to edit text strings (and in the future: review mnemonic and accelerator choices)
+How to connect to the database from the shell (assuming your IP has been authorized):
+mysql -h92.243.13.151 -u[username] -p[password] -A lionutf8
 
-If you have the good fortune to work on these tools, you will find the following information useful:
+To run our scripts, you'll need the DB folder, which contains top-secret connection information.  Ask me where to get this.
+Make sure the path to the DB folder is on your PYTHONPATH or that you added its path to your sys.path.
 
-How to connect to the database from the shell:
-mysql -hdaisy-for-all.org -u[username] -p[password] -A daisyfor_amisl10n
+Your code looks like this:
 
-How to connect to the database from a python script:
-1. Get the DB folder (it's on our FTP if you have a login), which contains the connection info module
-sys.path.append("../")	#location of the parent folder for the DB folder
 from DB.connect import *
 #username can be "admin", "rw", "ro" for "admin", "read-write", "read-only"
-#two options - the first for connecting from a local machine, the second for connecting from within a webscript
-db = connect_to_remote_db("admin")
 db = connect_to_db("admin")
 
-Note that with the current server (bluehost), your IP has to be authorized in order to connect from a local machine.  Do the following:
-1. Go to http://www.daisy-for-all.org:2082/frontend/bluehost/index.html and login as the site admin
-2. Under "Remote MySQL", add your own IP as an Access Host
-3. Under "Update contact/billing info", add your own IP under MySQL Whitelisted IPs
+Note that with the current server (Gandi), your IP has to be authorized in order to connect from a local machine.  Do the following:
+1. Connect via SSH to 93.243.13.151
+2. mysql -uroot -p[secretpassword]
+3. GRANT ALL on *.* TO 'yourname'@'yourIP' IDENTIFIED BY 'your_top_secret_password';
+
 
 THE USERS TABLE
 
@@ -70,9 +67,9 @@ svnpath:
 	The full path to the svn repository for their language pack
 sessionid:
 	Their session id
-lastpage:
+lastpage (DEPRECATED) :
 	The last page the user worked on ("main" | "mnemonics" | "accelerators")
-lastpageoptions:
+lastpageoptions (DEPRECATED) :
 	The options for the last page the user worked on (usually the view (all, new, todo) on the main page)
 
 THE LANGUAGE TABLES
@@ -101,7 +98,7 @@ id
 	The internal table id, which is managed automatically by the database.
 textstring
 	The text contents
-audiodata
+audiodata (TO BE DEPRECATED) 
 	The raw audio data, presumably after having been uploaded by the user
 audiouri
 	The path to the audiodata, relative to the language's svn directory.  the audiodata gets moved here manually after the translation is done.
@@ -122,28 +119,83 @@ target
 actualkeys
 	The programmatic keys for the shortcut or mnemonic.  For example, the textstring would say "Espacio" in Spanish, but the actual key is still "Space"
 
-THE LOCAL TOOLS
+THE DB MANAGEMENT TOOLS
 ====
-In a folder called "local" are tools that can be run locally.
+In a folder called "managedb" are tools for adding users/languages, adding/removing/changing master language table strings, exporting strings, and using module functions such as importing from XML or exporting to specific formats.
 
-amisdb.py
-	Operations related to the database described above.  Requires your IP to be authorized.  See the file itself for usage instructions.
+The commands
+-----------
 
-fill in the RC template:
-	XXold way perl instantiate.pl AmisLangpackTemplate.rc yourAccessibleUi.xml
+But first, common options for these commands:
 
-make an html file with each prompt as a heading
-	1) managedb.py --strings > strings.xml
-	2) xsltproc xhtml.xslt strings.xml > strings.html
-	
-make a PDF with each prompt as a heading:
-	1) managedb.py --strings > strings.xml
-	2) xsltproc fo.xslt strings.xml > strings.fo
-	3) fop strings.fo strings.pdf
+application	
+	The application module you are using.  E.g. "amis" or "obi"
+force
+	Force acceptance of drastic actions such as deleting a language account or removing a string from all tables
+trace
+	Print trace output
+file
+	A file required by the command
+langid
+	The ID of the language you want to work with.  Examples: eng-US, hin-IN, spa-ES.  ISO-compliant naming is used.
 
-fill the accessibleUi.xml file with audio prompts from an NCC-only book containing TOC entries for each prompt:
-	XX old way 
-		The stuff after the pipe ( | ) is for utf8 output
-		perl audio-files.pl -d --nobarf NCC_FILE XML_FILE  | perl -pe'BEGIN{binmode STDOUT, ":utf8"}s/&#x([^;]+);/chr(hex($1))/ge' > out.xml
-	
-	
+1. help
+Print something vaguely helpful
+
+2. export
+Each application module will have its own version of export.  If there is more than one type of export, you can specify which one by using the "option" option.  For example, the AMIS module can export to its own XML format (option 1), a Microsoft RC file (2), or a DAISY book of its keyboard shortcuts (3).
+
+export --application=amis --langid=eng-US --option=2  > data_export
+
+there is another parameter called "extra" that can pass one additional parameter to the module's export function.  
+
+3. import
+Import a file.  This is also application module-specific.
+
+import --application=amis --file=myxml.xml --langid=eng-US
+
+4. add_language
+Add a language account to the database.  
+
+add_language --langid=abc-YZ --langname="Made up language" --username=abcdefg --password=lmnop --realname="Joe Translator" --email=joe@translators.com
+
+5. remove_language
+Remove a language account.  Just supply the langid.
+
+6. remove_item
+Remove any entry from the database. The langid is the master language table.  The stringid is the xmlid value of the item to remove.  The item is removed from all tables after it is removed from the master language table.
+
+remove_item --langid=eng-US --stringid=t34
+
+7. add_string
+Add a textstring to the master language table, and update all other tables to reflect this.  The new string will be listed in the other tables as a "new" item.  The stringid is the ID for this new item.
+
+add_string --langid=eng-US --text="The new string" --stringid=t999 
+
+8. add_accelerator
+Add an accelerator (a keyboard shortcut) to the master language table, and update all other tables to reflect this.  The new accelerator will be listed in the other tables as a "new" item.  
+
+The textstring is the name of the accelerator, and the keys parameter gives the programmatic name of the keys.  The refid is the string ID (xmlid) of the item that this accelerator goes with.  For example, if Space is the accelerator for the Play command, then the refid would be the string id for "Play".  The stringid value here, as in other examples, is the ID for the new accelerator.
+
+add_accelerator --langid=spa-ES --textstring="Espacio" stringid=t999 refid=t34 keys=Space
+
+9. change_item
+
+Change the contents of an item in the master language table.  All other tables will list this item as "to-do".
+
+change_item --langid=eng-US --text="The changed text" --stringid=t44
+
+10. textstrings
+Get an XML-formatted list of all the textstrings in the database for a given language.  
+
+textstrings --langid=eng-US
+
+11. all_strings
+Get an XML-formatted list of all the strings (textstrings, accelerators, mnemonics) in the database for a given language.
+
+all_strings --langid=eng-US
+
+12. audio_prompts 
+Import audio prompts into the database audio file field from the NCX file of a book which contains one prompt per heading.  The text of the NCX must match the text of the database, otherwise this won't work.
+
+audio_prompts --langid=eng-US --file=myfile.ncx
