@@ -44,8 +44,9 @@ class TranslateStrings(TranslationPage):
         rows = cursor.fetchall()
         cursor.close()
         db.close()
-        
-        for r in rows:
+        start, end = translationpage.calculate_range(len(rows), pagenum)
+        for i in range[start, end+1]:
+            r = rows[i]
             t = tablerow.tablerow(searchList=dict(zip(template_fields, r)))
             t.instructions = self.instructions
     	    t.width = self.textbox_columns

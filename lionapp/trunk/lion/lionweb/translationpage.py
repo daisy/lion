@@ -17,6 +17,8 @@ class TranslationPage(translate.translate):
     check_conflict = False
     show_no_conflicts = False
     pagenum = 0
+    items_per_page = 50
+    total_num_items = 0
     def index(self, view, id_anchor = ""):
         """Show the big table of translate-able items"""
         self.last_view = view
@@ -73,8 +75,47 @@ class TranslationPage(translate.translate):
         if table != "": table = "%s." % table
         return []
     
+    def get_total_num_pages(self):
+        total_num_pages = self.total_num_items/self.items_per_page
+        # add another page for any remaining items
+        if self.total_num_items % self.items_per_page != 0:
+            total_num_pages += 1
+        return total_num_pages
+    
+    def calculate_range(self, pagenum):
+        """returns a start and inclusive end point"""
+        total_num_pages = self.get_total_num_pages()    
+        # make sure the page is in range
+        if pagenum > 0 and pagenum <= total_num_pages:
+            start = pagenum * self.items_per_page - self.items_per_page
+            end = start + self.items_per_page - 1
+            return start, end
+        else:
+            return 0, 0
+    
+    def next_page(self):
+        print "next page"
+        if self.pagenum + 1 > 0 and self.pagenum + 1 <= self.get_total_num_pages():
+            self.pagenum += 1        
+            return self.index(self.last_view)
+        else:
+            return None
+    next_page.exposed = True
+    
+    def previous_page(self):
+        print "previous page"
+        if self.pagenum - 1 > 0 and self.pagenum - 1 <= self.get_total_num_pages():
+            self.pagenum -= 1        
+            return self.index(self.last_view)
+        else:
+            return None
+    previous_page.exposed = True
+    
     def change_page(self, pagenum):
         print "change page %d" % int(pagenum)
-        self.pagenum = int(pagenum)
-        return self.index(self.last_view)
+        if int(pagenum) > 0 and int(pagenum) <= self.get_total_num_pages():
+            self.pagenum = int(pagenum)        
+            return self.index(self.last_view)
+        else:
+            return None
     change_page.exposed = True
