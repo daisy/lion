@@ -1,6 +1,6 @@
 import MySQLdb
 import util
-import dbsession
+import daisylion.liondb.dbsession
 from templates import translate, error
 
 VIEW_DESCRIPTIONS = {"all": "all items", 

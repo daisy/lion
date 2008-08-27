@@ -10,7 +10,7 @@ class LionDB(DBSession):
         
         if app:
             self.config = ConfigParser()
-            self.config.read("lion.cfg")
+            self.config.read("../lion.cfg")
             self.masterlang = self.config.get("main", "masterlang")
             self.trace_msg(self.masterlang)
             

@@ -12,7 +12,7 @@ class ChooseMnemonics(TranslationPage):
         "ACCELERATOR": "keyboard shortcut",
         "MNEMONIC": "letter (underlined) to press to activate the item"}
     
-    def __init__(self):
+    def __init__(self, session):
         self.section = "mnemonics"
         self.textbox_columns = 10
         self.textbox_rows = 1
@@ -22,7 +22,7 @@ class ChooseMnemonics(TranslationPage):
             a unique mnemonic."
         self.check_conflict = True
         #this is weird but necessary .. otherwise cheetah complains
-        TranslationPage.__init__(self)    
+        TranslationPage.__init__(self, session)    
 
     def make_table(self, view_filter, pagenum):
         """Make the form for main page"""
