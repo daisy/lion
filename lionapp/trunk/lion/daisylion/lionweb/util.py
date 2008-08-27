@@ -7,9 +7,7 @@ import os
 import datetime
 import MySQLdb
 import cherrypy
-# not needed on the server:
-sys.path.append("../")
-from DB.connect import *
+import daisylion.liondb.dbsession
 
 def get_uuid():
     """Get a uuid from the os to act as a session id."""
@@ -18,63 +16,42 @@ def get_uuid():
     pipe.close()
     return uuid.rstrip()
 
-def login(username, password):
+def login(username, password, session):
     """Try to login the user and return None on failure."""
-    db = connect_to_lion_db("rw")
-    cursor = db.cursor()
     request = """
     SELECT * FROM users WHERE username="%(name)s" AND password="%(pwd)s" """ \
     % {"name": username, "pwd": password}
-    cursor.execute(request)
-    userinfo = cursor.fetchall()
+    session.execute_query(request)
+    userinfo = session.cursor.fetchall()
     if userinfo != None and len(userinfo) > 0:
         now = datetime.datetime.now()
         sessionid = get_uuid()
         request = """
         UPDATE users SET sessionid="%(id)s", lastlogin="%(last)s" WHERE username="%(name)s" """ % \
         {"id": sessionid, "last": now.strftime("%Y-%m-%d %H:%M:%S"), "name": username}
-        cursor.execute(request)
+        session.execute_query(request)
         set_cookie(username, sessionid)
+        return userinfo
     else:
         return None
     
-    cursor.close()
-    db.close()
-    return userinfo
 
-
-def connect_to_lion_db(user):
-    """connect to the database
-       one day, this function should be replaced with the DBSession class.
-    """
-    db = db_connect(user)
-    if db == None:
-        print "Error connecting to the database"
-        sys.exit()
-    else:
-        cursor = db.cursor()
-        cursor.execute("SET collation_connection = utf8_unicode_ci")
-        return db
-
-
-def get_user():
+def get_user(session):
     """Check that the user's cookie to see if she's logged in and return her
     user info in a dictionary. If not logged in, return None."""
     username, sessionid = read_cookie()
     if username == "" or username == None: return None
-    db = connect_to_lion_db("ro")
-    cursor = db.cursor()
     fields = ["users.username", "users.realname", "users.password", "users.email", "users.langid", \
     "users.lastactivity", "users.svnpath", "users.sessionid", "languages.langname", "languages.translate_for_keyboard"]
     request = """
     SELECT %s FROM users, languages WHERE users.username="%s" AND users.sessionid="%s" AND users.langid = languages.langid""" % \
         (",".join(fields), username, sessionid)
-    cursor.execute(request)
-    row = cursor.fetchone()
-    if row == None: return None
-    cursor.close()
-    db.close()
-    return dict(zip(fields, row))
+    session.execute_query(request)
+    row = session.cursor.fetchone()
+    if row == None: 
+        return None
+    else: 
+        return dict(zip(fields, row))
 
 
 

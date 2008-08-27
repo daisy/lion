@@ -36,10 +36,8 @@ class ChooseMnemonics(TranslationPage):
             "eng_US.textstring", "eng_US.role"]
         
         request = "SELECT DISTINCT mnemonicgroup FROM %s WHERE mnemonicgroup >= 0" % table
-        db = util.connect_to_lion_db("ro")
-        cursor = db.cursor()
-        cursor.execute(request)
-        mnem_groups = cursor.fetchall()
+        TranslationPage.session.execute_query(request)
+        mnem_groups = TranslationPage.session.cursor.fetchall()
         form = ""
         group_number = 1
         num_rows = 0
@@ -51,8 +49,8 @@ class ChooseMnemonics(TranslationPage):
                 {"fields": ",".join(dbfields), "table": table, 
                     "where_flags": textflags_sql, "mnem_group": g[0]}
 
-            cursor.execute(request)
-            rows = cursor.fetchall()
+            TranslationPage.session.execute_query(request)
+            rows = TranslationPage.session.cursor.fetchall()
             num_rows += len(rows)
             if len(rows) > 0:
                 # the title of each section
@@ -60,9 +58,9 @@ class ChooseMnemonics(TranslationPage):
                 form += "<table>"
                 for r in rows:
                     data = dict(zip(template_fields, r))
-                    local_ref = self.build_mnemonic_string(cursor, table,
+                    local_ref = self.build_mnemonic_string(table,
                         data["target"], data["textstring"])
-                    eng_ref = self.build_mnemonic_string(cursor, "eng_US", 
+                    eng_ref = self.build_mnemonic_string("eng_US", 
                             data["target"], data["ref_string"])
                     # override some values
                     data["ref_string"] = local_ref
@@ -80,19 +78,15 @@ class ChooseMnemonics(TranslationPage):
                 form += "</table>"
                 group_number += 1
         #end for
-        cursor.close()
-        db.close()
         
         return form, num_rows
     
-    def build_mnemonic_string(self, cursor, table, target_id, letter):
+    def build_mnemonic_string(self, table, target_id, letter):
         """build a string where the mnemonic letter is 
         underlined in the word (referenced by target_id)"""
-        
-        cursor.execute("SELECT textstring FROM %s WHERE xmlid = \"%s\"" \
-            % (table, target_id))
-        row = cursor.fetchone()
-        
+        request = "SELECT textstring FROM %s WHERE xmlid = \"%s\"" % (table, target_id)
+        TranslationPage.session.execute_query(request)
+        row = TranslationPage.session.cursor.fetchone()
         if row == None: 
             print "Warning: invalid mnemonic"
             return ""
@@ -110,10 +104,8 @@ class ChooseMnemonics(TranslationPage):
         """check the mnemonic groups for conflicts"""
         table = self.user["users.langid"].replace("-", "_")
         request = "SELECT DISTINCT mnemonicgroup FROM %s WHERE mnemonicgroup >= 0" % table
-        db = util.connect_to_lion_db("ro")
-        cursor = db.cursor()
-        cursor.execute(request)
-        rows = cursor.fetchall()
+        TranslationPage.session.execute_query(request)
+        rows = TranslationPage.session.cursor.fetchall()
         # for each mnemonic group, make sure that each entry is unique
         conflict_found = False
         self.warning_links = []
@@ -121,20 +113,18 @@ class ChooseMnemonics(TranslationPage):
             group_id = r[0]
             #first get all the items in this mnemonic group
             request = "SELECT id FROM %s WHERE mnemonicgroup = %d" % (table, group_id)
-            cursor.execute(request)
-            first_set = cursor.fetchall()
+            TranslationPage.session.execute_query(request)
+            first_set = TranslationPage.session.cursor.fetchall()
             #then get all unique textstrings from this mnemonic group.  
             #this relies on MYSQL being case-insensitive in its comparisons.
             request = "SELECT DISTINCT textstring FROM %s WHERE mnemonicgroup = %d" % (table, group_id)
-            cursor.execute(request)
-            second_set = cursor.fetchall()
+            TranslationPage.session.execute_query(request)
+            second_set = TranslationPage.session.cursor.fetchall()
             #if they returned different numbers of results, then probably a mnemonic was repeated
             if len(first_set) != len(second_set):
                 group_link = "group_%d" % group_id
                 self.warning_links.append(group_link)
                 conflict_found = True
-        cursor.close()
-        db.close()
         self.show_no_conflicts = not conflict_found
         return self.index(self.last_view)
     check_conflicts.exposed = True

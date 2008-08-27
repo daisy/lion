@@ -35,20 +35,18 @@ class ChooseAccelerators(TranslationPage):
             %(where_flags)s""" % \
             {"fields": ",".join(dbfields), "table": table, 
                 "where_flags": textflags_sql}
-    
-        db = util.connect_to_lion_db("ro")
-        cursor = db.cursor()
-        cursor.execute(request)
-        rows = cursor.fetchall()
+        
+        TranslationPage.session.execute_query(request)
+        rows = TranslationPage.session.cursor.fetchall()
         
         form = "<table>"
         for r in rows:
             data = dict(zip(template_fields, r))
             if self.is_excluded(data["actualkeys"]) == True:
                 continue
-            local_ref = self.build_accelerator_string(cursor, table,
+            local_ref = self.build_accelerator_string(table,
                     data["target"], data["textstring"])
-            eng_ref = self.build_accelerator_string(cursor, "eng_US", 
+            eng_ref = self.build_accelerator_string("eng_US", 
                     data["target"], data["ref_string"])
             # override some values
             data["ref_string"] = local_ref
@@ -62,14 +60,13 @@ class ChooseAccelerators(TranslationPage):
             form += t.respond()
         #end for
         form += "</table>"
-        cursor.close()
-        db.close()        
         return form, len(rows)
     
-    def build_accelerator_string(self, cursor, table, target_id, textstring):
+    def build_accelerator_string(self, table, target_id, textstring):
         """build a string that looks like this: Ctrl + O (Open)"""
-        cursor.execute("SELECT textstring FROM %s WHERE xmlid=\"%s\" " % (table, target_id))
-        row = cursor.fetchone()
+        request = "SELECT textstring FROM %s WHERE xmlid=\"%s\" " % (table, target_id)
+        TranslationPage.session.execute_query(request)
+        row = TranslationPage.session.cursor.fetchone()
         if row == None:
             print "Warning! Invalid accelerator"
             return ""
@@ -103,15 +100,11 @@ class ChooseAccelerators(TranslationPage):
         conflict_found = False
         table = self.user["users.langid"].replace("-", "_")
         request = "SELECT DISTINCT actualkeys FROM %s WHERE role=\"ACCELERATOR\" and actualkeys != \"Space\"" % table
-        db = util.connect_to_lion_db("ro")
-        cursor = db.cursor()
-        cursor.execute(request)
-        first_count = cursor.rowcount
+        TranslationPage.session.execute_query(request)
+        first_count = TranslationPage.session.cursor.rowcount
         request = "SELECT id FROM %s WHERE role=\"ACCELERATOR\" and actualkeys != \"Space\"" % table
-        cursor.execute(request)
-        second_count = cursor.rowcount
-        cursor.close()
-        db.close()
+        TranslationPage.session.execute_query(request)
+        second_count = TranslationPage.session.cursor.rowcount
         print "distinct = %d, ours = %d" % (first_count, second_count)
         if first_count != second_count:
             self.warning_message = "There is a conflict because two commands are using the same keyboard shortcut."
@@ -140,8 +133,6 @@ class ChooseAccelerators(TranslationPage):
             return ("""Field cannot be empty.  Press the back button to try again.""")
         
         table = langid.replace("-", "_")
-        db = util.connect_to_lion_db("rw")
-        cursor = db.cursor()
         if thekeys != "XXXX":
             actualkeys = keymask + thekeys
         else:
@@ -152,9 +143,7 @@ class ChooseAccelerators(TranslationPage):
             xmlid="%(xmlid)s" """ % \
             {"table": table, "status": status, "actualkeys": actualkeys, \
                 "remarks": remarks, "xmlid": xmlid, "textstring": translation}
-        cursor.execute(request)
-        cursor.close()
-        db.close()
+        TranslationPage.session.cursor.execute_query(request)
         self.show_no_conflicts = False
         return self.index(self.last_view)
     save_string.exposed = True

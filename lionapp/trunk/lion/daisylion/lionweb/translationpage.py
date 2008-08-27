@@ -1,5 +1,6 @@
 import MySQLdb
 import util
+import dbsession
 from templates import translate, error
 
 VIEW_DESCRIPTIONS = {"all": "all items", 
@@ -19,7 +20,8 @@ class TranslationPage(translate.translate):
     pagenum = 0
     items_per_page = 50
     total_num_items = 0
-    def index(self, view, id_anchor = ""):
+    session = None
+    def index(self, view, session, id_anchor = ""):
         """Show the big table of translate-able items"""
         self.last_view = view
         user = util.get_user()
@@ -32,6 +34,7 @@ class TranslationPage(translate.translate):
         self.form, self.count = self.make_table(view, self.pagenum)
         print "made table"
         self.targetid = id_anchor
+        self.session = session
         return self.respond()
     index.exposed = True
     
@@ -41,16 +44,12 @@ class TranslationPage(translate.translate):
     
     def save_string(self, translation, remarks, status, xmlid, langid):
         table = langid.replace("-", "_")
-        db = util.connect_to_lion_db("rw")
-        cursor = db.cursor()
         request = """UPDATE %(table)s SET textflag="%(status)s", \
             textstring="%(translation)s", remarks="%(remarks)s" WHERE \
             xmlid="%(xmlid)s" """ % \
             {"table": table, "status": status, "translation": MySQLdb.escape_string(translation), \
                 "remarks": remarks, "xmlid": xmlid}
-        cursor.execute(request)
-        cursor.close()
-        db.close()
+        self.session.execute_query(request)
         self.show_no_conflicts = False
         return self.index(self.last_view, xmlid)
     save_string.exposed = True

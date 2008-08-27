@@ -37,6 +37,8 @@ class DBSession:
             self.trace_msg("Connecting to the database...")
             self.db = DB.connect.db_connect("admin")
             self.cursor = self.db.cursor()
+            # just for safety!
+            self.cursor.execute("SET collation_connection = utf8_unicode_ci")
             self.connected = True
             self.trace_msg("... connected")
 

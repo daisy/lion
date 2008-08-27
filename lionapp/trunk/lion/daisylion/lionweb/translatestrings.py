@@ -38,13 +38,9 @@ class TranslateStrings(TranslationPage):
             {"fields": ",".join(dbfields), "table": table, 
                 "where_flags": textflags_sql}
         print request
-        db = util.connect_to_lion_db("ro")
-        cursor=db.cursor()
-        cursor.execute(request)
-        rows = cursor.fetchall()
-        cursor.close()
-        db.close()
-        start, end = translationpage.calculate_range(len(rows), pagenum)
+        TranslationPage.session.execute_query(request)
+        rows = TranslationPage.session.cursor.fetchall()
+        start, end = TranslationPage.calculate_range(len(rows), pagenum)
         for i in range[start, end+1]:
             r = rows[i]
             t = tablerow.tablerow(searchList=dict(zip(template_fields, r)))
