@@ -36,8 +36,8 @@ class ChooseMnemonics(TranslationPage):
             "eng_US.textstring", "eng_US.role"]
         
         request = "SELECT DISTINCT mnemonicgroup FROM %s WHERE mnemonicgroup >= 0" % table
-        TranslationPage.session.execute_query(request)
-        mnem_groups = TranslationPage.session.cursor.fetchall()
+        self.session.execute_query(request)
+        mnem_groups = self.session.cursor.fetchall()
         form = ""
         group_number = 1
         num_rows = 0
@@ -49,8 +49,8 @@ class ChooseMnemonics(TranslationPage):
                 {"fields": ",".join(dbfields), "table": table, 
                     "where_flags": textflags_sql, "mnem_group": g[0]}
 
-            TranslationPage.session.execute_query(request)
-            rows = TranslationPage.session.cursor.fetchall()
+            self.session.execute_query(request)
+            rows = self.session.cursor.fetchall()
             num_rows += len(rows)
             if len(rows) > 0:
                 # the title of each section
@@ -85,10 +85,10 @@ class ChooseMnemonics(TranslationPage):
         """build a string where the mnemonic letter is 
         underlined in the word (referenced by target_id)"""
         request = "SELECT textstring FROM %s WHERE xmlid = \"%s\"" % (table, target_id)
-        TranslationPage.session.execute_query(request)
-        row = TranslationPage.session.cursor.fetchone()
+        self.session.execute_query(request)
+        row = self.session.cursor.fetchone()
         if row == None: 
-            print "Warning: invalid mnemonic"
+            self.session.warn("Invalid mnemonic")
             return ""
         word = row[0]
         pos = word.lower().find(letter.lower())
@@ -104,8 +104,8 @@ class ChooseMnemonics(TranslationPage):
         """check the mnemonic groups for conflicts"""
         table = self.user["users.langid"].replace("-", "_")
         request = "SELECT DISTINCT mnemonicgroup FROM %s WHERE mnemonicgroup >= 0" % table
-        TranslationPage.session.execute_query(request)
-        rows = TranslationPage.session.cursor.fetchall()
+        self.session.execute_query(request)
+        rows = self.session.cursor.fetchall()
         # for each mnemonic group, make sure that each entry is unique
         conflict_found = False
         self.warning_links = []
@@ -113,13 +113,13 @@ class ChooseMnemonics(TranslationPage):
             group_id = r[0]
             #first get all the items in this mnemonic group
             request = "SELECT id FROM %s WHERE mnemonicgroup = %d" % (table, group_id)
-            TranslationPage.session.execute_query(request)
-            first_set = TranslationPage.session.cursor.fetchall()
+            self.session.execute_query(request)
+            first_set = self.session.cursor.fetchall()
             #then get all unique textstrings from this mnemonic group.  
             #this relies on MYSQL being case-insensitive in its comparisons.
             request = "SELECT DISTINCT textstring FROM %s WHERE mnemonicgroup = %d" % (table, group_id)
-            TranslationPage.session.execute_query(request)
-            second_set = TranslationPage.session.cursor.fetchall()
+            self.session.execute_query(request)
+            second_set = self.session.cursor.fetchall()
             #if they returned different numbers of results, then probably a mnemonic was repeated
             if len(first_set) != len(second_set):
                 group_link = "group_%d" % group_id

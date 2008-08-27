@@ -57,10 +57,10 @@ def export_keys_book(session, xmlfile, langid, folder):
     nav.menus = menus
     for menu in menus:
         for m in menu:
-            print m.caption.text
-            print m.caption.id
-            print m.caption.audio
-        print "---"
+            session.trace_msg(m.caption.text)
+            session.trace_msg(m.caption.id)
+            session.trace_msg(m.caption.audio)
+        session.trace_msg("---")
     
     nav.title_chapter = title_chapter
     nav.organized_by_menu_chapter = organized_by_menu_chapter

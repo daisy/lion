@@ -35,7 +35,12 @@ False
 
 <div class="description">
 	<p>$about</p>
-	<p>Showing $view_description ($count items)</p>
+	<p>Showing $view_description ($count items).  
+	#if $usepages == True:
+		#set $p = $pagenum + 1
+		Page $p of $total_num_pages
+	#end if
+	</p>
 </div>
 <div>
     <form action="change_view" method="POST">
@@ -83,11 +88,16 @@ False
 ## the big table
 <div>$form</div>
 
+## the page numbers at the bottom
+
 #if $usepages == True:
-#if $pagenum==1:
-<p><a href="change_page?pagenum=2">Go to Page 2</a></p>
-#else
-<p><a href="change_page?pagenum=1">Return to Page 1</a></p>
-#end if
+	#for $i in range(0, $total_num_pages):
+		#set $display_pagenum = $i + 1
+		#if $pagenum != $i:
+			<span><a href="change_page?pagenum=$i">$display_pagenum</a></span>
+		#else:
+			<span>$display_pagenum</span>
+		#end if
+	#end for
 #end if
 #end def

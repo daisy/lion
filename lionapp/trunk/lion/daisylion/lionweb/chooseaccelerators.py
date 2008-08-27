@@ -36,8 +36,8 @@ class ChooseAccelerators(TranslationPage):
             {"fields": ",".join(dbfields), "table": table, 
                 "where_flags": textflags_sql}
         
-        TranslationPage.session.execute_query(request)
-        rows = TranslationPage.session.cursor.fetchall()
+        self.session.execute_query(request)
+        rows = self.session.cursor.fetchall()
         
         form = "<table>"
         for r in rows:
@@ -65,10 +65,10 @@ class ChooseAccelerators(TranslationPage):
     def build_accelerator_string(self, table, target_id, textstring):
         """build a string that looks like this: Ctrl + O (Open)"""
         request = "SELECT textstring FROM %s WHERE xmlid=\"%s\" " % (table, target_id)
-        TranslationPage.session.execute_query(request)
-        row = TranslationPage.session.cursor.fetchone()
+        self.session.execute_query(request)
+        row = self.session.cursor.fetchone()
         if row == None:
-            print "Warning! Invalid accelerator"
+            self.session.warn("Invalid accelerator")
             return ""
         accel_string = "%s (%s)" % (textstring, row[0])
         return accel_string
@@ -100,16 +100,18 @@ class ChooseAccelerators(TranslationPage):
         conflict_found = False
         table = self.user["users.langid"].replace("-", "_")
         request = "SELECT DISTINCT actualkeys FROM %s WHERE role=\"ACCELERATOR\" and actualkeys != \"Space\"" % table
-        TranslationPage.session.execute_query(request)
-        first_count = TranslationPage.session.cursor.rowcount
+        self.session.execute_query(request)
+        first_count = self.session.cursor.rowcount
         request = "SELECT id FROM %s WHERE role=\"ACCELERATOR\" and actualkeys != \"Space\"" % table
-        TranslationPage.session.execute_query(request)
-        second_count = TranslationPage.session.cursor.rowcount
-        print "distinct = %d, ours = %d" % (first_count, second_count)
+        self.session.execute_query(request)
+        second_count = self.session.cursor.rowcount
+        msg = "Checking for conflicts. Found %d distinct items versus %d total items in the table %s" \
+            % (first_count, second_count, table)
+        self.session.trace_msg(msg)
         if first_count != second_count:
             self.warning_message = "There is a conflict because two commands are using the same keyboard shortcut."
             conflict_found = True
-            print "CONFLICT!"
+            self.session.warn(self.warning_message)
         else:
             conflict_found = False
             self.warning_message = ""
@@ -143,7 +145,7 @@ class ChooseAccelerators(TranslationPage):
             xmlid="%(xmlid)s" """ % \
             {"table": table, "status": status, "actualkeys": actualkeys, \
                 "remarks": remarks, "xmlid": xmlid, "textstring": translation}
-        TranslationPage.session.cursor.execute_query(request)
+        self.session.cursor.execute_query(request)
         self.show_no_conflicts = False
         return self.index(self.last_view)
     save_string.exposed = True

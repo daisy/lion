@@ -59,8 +59,7 @@ class AmisImport():
                     elif tag == "dialog": role = "DIALOG"
                     else: role = "STRING"
                 else: role = "STRING"
-                if self.session.trace == True:
-                    print "Role = %s for %s" % (role, xmlid)
+                self.session.trace_msg("Role = %s for %s" % (role, xmlid))
                 self.session.execute_query("""UPDATE %s SET role="%s" WHERE id=%s""" % \
                     (self.table, role, id))
 
@@ -88,10 +87,8 @@ class AmisImport():
             self.doc.getElementsByTagName("containers"):
             items = self.doc.get_items_in_container(elem)
             
-            # redo this
-            if self.session.trace == True:
-                print "group id = %d" % groupid
-                self.doc.printelements(items)
+            self.session.trace_msg("group id = %d" % groupid)
+            self.doc.printelements(items)
             
             self.__get_mnemonics_and_write_data(items, groupid)
             groupid += 1
@@ -100,9 +97,8 @@ class AmisImport():
         for elem in self.doc.getElementsByTagName("dialog"):
             items = self.doc.get_items_in_dialog(elem)
             self.__get_mnemonics_and_write_data(items, groupid)
-            if self.session.trace == True:
-                print "group id = %d" % groupid
-                printelements(items)
+            self.session.trace_msg("group id = %d" % groupid)
+            self.doc.printelements(items)
             groupid += 1
 
 

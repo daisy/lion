@@ -14,7 +14,6 @@ class TranslateStrings(TranslationPage):
         self.warning_links = None
         self.check_conflict = False
         self.warning_message = None
-        self.pagenum = 1
         self.usepages = True
         #this is weird but necessary .. otherwise cheetah complains
         TranslationPage.__init__(self, session)
@@ -37,11 +36,13 @@ class TranslateStrings(TranslationPage):
             %(where_flags)s""" % \
             {"fields": ",".join(dbfields), "table": table, 
                 "where_flags": textflags_sql}
-        print request
-        TranslationPage.session.execute_query(request)
-        rows = TranslationPage.session.cursor.fetchall()
-        start, end = TranslationPage.calculate_range(len(rows), pagenum)
-        for i in range[start, end+1]:
+        self.session.execute_query(request)
+        rows = self.session.cursor.fetchall()
+        self.total_num_items = len(rows)
+        start, end = self.calculate_range(pagenum)
+        self.session.trace_msg("Range for page %d: %d, %d" % (pagenum, start, end))
+        form = "<table>"
+        for i in range(start, end):
             r = rows[i]
             t = tablerow.tablerow(searchList=dict(zip(template_fields, r)))
             t.instructions = self.instructions

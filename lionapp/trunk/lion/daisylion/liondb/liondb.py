@@ -12,7 +12,7 @@ class LionDB(DBSession):
             self.config = ConfigParser()
             self.config.read("../lion.cfg")
             self.masterlang = self.config.get("main", "masterlang")
-            self.trace_msg(self.masterlang)
+            self.trace_msg("Master language = %s" % self.masterlang)
             
             
             # Import the application module, which lives here:
@@ -66,7 +66,7 @@ class LionDB(DBSession):
         if not file: die("No XML file given.")
         if not self.check_language(langid):
             die("No table for language %s." % langid)
-        self.trace_msg("Import from " + file + " for " + langid)
+        self.trace_msg("Import from %s for %s" % (file, langid))
         self.dbio.import_xml(self, file, langid)
         removed_ids = self.dbio.get_removed_ids_after_import()
         self.__process_changes(langid, removed_ids)

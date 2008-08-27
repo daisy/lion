@@ -162,7 +162,7 @@ class AmisUiDoc(minidom.Document):
 
     def printelements(self, session, elms):
         for el in elms:
-            print "\t%s\n" % el.toxml()
+            session.trace_msg("\t%s\n" % el.toxml())
 
     
     def escape_quotes(self, str):

@@ -22,7 +22,7 @@ def export_xml(session, file, langid):
     for xmlid, textstring, actualkeys, role, audiouri in session.cursor:
         elm = doc.get_element_by_id("text", xmlid)
         if elm == None: 
-            session.trace_msg("Text element %s not found." % xmlid)
+            session.warn("Text element %s not found." % xmlid)
             continue
         
         if elm.firstChild.nodeType == Node.TEXT_NODE:
