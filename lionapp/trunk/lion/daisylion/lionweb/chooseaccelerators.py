@@ -1,3 +1,4 @@
+import MySQLdb
 from translationpage import *
 from templates import tablerow, acceltablerow
 import util
@@ -143,8 +144,8 @@ class ChooseAccelerators(TranslationPage):
         request = """UPDATE %(table)s SET textflag="%(status)s", \
             textstring="%(textstring)s", remarks="%(remarks)s", actualkeys="%(actualkeys)s" WHERE \
             xmlid="%(xmlid)s" """ % \
-            {"table": table, "status": status, "actualkeys": actualkeys, \
-                "remarks": remarks, "xmlid": xmlid, "textstring": translation}
+            {"table": table, "status": status, "actualkeys": MySQLdb.escape_string(actualkeys), \
+                "remarks": MySQLdb.escape_string(remarks), "xmlid": xmlid, "textstring": MySQLdb.escape_string(translation)}
         self.session.execute_query(request)
         self.show_no_conflicts = False
         return self.index(self.last_view)

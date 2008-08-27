@@ -55,7 +55,7 @@ class TranslationPage(translate.translate):
             textstring="%(translation)s", remarks="%(remarks)s" WHERE \
             xmlid="%(xmlid)s" """ % \
             {"table": table, "status": status, "translation": MySQLdb.escape_string(translation), \
-                "remarks": remarks, "xmlid": xmlid}
+                "remarks": MySQLdb.escape_string(remarks), "xmlid": xmlid}
         self.session.execute_query(request)
         self.show_no_conflicts = False
         self.pagenum = int(pagenum)
