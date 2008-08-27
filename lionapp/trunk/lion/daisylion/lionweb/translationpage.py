@@ -49,7 +49,7 @@ class TranslationPage(translate.translate):
         return self.index(viewfilter)
     change_view.exposed = True
     
-    def save_string(self, translation, remarks, status, xmlid, langid):
+    def save_string(self, translation, remarks, status, xmlid, langid, pagenum):
         table = langid.replace("-", "_")
         request = """UPDATE %(table)s SET textflag="%(status)s", \
             textstring="%(translation)s", remarks="%(remarks)s" WHERE \
@@ -58,6 +58,8 @@ class TranslationPage(translate.translate):
                 "remarks": remarks, "xmlid": xmlid}
         self.session.execute_query(request)
         self.show_no_conflicts = False
+        self.pagenum = int(pagenum)
+        self.session.trace_msg("On page %d" % self.pagenum)
         return self.index(self.last_view, xmlid)
     save_string.exposed = True
         
@@ -94,8 +96,9 @@ class TranslationPage(translate.translate):
         # make sure the page is in range
         if pagenum >= 0 and pagenum < total_num_pages:
             start = (pagenum + 1) * self.items_per_page - self.items_per_page
-            if self.total_num_items % self.items_per_page != 0:
-                end = start + (self.total_num_items % self.items_per_page)
+            if pagenum == total_num_pages - 1 and \
+                self.total_num_items % self.items_per_page != 0:
+                    end = start + (self.total_num_items % self.items_per_page)
             else:
                 end = start + self.items_per_page
             return start, end

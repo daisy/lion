@@ -10,6 +10,9 @@ Template variables:
 	warning_links = a list of links to go along with a warning
 	warning_message = a warning message
 	show_no_conflicts = if True, show a message area that says "no conflicts"
+	usepages = if True, this represents a page
+	total_num_pages = the total number of pages
+	pagenum = the current page number
 *#
 
 #from xhtml import xhtml
@@ -61,6 +64,8 @@ False
 <br/>
 #end if
 
+
+## for showing the conflicts warning
 #if ($warning_links != None and len($warning_links) > 0) or ($warning_message != None and len($warning_message) > 0)
 <div class="warning">
 	<h2>Warning!</h2>
@@ -71,6 +76,7 @@ False
 			<li>There is a conflict in <a href="#$link">this group</a></li>
 		#end for
 		</ul>
+		<p>Fix the problem, save the item(s), and press <em>Check for Conflicts</em> again.</p>
 	#end if
 
 	#if $warning_message != None and len($warning_message) > 0
@@ -79,6 +85,7 @@ False
 </div>
 #end if
 
+## for showing the "no conflicts" message
 #if $show_no_conflicts
 <div class="message">
 	<p>No conflicts</p>
@@ -90,7 +97,11 @@ False
 
 ## the page numbers at the bottom
 
-#if $usepages == True:
+#if $usepages == True and $total_num_pages > 1:
+<div class="page_nav">
+	#if $pagenum != 0:
+		<span><a href="previous_page">&lt;&lt;</a></span>
+	#end if
 	#for $i in range(0, $total_num_pages):
 		#set $display_pagenum = $i + 1
 		#if $pagenum != $i:
@@ -99,5 +110,9 @@ False
 			<span>$display_pagenum</span>
 		#end if
 	#end for
+	#if $pagenum != $total_num_pages - 1:
+		<span><a href="next_page">&gt;&gt;</a></span>
+	#end if
+</div>
 #end if
 #end def

@@ -49,6 +49,7 @@ class TranslateStrings(TranslationPage):
     	    t.width = self.textbox_columns
     	    t.height = self.textbox_rows
     	    t.langid = self.user["users.langid"]
+    	    t.pagenum = pagenum
             form = form + t.respond()
         form = form + "</table>"
         return form, len(rows)

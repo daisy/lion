@@ -10,6 +10,9 @@ Template variables:
 	height = the height of the text box for the translation
 	langid = the id of the language being translated into
 *#
+#def $pagenum
+0
+#end def
 #if $textflag == 1
 	#set $ok = "checked"
 	#set $todo = ""
@@ -47,6 +50,7 @@ Template variables:
 	<input type="submit" value="Save" style="align: bottom"/>
 	<input type="hidden" name="xmlid" value="$xmlid"/>
 	<input type="hidden" name="langid" value="$langid"/>
+	<input type="hidden" name="pagenum" value="$pagenum">
 </td>
 </form>
 </tr>

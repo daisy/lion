@@ -145,7 +145,7 @@ class ChooseAccelerators(TranslationPage):
             xmlid="%(xmlid)s" """ % \
             {"table": table, "status": status, "actualkeys": actualkeys, \
                 "remarks": remarks, "xmlid": xmlid, "textstring": translation}
-        self.session.cursor.execute_query(request)
+        self.session.execute_query(request)
         self.show_no_conflicts = False
         return self.index(self.last_view)
     save_string.exposed = True
