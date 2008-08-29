@@ -7,7 +7,7 @@ import re
 class ChooseAccelerators(TranslationPage):
     """The page of all the strings (the main page)"""
     
-    def __init__(self, session, host, port):
+    def __init__(self, session, host, port, masterlang):
         self.section = "accelerators"
         self.textbox_columns = 20
         self.textbox_rows = 1
@@ -17,25 +17,25 @@ class ChooseAccelerators(TranslationPage):
             for your custom shortcuts."
         self.check_conflict = True
         #this is weird but necessary .. otherwise cheetah complains
-        TranslationPage.__init__(self, session, host, port)    
+        TranslationPage.__init__(self, session, host, port, masterlang)    
 
     def make_table(self, view_filter, pagenum):
         """Make the form for main page"""
-        table = self.user["users.langid"].replace("-", "_")
+        table = self.make_table_name(self.user["users.langid"])
+        mtable = self.make_table_name(self.masterlang)
         langid = self.user["users.langid"]
         textflags_sql = self.get_sql_for_view_filter(view_filter, table)
-        
         template_fields = ["xmlid", "textstring", "textflag", "remarks", 
             "target", "actualkeys", "ref_string", "role"]
         dbfields = ["%s.xmlid" % table, "%s.textstring" % table, 
             "%s.textflag" % table, "%s.remarks" % table, "%s.target" % table,
-            "%s.actualkeys" % table, "eng_US.textstring", "eng_US.role"]
+            "%s.actualkeys" % table, "%s.textstring" % mtable, "%s.role" % mtable]
         
-        request = """SELECT %(fields)s FROM %(table)s, eng_US WHERE %(table)s.\
-            xmlid=eng_US.xmlid AND %(table)s.role="ACCELERATOR" \
+        request = """SELECT %(fields)s FROM %(table)s, %(mastertable)s WHERE %(table)s.\
+            xmlid=%(mastertable)s.xmlid AND %(table)s.role="ACCELERATOR" \
             %(where_flags)s""" % \
             {"fields": ",".join(dbfields), "table": table, 
-                "where_flags": textflags_sql}
+                "where_flags": textflags_sql, "mastertable": mtable}
         
         self.session.execute_query(request)
         rows = self.session.cursor.fetchall()
@@ -45,13 +45,13 @@ class ChooseAccelerators(TranslationPage):
             data = dict(zip(template_fields, r))
             if self.is_excluded(data["actualkeys"]) == True:
                 continue
-            local_ref = self.build_accelerator_string(table,
+            locallang_ref = self.build_accelerator_string(table,
                     data["target"], data["textstring"])
-            eng_ref = self.build_accelerator_string("eng_US", 
+            masterlang_ref = self.build_accelerator_string(mtable, 
                     data["target"], data["ref_string"])
             # override some values
-            data["ref_string"] = local_ref
-            data["our_remarks"] = "In English, the accelerator is %s" % eng_ref
+            data["ref_string"] = locallang_ref
+            data["our_remarks"] = "In %s, the accelerator is %s" % (self.masterlangname, masterlang_ref)
             key_mask, letter = self.parse_key_masks(data["actualkeys"])
             data["thekeys"] = letter
             data["keymask"] = key_mask

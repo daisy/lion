@@ -23,10 +23,14 @@ class TranslationPage(translate.translate):
     session = None
     pagenum = 0
     
-    def __init__(self, session, host, port):
+    def __init__(self, session, host, port, masterlang):
         self.session = session
         self.host = host
         self.port = port
+        self.masterlang = masterlang
+        session.execute_query("""SELECT langname from languages WHERE langid="%s" """ \
+            % masterlang)
+        self.masterlangname = session.cursor.fetchone()[0]
         translate.translate.__init__(self)
     
     def index(self, view, id_anchor = ""):
@@ -78,13 +82,6 @@ class TranslationPage(translate.translate):
             sql = ""
         return sql
     
-    def make_fields(self, table):
-        """format a list of fields, with or without the table prefix"""
-        # get the xmlid, textstring, textflag, remarks from the localized table
-        # get the textstring and remarks from the english table
-        if table != "": table = "%s." % table
-        return []
-    
     def get_total_num_pages(self):
         total_num_pages = self.total_num_items/self.items_per_page
         # add another page for any remaining items
@@ -133,3 +130,9 @@ class TranslationPage(translate.translate):
         else:
             return None
     change_page.exposed = True
+    
+    def make_table_name(self, langid):
+        """This is a duplicate of the liondb/liondb.py function.  It will disappear soon as integration improves. """
+        return langid.replace("-", "_")
+
+        

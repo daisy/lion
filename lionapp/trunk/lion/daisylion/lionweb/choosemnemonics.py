@@ -12,7 +12,7 @@ class ChooseMnemonics(TranslationPage):
         "ACCELERATOR": "keyboard shortcut",
         "MNEMONIC": "letter (underlined) to press to activate the item"}
     
-    def __init__(self, session, host, port):
+    def __init__(self, session, host, port, masterlang):
         self.section = "mnemonics"
         self.textbox_columns = 10
         self.textbox_rows = 1
@@ -22,18 +22,19 @@ class ChooseMnemonics(TranslationPage):
             a unique mnemonic."
         self.check_conflict = True
         #this is weird but necessary .. otherwise cheetah complains
-        TranslationPage.__init__(self, session, host, port)    
+        TranslationPage.__init__(self, session, host, port, masterlang)    
 
     def make_table(self, view_filter, pagenum):
         """Make the form for main page"""
-        table = self.user["users.langid"].replace("-", "_")
+        table = self.make_table_name(self.user["users.langid"])
+        mtable = self.make_table_name(self.masterlang)
         langid = self.user["users.langid"]
         textflags_sql = self.get_sql_for_view_filter(view_filter, table)
         template_fields = ["xmlid", "textstring", "textflag", "remarks", 
             "target", "ref_string", "role"]
         dbfields = ["%s.xmlid" % table, "%s.textstring" % table, 
             "%s.textflag" % table, "%s.remarks" % table, "%s.target" % table,
-            "eng_US.textstring", "eng_US.role"]
+            "%s.textstring" % mtable, "%s.role" % mtable]
         
         request = "SELECT DISTINCT mnemonicgroup FROM %s WHERE mnemonicgroup >= 0" % table
         self.session.execute_query(request)
@@ -43,11 +44,11 @@ class ChooseMnemonics(TranslationPage):
         num_rows = 0
         # each mnemonic group gets its own section
         for g in mnem_groups:
-            request = """SELECT %(fields)s FROM %(table)s, eng_US WHERE %(table)s.\
-                xmlid=eng_US.xmlid AND %(table)s.mnemonicgroup=%(mnem_group)d \
+            request = """SELECT %(fields)s FROM %(table)s, %(mastertable)s WHERE %(table)s.\
+                xmlid=%(mastertable)s.xmlid AND %(table)s.mnemonicgroup=%(mnem_group)d \
                  AND %(table)s.role="MNEMONIC" %(where_flags)s""" % \
                 {"fields": ",".join(dbfields), "table": table, 
-                    "where_flags": textflags_sql, "mnem_group": g[0]}
+                    "where_flags": textflags_sql, "mnem_group": g[0], "mastertable": mtable}
 
             self.session.execute_query(request)
             rows = self.session.cursor.fetchall()
@@ -58,16 +59,17 @@ class ChooseMnemonics(TranslationPage):
                 form += "<table>"
                 for r in rows:
                     data = dict(zip(template_fields, r))
-                    local_ref = self.build_mnemonic_string(table,
+                    locallang_ref = self.build_mnemonic_string(table,
                         data["target"], data["textstring"])
-                    eng_ref = self.build_mnemonic_string("eng_US", 
+                    masterlang_ref = self.build_mnemonic_string(mtable, 
                             data["target"], data["ref_string"])
                     # override some values
-                    data["ref_string"] = local_ref
-                    data["our_remarks"] = "This is for a %(item)s.  In English, it is \
+                    data["ref_string"] = locallang_ref
+                    data["our_remarks"] = "This is for a %(item)s.  In %(masterlangname)s, it is \
                         used like this: \"%(example)s\"" \
                         % {"item": self.ROLE_DESCRIPTIONS[data["role"]], 
-                            "example": eng_ref}
+                            "example": masterlang_ref,
+                            "masterlangname": self.masterlangname}
                 
                     t = tablerow.tablerow(searchList=data)
                     t.instructions = self.instructions

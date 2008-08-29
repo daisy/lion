@@ -350,7 +350,7 @@ class LionDB(DBSession):
 
         self.__add_user_to_database(langid, username, password, realname, email)
 
-        # create the new table as a copy of the english table
+        # create the new table as a copy of the master language table
         table = self.make_table_name(langid)
         self.execute_query("CREATE TABLE %s SELECT * from %s" % (table, self.get_masterlang_table()))
 
