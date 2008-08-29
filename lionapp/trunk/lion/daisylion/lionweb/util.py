@@ -1,7 +1,5 @@
 #small and useful things...
 
-#import cgi
-#import cgitb; cgitb.enable()
 import sys
 import os
 import datetime
