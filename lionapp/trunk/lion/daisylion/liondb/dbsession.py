@@ -6,11 +6,13 @@ import DB.connect  # Harcoded DB connection info, not stored in SVN
 class DBSession:
     """A session with the DB."""
     
-    def __init__(self, trace, force):
+    def __init__(self, host, dbname, trace=False, force=False):
         self.trace = trace      # trace flag
         self.warnings = 0       # warnings during operation
         self.connected = False  # no connection yet
         self.force = force      # force flag
+        self.host = host
+        self.dbname = dbname
     
     def __del__(self):
         """Disconnect when disappearing."""
@@ -35,7 +37,7 @@ class DBSession:
         """Connect to the database."""
         if not self.connected:
             self.trace_msg("Connecting to the database...")
-            self.db = DB.connect.db_connect("admin")
+            self.db = DB.connect.db_connect("admin", self.host, self.dbname)
             self.cursor = self.db.cursor()
             # just for safety!
             self.cursor.execute("SET collation_connection = utf8_unicode_ci")

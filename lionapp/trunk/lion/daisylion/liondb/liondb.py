@@ -5,16 +5,19 @@ from dbsession import DBSession
 import modules.lion_module
 
 class LionDB(DBSession):
-    def __init__(self, trace=False, force=False, app=None):
-        DBSession.__init__(self, trace, force)
+    def __init__(self, config, trace=False, force=False, app=None):
+        # read the settings
+        self.config = ConfigParser()
+        self.config.read(config)
+        self.masterlang = self.config.get("main", "masterlang")
+        host = self.config.get("main", "dbhost")    
+        dbname = self.config.get("main", "dbname")
+        DBSession.__init__(self, host, dbname, trace, force)
         
+        self.trace_msg("Master language = %s" % self.masterlang)
+        self.trace_msg("Host = %s" % host)
+        self.trace_msg("DB = %s" % dbname)
         if app:
-            self.config = ConfigParser()
-            self.config.read("../lion.cfg")
-            self.masterlang = self.config.get("main", "masterlang")
-            self.trace_msg("Master language = %s" % self.masterlang)
-            
-            
             # Import the application module, which lives here:
             # top-level/modules/APP/lionio_APP.someclass
             # someclass is defined in the config file and it inherits from LionIOModule

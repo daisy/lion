@@ -4,7 +4,7 @@ import util
 
 class TranslateStrings(TranslationPage):
     """The page of all the strings (the main page)"""
-    def __init__(self, session):
+    def __init__(self, session, host, port):
         self.section = "main"
         self.textbox_columns = 64
         self.textbox_rows = 3
@@ -16,7 +16,7 @@ class TranslateStrings(TranslationPage):
         self.warning_message = None
         self.usepages = True
         #this is weird but necessary .. otherwise cheetah complains
-        TranslationPage.__init__(self, session)
+        TranslationPage.__init__(self, session, host, port)
     
     def make_table(self, view_filter, pagenum):
         """Make the form for main page"""

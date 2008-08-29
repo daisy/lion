@@ -17,7 +17,10 @@ Your code looks like this:
 
 from DB.connect import *
 #username can be "admin", "rw", "ro" for "admin", "read-write", "read-only"
-db = connect_to_db("admin")
+db = connect_to_db(user, hostname)
+
+user : "admin" (ALL permissions), "ro" (SELECT), "rw" (SELECT/UPDATE/INSERT/DELETE)
+hostname : "localhost", "92.243.13.151" (Gandi), or whatever the host IP is
 
 Note that with the current server (Gandi), your IP has to be authorized in order to connect from a local machine.  Do the following:
 1. Connect via SSH to 93.243.13.151

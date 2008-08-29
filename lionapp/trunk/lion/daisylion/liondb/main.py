@@ -34,6 +34,7 @@ Other options:
   --application, -a: which application module to use (e.g. "amis" or "obi")
   --trace, -t: trace mode (send trace messages to stderr.)
   --force, -f: force execution without safe checks 
+  --config: the configuration file. default is lion_combo.cfg.
 
 """ % {"script": os.sys.argv[0]}
     os.sys.exit(code)
@@ -65,6 +66,7 @@ def main():
     add_accel = False
     change_item = False
     export = False
+    config="../lion_combo.cfg"
     
     try:
         opts, args = getopt.getopt(os.sys.argv[1:], "a:ef:hil:e",
@@ -73,7 +75,7 @@ def main():
                 "username=", "password=", "realname=", "email=", "force", 
                 "stringid=", "text=", "remove_item", "add_string", "refid=", 
                 "keys=", "add_accelerator", "textstrings", "all_strings", 
-                "audio_prompts", "change_item", "extra="])
+                "audio_prompts", "change_item", "extra=", "config="])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
@@ -96,6 +98,7 @@ def main():
         elif opt in ("--extra"): extra = arg
         elif opt in ("-e", "--export"): export = True
         elif opt in ("--option"): option = int(arg)
+        elif opt in ("--config"): config = arg
         elif opt in ("-h", "--help"):
             action = lambda s, f, l: usage()
         elif opt in ("-i", "--import"):
@@ -113,8 +116,8 @@ def main():
             action = lambda s, f, l: s.all_strings(l)
         elif opt in ("--audio_prompts"):
             action = lambda s, f, l: s.audio_prompts(l, f)
-    
-    session = LionDB(trace, force, app)
+        
+    session = LionDB(config, trace, force, app)
     if add_language == True:
         session.add_language(langid, langname, username, password, realname, email)
     elif add_string == True:

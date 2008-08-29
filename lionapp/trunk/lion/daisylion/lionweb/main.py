@@ -1,6 +1,7 @@
 import sys
 import os
 os.sys.path.append("./templates")
+import getopt
 from ConfigParser import ConfigParser
 import MySQLdb
 import cherrypy
@@ -14,8 +15,10 @@ import daisylion.liondb.dbsession
 class Login(login.login):
     """Things relating to logging in"""
     
-    def __init__(self, session):
+    def __init__(self, session, host, port):
         self.session = session
+        self.host = host
+        self.port = port
         login.login.__init__(self)
     
     def index(self):
@@ -43,8 +46,10 @@ class Login(login.login):
 class MainMenu(mainmenu.mainmenu):
     """This menu gives the tasks for the translators"""
     
-    def __init__(self, session):
+    def __init__(self, session, host, port):
         self.session = session
+        self.host = host
+        self.port = port
         mainmenu.mainmenu.__init__(self)
     
     def index(self):
@@ -63,21 +68,43 @@ class MainMenu(mainmenu.mainmenu):
 
 def main():
     """The entry point for the web app"""
+    # read the command line arguments
+    try:
+        opts, args = getopt.getopt(os.sys.argv[1:], "c", ["config="])
+    
+    except getopt.GetoptError, e:
+        os.sys.stderr.write("Error: %s" % e.msg)
+        exit(1)
+    
+    config_file = None
+    for opt, arg in opts:
+        if opt in ("-c", "--config"): config_file = arg
+    print config_file
     
     # read the lion configuration file
     config = ConfigParser()
-    config.read("../lion.cfg")
-    trace = config.get("main", "trace")
-    force = config.get("main", "force")
-    session = daisylion.liondb.dbsession.DBSession(trace, force)
-    session.trace_msg("Starting the Lion website")
+    try:
+        config.read(config_file)
+    except e:
+        os.sys.stderr.write("Error: %s" % e.msg)
+        exit(1)
     
+    trace = True
+    if config.get("main", "trace") == "false": trace = False
+    force = True
+    if config.get("main", "force") == "false": force = False
+    webhost =  config.get("main", "webhost")    
+    webport = int(config.get("main", "webport"))
+    dbhost = config.get("main", "dbhost")
+    dbname = config.get("main", "dbname")
+    session = daisylion.liondb.dbsession.DBSession(dbhost, dbname, trace, force)
+    session.trace_msg("Starting the Lion website")
     # initialize the object hierarchy that cherrypy will use
-    root = Login(session)
-    root.MainMenu = MainMenu(session)
-    root.TranslateStrings = translatestrings.TranslateStrings(session)
-    root.ChooseMnemonics = choosemnemonics.ChooseMnemonics(session)
-    root.ChooseAccelerators = chooseaccelerators.ChooseAccelerators(session)
+    root = Login(session, webhost, webport)
+    root.MainMenu = MainMenu(session, webhost, webport)
+    root.TranslateStrings = translatestrings.TranslateStrings(session, webhost, webport)
+    root.ChooseMnemonics = choosemnemonics.ChooseMnemonics(session, webhost, webport)
+    root.ChooseAccelerators = chooseaccelerators.ChooseAccelerators(session, webhost, webport)
     root.style = "./style/"
     app = cherrypy.tree.mount(root, script_name='/')
     
@@ -86,10 +113,8 @@ def main():
     cherrypy.config.update({'environment': 'production',
         'log.error_file': 'site.log',
         'log.screen': True,
-        # use this instead for the server:
-        #'server.socket_host': '92.243.13.151',
-        'server.socket_host': 'localhost',
-        'server.socket_port': 8080,
+        'server.socket_host': '%s' % webhost,
+        'server.socket_port': webport,
         'server.thread_pool': 10,
         'tools.encode.on':True,
         'tools.encode.encoding':'utf8'})

@@ -1,12 +1,27 @@
 #!/bin/bash
-# compile the templates before using them.  delete backup files.
+# start the lion web server
 
-cd ./templates
+if [ -z "$1" ]; then 
+    echo usage: start-the-lion configfile
+    exit
+fi
+
+# from http://forums.macosxhints.com/showthread.php?t=73839
+## Linux
+LSOF=$(lsof -p $$ | grep -E "/"$(basename $0)"$")
+THIS_FILE_PATH=$(echo $LSOF | sed -r s/'^([^\/]+)\/'/'\/'/1 2>/dev/null)
+if [ $? -ne 0 ]; then
+## OSX
+  THIS_FILE_PATH=$(echo $LSOF | sed -E s/'^([^\/]+)\/'/'\/'/1 2>/dev/null)
+fi
+
+THIS_DIR=$(dirname $THIS_FILE_PATH)
+
+# compile the template files
+TEMPLATES_DIR="$THIS_DIR""/templates"
+cd "$TEMPLATES_DIR"
 cheetah compile *.tmpl
-echo "Removing backup files"
-rm -fv *.bak
-cd ../
+cd "$THIS_DIR"
+
 echo "Starting..."
-# for the server, use this instead:
-# nohup python main.py &
-python main.py
+python main.py --config=$1

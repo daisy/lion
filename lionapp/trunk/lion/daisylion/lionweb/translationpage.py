@@ -23,8 +23,10 @@ class TranslationPage(translate.translate):
     session = None
     pagenum = 0
     
-    def __init__(self, session):
+    def __init__(self, session, host, port):
         self.session = session
+        self.host = host
+        self.port = port
         translate.translate.__init__(self)
     
     def index(self, view, id_anchor = ""):

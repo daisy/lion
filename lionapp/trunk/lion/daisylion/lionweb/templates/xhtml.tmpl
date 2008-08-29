@@ -2,10 +2,13 @@
 Template variables:
 	title = page title
 	body = page body
+	host = the host
 *#
-### use this for running the lion locally:
-#set $base_url = "http://localhost:8080/style/"
-###set $base_url = "http://92.243.13.151:8080/style"
+#def host
+#end def
+#def port
+#end def
+#set $base_url = "http://" + $host + ":" + str($port) + "/style/"
 #set $css = $base_url + "l10n.css"
 #set $icon = $base_url + "lionicon.ico"
 #set $logo = $base_url + "lion144.png"
