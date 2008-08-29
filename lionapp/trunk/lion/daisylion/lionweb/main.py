@@ -70,15 +70,19 @@ def main():
     """The entry point for the web app"""
     # read the command line arguments
     try:
-        opts, args = getopt.getopt(os.sys.argv[1:], "c", ["config="])
+        opts, args = getopt.getopt(os.sys.argv[1:], "c", ["config=", "force", "trace"])
     
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         exit(1)
     
     config_file = None
+    trace = False
+    force = False
     for opt, arg in opts:
         if opt in ("-c", "--config"): config_file = arg
+        if opt in ("--trace"): trace = True
+        if opt in ("--force"): force = True
     print config_file
     
     # read the lion configuration file
@@ -89,10 +93,17 @@ def main():
         os.sys.stderr.write("Error: %s" % e.msg)
         exit(1)
     
-    trace = True
-    if config.get("main", "trace") == "false": trace = False
-    force = True
-    if config.get("main", "force") == "false": force = False
+    # for trace and force, read the values from the config file
+    # override if they were turned on via the command line
+    if config.get("main", "trace") == "true":
+        trace = True
+    else:
+        trace = False | trace
+    if config.get("main", "force") == "true":
+        force = True
+    else:
+        force = False | force
+
     webhost =  config.get("main", "webhost")    
     webport = int(config.get("main", "webport"))
     dbhost = config.get("main", "dbhost")

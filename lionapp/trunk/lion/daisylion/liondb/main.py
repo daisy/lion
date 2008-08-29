@@ -29,6 +29,9 @@ Usage:
   %(script)s --all_strings --langid=id           Output XML of strings, including keyboard shortcuts
   %(script)s --change_item --langid=id --text=string --stringid=id  
                                                 Change an item in the master table and reflect the change elsewhere 
+  %(script)s --add_user --langid=id --username=username --password=password --email=email --realname=realname
+                                                Add a user for a pre-existing language
+  %(script)s --remove_user --username=username  Remove a user (but not their associated language)
   
 Other options:
   --application, -a: which application module to use (e.g. "amis" or "obi")
@@ -59,13 +62,16 @@ def main():
     actualkeys = None
     extra = None
     option = 0
-    # if the action is add/remove a language/string/accelerator, the parameters are different
+    # if the action is add/remove a language/string/accelerator/user, the parameters are different
+    # we have to test these actions separately from the generic lambda used below.  
     add_language = False  
     add_string = False
     remove_item = False
     add_accel = False
     change_item = False
     export = False
+    add_user = False
+    remove_user = False
     config="../lion_combo.cfg"
     
     try:
@@ -75,7 +81,7 @@ def main():
                 "username=", "password=", "realname=", "email=", "force", 
                 "stringid=", "text=", "remove_item", "add_string", "refid=", 
                 "keys=", "add_accelerator", "textstrings", "all_strings", 
-                "audio_prompts", "change_item", "extra=", "config="])
+                "audio_prompts", "change_item", "extra=", "config=", "add_user", "remove_user"])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
@@ -116,7 +122,9 @@ def main():
             action = lambda s, f, l: s.all_strings(l)
         elif opt in ("--audio_prompts"):
             action = lambda s, f, l: s.audio_prompts(l, f)
-        
+        elif opt in ("--add_user"): add_user = True
+        elif opt in ("--remove_user"): remove_user = True
+    
     session = LionDB(config, trace, force, app)
     if add_language == True:
         session.add_language(langid, langname, username, password, realname, email)
@@ -130,6 +138,10 @@ def main():
         session.change_item(langid, textstring, stringid)
     elif export == True:
         session.export(file, langid, option, extra)
+    elif add_user == True:
+        session.add_user(langid, username, password, realname, email)
+    elif remove_user == True:
+        session.remove_user(username)
     else:
         action(session, file, langid)
 
