@@ -7,7 +7,7 @@ import re
 class ChooseAccelerators(TranslationPage):
     """The page of all the strings (the main page)"""
     
-    def __init__(self, session, host, port, masterlang):
+    def __init__(self, session, host, port, masterlang, show_audio_upload):
         self.section = "accelerators"
         self.textbox_columns = 20
         self.textbox_rows = 1
@@ -17,7 +17,7 @@ class ChooseAccelerators(TranslationPage):
             for your custom shortcuts."
         self.check_conflict = True
         #this is weird but necessary .. otherwise cheetah complains
-        TranslationPage.__init__(self, session, host, port, masterlang)    
+        TranslationPage.__init__(self, session, host, port, masterlang, show_audio_upload)    
 
     def make_table(self, view_filter, pagenum):
         """Make the form for main page"""

@@ -9,7 +9,8 @@ def usage(code=0):
 Usage:
 
   %(script)s --help                              Show this help message.
-  %(script)s --import --langid=id --file=file    Import file into table id.
+  %(script)s --import --langid=id --file=file --option=1|2|3etc   
+                                                Import file into table id.
   
   %(script)s --export --option=1|2|3etc --langid=id --file=file --extra=output folder (for multi-file output)    
                                                 Export (option to specify a number giving the export type)
@@ -72,6 +73,7 @@ def main():
     export = False
     add_user = False
     remove_user = False
+    import_xml = False
     config="../lion_combo.cfg"
     
     try:
@@ -107,8 +109,7 @@ def main():
         elif opt in ("--config"): config = arg
         elif opt in ("-h", "--help"):
             action = lambda s, f, l: usage()
-        elif opt in ("-i", "--import"):
-            action = lambda s, f, l: s.import_xml(f, l)
+        elif opt in ("-i", "--import"): import_xml = True
         elif opt in ("--add_language"): add_language = True
         elif opt in ("--remove_language"):
             action = lambda s, f, l: s.remove_language(l)
@@ -142,6 +143,8 @@ def main():
         session.add_user(langid, username, password, realname, email)
     elif remove_user == True:
         session.remove_user(username)
+    elif import_xml == True:
+        session.import_xml(file, langid, option)
     else:
         action(session, file, langid)
 

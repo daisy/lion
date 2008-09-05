@@ -79,15 +79,16 @@ class LionDB(DBSession):
     def get_masterlang_table(self):
         return make_table_name(self.masterlang)
     
-    def import_xml(self, file, langid):
+    def import_xml(self, file, langid, option):
         """Import from XML to the database."""
-        if not file: die("No XML file given.")
+        if not file: self.die("No XML file given.")
         if not self.check_language(langid):
-            die("No table for language %s." % langid)
+            self.die("No table for language %s." % langid)
         self.trace_msg("Import from %s for %s" % (file, langid))
-        self.dbio.import_xml(self, file, langid)
+        self.dbio.import_xml(self, file, langid, option)
         removed_ids = self.dbio.get_removed_ids_after_import()
-        self.__process_changes(langid, removed_ids)
+        if langid == self.masterlang:
+            self.__process_changes(langid, removed_ids)
     
     def export(self, file, langid, option, extra):
         print self.dbio.export(self, file, langid, option, extra)
@@ -165,7 +166,8 @@ class LionDB(DBSession):
             3, "%(xmlid)s", "STRING")""" % \
             {"table": table, "textstring": textstring, "xmlid": stringid})
         self.trace_msg("Remember to change the next-id value in the AMIS XML file.")
-        self.__process_changes(langid, None)
+        if langid == self.masterlang:
+            self.__process_changes(langid, None)
 
     def remove_item(self, langid, stringid):
         """Remove a string from all the tables
@@ -192,7 +194,8 @@ class LionDB(DBSession):
                 WHERE xmlid="%(xmlid)s" """ % \
                 {"table": table, "xmlid": stringid})
 
-        self.__process_changes(langid, removed_ids)
+        if langid == self.masterlang:
+            self.__process_changes(langid, removed_ids)
 
     def add_accelerator(self, langid, textstring, stringid, refid, keys):
         """Add an accelerator to all language tables.  
@@ -215,7 +218,8 @@ class LionDB(DBSession):
             {"table": table, "textstring": textstring, "xmlid": stringid,
                 "keys": keys, "refid": refid})
         self.trace_msg("Remember to change the next-id value in the AMIS XML file.")
-        self.__process_changes(langid, None)
+        if langid == self.masterlang:
+            self.__process_changes(langid, None)
 
     def change_item(self, langid, textstring, stringid):
         """Change the text of the item at the given ID.  Reflect the change in the other tables.
@@ -229,7 +233,8 @@ class LionDB(DBSession):
         self.execute_query("""UPDATE %(table)s SET textstring="%(textstring)s",\
             textflag=2 WHERE xmlid="%(xmlid)s" """ %\
             {"table": table, "textstring": textstring, "xmlid": stringid})
-        self.__process_changes(langid, None)
+        if langid == self.masterlang:
+            self.__process_changes(langid, None)
     
     def get_textstring(self, table, strid):
         """Get the text string for the string given by strid"""

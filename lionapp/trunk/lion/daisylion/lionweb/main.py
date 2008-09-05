@@ -111,13 +111,14 @@ def main():
     session = daisylion.liondb.dbsession.DBSession(dbhost, dbname, trace, force)
     session.trace_msg("Starting the Lion website")
     masterlang = config.get("main", "masterlang")
+    show_audio_upload = config.get("main", "show_audio_upload")
     
     # initialize the object hierarchy that cherrypy will use
     root = Login(session, webhost, webport)
     root.MainMenu = MainMenu(session, webhost, webport)
-    root.TranslateStrings = translatestrings.TranslateStrings(session, webhost, webport, masterlang)
-    root.ChooseMnemonics = choosemnemonics.ChooseMnemonics(session, webhost, webport, masterlang)
-    root.ChooseAccelerators = chooseaccelerators.ChooseAccelerators(session, webhost, webport, masterlang)
+    root.TranslateStrings = translatestrings.TranslateStrings(session, webhost, webport, masterlang, show_audio_upload)
+    root.ChooseMnemonics = choosemnemonics.ChooseMnemonics(session, webhost, webport, masterlang, show_audio_upload)
+    root.ChooseAccelerators = chooseaccelerators.ChooseAccelerators(session, webhost, webport, masterlang, show_audio_upload)
     root.style = "./style/"
     app = cherrypy.tree.mount(root, script_name='/')
     

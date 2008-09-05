@@ -23,11 +23,12 @@ class TranslationPage(translate.translate):
     session = None
     pagenum = 0
     
-    def __init__(self, session, host, port, masterlang):
+    def __init__(self, session, host, port, masterlang, show_audio_upload):
         self.session = session
         self.host = host
         self.port = port
         self.masterlang = masterlang
+        self.show_audio_upload = show_audio_upload
         session.execute_query("""SELECT langname from languages WHERE langid="%s" """ \
             % masterlang)
         self.masterlangname = session.cursor.fetchone()[0]

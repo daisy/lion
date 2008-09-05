@@ -1,7 +1,7 @@
 from amisxml import AmisUiDoc
 from xml.dom import Node
 import os
-from liondb import LionDB       # the session object
+from daisylion.liondb import *
 from xml.dom import minidom, Node
 
 class AmisImport():
@@ -11,6 +11,7 @@ class AmisImport():
         self.session = session
     
     def import_xml(self, filepath, langid):
+        """Rebuild the language table from the XML file."""
         self.session.trace_msg("Amis import from XML.  File = %s, Language = %s." % (filepath, langid))
         self.table = self.session.make_table_name(langid)
         # clear the tables
@@ -32,7 +33,7 @@ class AmisImport():
         
             self.session.execute_query(
             """INSERT INTO %(table)s (textstring, textflag, audioflag, audiouri, xmlid,
-            actualkeys) VALUES ("%(textstring)s", "%(textflag)d", "%(audioflag)d",
+            actualkeys) VALUES ("%(textstring)s", %(textflag)d, %(audioflag)d,
             "%(audiouri)s", "%(xmlid)s", "%(keys)s")""" % \
             {"table": self.table, "textstring": textstring, "textflag": textflag,
                 "audioflag": audioflag, "audiouri": audiouri, "xmlid": xmlid,
@@ -42,6 +43,50 @@ class AmisImport():
         self.__set_roles()
         self.__find_mnemonic_groups()
         self.__find_accelerator_targets()
+    
+    def import_xml_updates_only(self, filepath, langid):
+        """Refresh existing text/audio from the XML file"""
+        self.session.trace_msg("Amis updates-only import from XML.  File = %s, Language = %s." % (filepath, langid))
+        self.table = self.session.make_table_name(langid)
+        
+        # use our implementation of minidom.Document instead
+        minidom.Document = AmisUiDoc
+        self.doc = minidom.parse(filepath)
+        self.doc.set_session(self.session)
+        
+        # add all the text item data to the table
+        for elem in self.doc.getElementsByTagName("text"):
+            data = self.doc.parse_text_element(elem)
+            if data:
+                textstring, audiouri, xmlid, textflag, audioflag = data
+            
+            self.session.execute_query(
+            """UPDATE %(table)s SET textstring="%(textstring)s", textflag=%(textflag)d, 
+            audioflag=%(audioflag)d, audiouri="%(audiouri)s" WHERE xmlid="%(xmlid)s" """ % \
+            {"table": self.table, "textstring": textstring, "textflag": textflag,
+            "audioflag": audioflag, "audiouri": audiouri, "xmlid": xmlid})
+    
+    def import_xml_audio_only(self, filepath, langid):
+        """Import the audio URIs from the XML file"""
+        self.session.trace_msg("Amis audio-only import from XML.  File = %s, Language = %s." % (filepath, langid))
+        self.table = self.session.make_table_name(langid)
+        
+        # use our implementation of minidom.Document instead
+        minidom.Document = AmisUiDoc
+        self.doc = minidom.parse(filepath)
+        self.doc.set_session(self.session)
+        
+        # add all the text item data to the table
+        for elem in self.doc.getElementsByTagName("text"):
+            data = self.doc.parse_text_element(elem)
+            if data:
+                textstring, audiouri, xmlid, textflag, audioflag = data
+        
+            self.session.execute_query(
+            """UPDATE %(table)s SET audioflag=%(audioflag)d, 
+            audiouri="%(audiouri)s" WHERE xmlid="%(xmlid)s" """ % \
+            {"table": self.table, "audioflag": audioflag, "audiouri": audiouri, 
+            "xmlid": xmlid})
         
     def __set_roles(self):
         """Set role for text elements"""

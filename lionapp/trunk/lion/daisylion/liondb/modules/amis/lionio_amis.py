@@ -6,12 +6,17 @@ class AmisLionIO (modules.lion_module.LionIOModule):
     """The AMIS-specific implementation of lion_module.LionIOModule"""
     importer = None
     
-    def import_xml(self, session, filepath, langid):
+    def import_xml(self, session, filepath, langid, option):
         """Import a document object (from minidom) into a table."""
         self.importer = amis_import.AmisImport(session)
-        self.session = session
-        self.importer.import_xml(filepath, langid)
         
+        if option == None or option == 1:
+            self.importer.import_xml(filepath, langid)
+        elif option == 2:
+            self.importer.import_xml_updates_only(filepath, langid)
+        elif option == 3:
+            self.importer.import_xml_audio_only(filepath, langid)
+    
     def get_removed_ids_after_import(self):
         """Items that have been removed are specified in the document root's 
         "removed" attribute"""
