@@ -49,8 +49,7 @@ class AmisUiDoc(minidom.Document):
         if elem.getAttribute("flag") == "new": textflag = 3
         elif elem.getAttribute("flag") == "changed": textflag = 2
         else: textflag = 1
-        if audio.getAttribute("flag") == "new": audioflag = 3
-        elif audio.getAttribute("flag") == "changed": audioflag = 2
+        if textflag != 1: audioflag = 2
         else: audioflag = 1
     
         return text, src, id, textflag, audioflag

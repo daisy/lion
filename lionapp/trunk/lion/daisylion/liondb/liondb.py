@@ -163,7 +163,7 @@ class LionDB(DBSession):
         # add the string to the master table
         self.execute_query("""INSERT INTO %(table)s (textstring, textflag, \
             audioflag, xmlid, role) VALUES ("%(textstring)s", 3, \
-            3, "%(xmlid)s", "STRING")""" % \
+            2, "%(xmlid)s", "STRING")""" % \
             {"table": table, "textstring": textstring, "xmlid": stringid})
         self.trace_msg("Remember to change the next-id value in the AMIS XML file.")
         if langid == self.masterlang:
@@ -213,7 +213,7 @@ class LionDB(DBSession):
         # add the string to the master table
         self.execute_query("""INSERT INTO %(table)s (textstring, textflag, \
             audioflag, xmlid, actualkeys, target, role) VALUES \
-            ("%(textstring)s", 3, 3, "%(xmlid)s", "%(keys)s", "%(refid)s", \
+            ("%(textstring)s", 3, 2, "%(xmlid)s", "%(keys)s", "%(refid)s", \
             "ACCELERATOR")""" % \
             {"table": table, "textstring": textstring, "xmlid": stringid,
                 "keys": keys, "refid": refid})
@@ -360,7 +360,7 @@ class LionDB(DBSession):
         self.execute_query("CREATE TABLE %s SELECT * from %s" % (table, self.get_masterlang_table()))
 
         # flag all "TODO" and clear some fields
-        self.execute_query("UPDATE %s SET textflag=3, audioflag=3, \
+        self.execute_query("UPDATE %s SET textflag=3, audioflag=2, \
             audiodata=NULL, audiouri=NULL, remarks=NULL" % table)
 
     def __remove_language_from_database(self, langid):
@@ -411,8 +411,8 @@ class LionDB(DBSession):
             langtable = self.make_table_name(lang[0])
             if changed != None:
                 for row in changed:
-                    self.execute_query("UPDATE %(table)s SET textflag=2 WHERE \
-                        xmlid='%(xmlid)s'" % \
+                    self.execute_query("UPDATE %(table)s SET textflag=2, audioflag=2 \
+                        WHERE xmlid='%(xmlid)s'" % \
                         {"table": langtable, "xmlid": row[0]})
             if newstuff != None:
                 for row in newstuff:
@@ -421,7 +421,7 @@ class LionDB(DBSession):
                         xmlid, role, mnemonicgroup, target, actualkeys, \
                         textflag, audioflag) VALUES ("%(text)s", "%(xmlid)s", \
                         "%(role)s", "%(mnem)s", "%(target)s", "%(keys)s", \
-                        3, 3)""" % \
+                        3, 2)""" % \
                         {"table": langtable, "text": text, "xmlid": xmlid, \
                             "role": role, "mnem": mnem, "target": target, \
                             "keys": keys})
