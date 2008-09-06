@@ -34,7 +34,7 @@ def export_xml(session, file, langid):
             
             audio_elm = doc.get_audio_sibling(elm)
             if audio_elm != None:
-                audio_elm.setAttribute("src", "./audio/" + audiouri)
+                audio_elm.setAttribute("src", audiouri)
                 audio_elm.setAttribute("from", "")
         else:
             session.warn("Text element %s has no contents." % xmlid)

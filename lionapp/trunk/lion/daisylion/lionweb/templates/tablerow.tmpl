@@ -2,7 +2,7 @@
 Template variables:
 
 	searchList = a row with these fields:
-		xmlid, textstring, textflag, remarks, ref_string, our_remarks
+		xmlid, textstring, textflag, remarks, ref_string, our_remarks, audiouri
 
 	instructions = what the translator should do	
 	handler = the function to handle the form submission
@@ -27,7 +27,7 @@ Template variables:
 	#set $ok = ""
 #end if
 <tr>
-<form action="save_string" method="POST">
+<form action="save_data" method="POST" enctype="multipart/form-data">
 <td>$xmlid</td>
 <td width="30%%">$ref_string</td>
 <td>
@@ -37,6 +37,11 @@ Template variables:
     <p class="comments">Remarks from you:</p>
 	<textarea class="remarks" name="remarks" cols="64" rows="2">$remarks</textarea>
 </td>
+<td>
+	<p><a href="$audiouri">Audio (click to play)</a></p>
+    choose a new file: 
+	<input type="file" name="audiofile" value="Browse"/>
+</td>	
 <td width="100px">
 	<p>Status:</p>
 	<input name="status" type="radio" $ok value="1"/>

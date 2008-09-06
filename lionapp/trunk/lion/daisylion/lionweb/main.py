@@ -15,10 +15,10 @@ import daisylion.liondb.dbsession
 class Login(login.login):
     """Things relating to logging in"""
     
-    def __init__(self, session, host, port):
+    def __init__(self, session, config):
         self.session = session
-        self.host = host
-        self.port = port
+        self.host = config["webhost"]
+        self.port = config["webport"]
         login.login.__init__(self)
     
     def index(self):
@@ -46,10 +46,10 @@ class Login(login.login):
 class MainMenu(mainmenu.mainmenu):
     """This menu gives the tasks for the translators"""
     
-    def __init__(self, session, host, port):
+    def __init__(self, session, config):
         self.session = session
-        self.host = host
-        self.port = port
+        self.host = config["webhost"]
+        self.port = config["webport"]
         mainmenu.mainmenu.__init__(self)
     
     def index(self):
@@ -83,42 +83,25 @@ def main():
         if opt in ("-c", "--config"): config_file = arg
         if opt in ("--trace"): trace = True
         if opt in ("--force"): force = True
-    print config_file
     
-    # read the lion configuration file
-    config = ConfigParser()
-    try:
-        config.read(config_file)
-    except e:
-        os.sys.stderr.write("Error: %s" % e.msg)
-        exit(1)
+    config = parse_config_section(config_file, "main")
     
     # for trace and force, read the values from the config file
     # override if they were turned on via the command line
-    if config.get("main", "trace") == "true":
-        trace = True
-    else:
-        trace = False | trace
-    if config.get("main", "force") == "true":
-        force = True
-    else:
-        force = False | force
-
-    webhost =  config.get("main", "webhost")    
-    webport = int(config.get("main", "webport"))
-    dbhost = config.get("main", "dbhost")
-    dbname = config.get("main", "dbname")
+    trace = config["trace"] | trace
+    force = config["force"] | force
+    dbhost = config["dbhost"]
+    dbname = config["dbname"]
+    
     session = daisylion.liondb.dbsession.DBSession(dbhost, dbname, trace, force)
     session.trace_msg("Starting the Lion website")
-    masterlang = config.get("main", "masterlang")
-    show_audio_upload = config.get("main", "show_audio_upload")
-    
+
     # initialize the object hierarchy that cherrypy will use
-    root = Login(session, webhost, webport)
-    root.MainMenu = MainMenu(session, webhost, webport)
-    root.TranslateStrings = translatestrings.TranslateStrings(session, webhost, webport, masterlang, show_audio_upload)
-    root.ChooseMnemonics = choosemnemonics.ChooseMnemonics(session, webhost, webport, masterlang, show_audio_upload)
-    root.ChooseAccelerators = chooseaccelerators.ChooseAccelerators(session, webhost, webport, masterlang, show_audio_upload)
+    root = Login(session, config)
+    root.MainMenu = MainMenu(session, config)
+    root.TranslateStrings = translatestrings.TranslateStrings(session, config)
+    root.ChooseMnemonics = choosemnemonics.ChooseMnemonics(session, config)
+    root.ChooseAccelerators = chooseaccelerators.ChooseAccelerators(session, config)
     root.style = "./style/"
     app = cherrypy.tree.mount(root, script_name='/')
     
@@ -127,14 +110,41 @@ def main():
     cherrypy.config.update({'environment': 'production',
         'log.error_file': 'site.log',
         'log.screen': True,
-        'server.socket_host': '%s' % webhost,
-        'server.socket_port': webport,
+        'server.socket_host': '%s' % config["webhost"],
+        'server.socket_port': config["webport"],
         'server.thread_pool': 10,
         'tools.encode.on':True,
         'tools.encode.encoding':'utf8'})
     conf = {'/style': {'tools.staticdir.on': True,
                 'tools.staticdir.dir': os.path.join(current_dir,'style')}}
     cherrypy.quickstart(root, '/', config=conf)
+
+def parse_config_section(file, section):
+    """Return a dictionary of options/values for the given section in the configuration file """
+    config = ConfigParser()
+    try:
+        config.read(file)
+    except e:
+        os.sys.stderr.write("Error: %s" % e.msg)
+        exit(1)
+    
+    data = {}
+    for o in config.options(section):
+        value = config.get(section, o)
+        # make all the true/false strings boolean
+        # also convert ints to ints
+        if value.lower() == "true": 
+            value = True
+        elif value.lower() == "false": 
+            value = False
+        else:
+            try:
+                value = int(value)
+            except Exception, e:
+                value = value
+        data[o] = value
+    
+    return data
     
 if __name__ == '__main__': main()
     

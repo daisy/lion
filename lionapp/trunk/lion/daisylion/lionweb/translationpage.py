@@ -1,3 +1,4 @@
+import os
 import MySQLdb
 import util
 import daisylion.liondb.dbsession
@@ -25,15 +26,16 @@ class TranslationPage(translate.translate):
     session = None
     pagenum = 0
     
-    def __init__(self, session, host, port, masterlang, show_audio_upload):
+    def __init__(self, session, config):
         self.session = session
-        self.host = host
-        self.port = port
-        self.masterlang = masterlang
-        self.show_audio_upload = show_audio_upload
+        self.host = config["webhost"]
+        self.port = config["webport"]
+        self.masterlang = config["masterlang"]
+        self.show_audio_upload = config["show_audio_upload"]
         session.execute_query("""SELECT langname from languages WHERE langid="%s" """ \
-            % masterlang)
+            % self.masterlang)
         self.masterlangname = session.cursor.fetchone()[0]
+        self.upload_dir = config["upload_dir"]
         translate.translate.__init__(self)
     
     def index(self, view, id_anchor = ""):
@@ -58,7 +60,7 @@ class TranslationPage(translate.translate):
         return self.index(viewfilter)
     change_view.exposed = True
     
-    def save_string(self, translation, remarks, status, xmlid, langid, pagenum):
+    def save_data(self, translation, remarks, status, xmlid, langid, pagenum, audiofile):
         table = langid.replace("-", "_")
         request = """UPDATE %(table)s SET textflag="%(status)s", \
             textstring="%(translation)s", remarks="%(remarks)s" WHERE \
@@ -69,9 +71,45 @@ class TranslationPage(translate.translate):
         self.show_no_conflicts = False
         self.pagenum = int(pagenum)
         self.session.trace_msg("On page %d" % self.pagenum)
+        if audiofile != None: 
+            self.save_audio(audiofile, langid, xmlid)
         return self.index(self.last_view, xmlid)
-    save_string.exposed = True
+    save_data.exposed = True
+    
+    def save_audio(self, infile, langid, xmlid):
+        size = 0
+        if not self.upload_dir.endswith("/"): self.upload_dir += "/"
+        tempdir = self.upload_dir + self.user["users.langid"] + "/"
+        if not os.path.exists(tempdir) or not os.path.isdir(tempdir):
+            os.mkdir(tempdir)
+        outfile = file (os.path.join(tempdir, infile.filename), 'wb')
+        while 1:
+            data = infile.file.read(8192)
+            if not data: break
+            else: outfile.write(data)
+            size += len(data)
         
+        if size == 0:
+            self.session.warn("Uploaded file size is 0")
+        else:
+            self.session.trace_msg("Uploaded file %s, %d bytes" % (outfile.name, size))
+            # update the tempaudio table
+            # does this have an entry already?
+            request = """SELECT id FROM tempaudio WHERE xmlid="%s" and langid="%s" """ % \
+                (xmlid, langid)
+            self.session.execute_query(request)
+            # if so, just update it
+            if self.session.cursor.rowcount > 0:
+                request = """UPDATE tempaudio SET audiouri="%(audiouri)s", xmlid="%(xmlid)s", 
+                    langid="%(langid)s" """  % \
+                    {"audiouri": outfile.name, "xmlid": xmlid, "langid": langid}
+            # otherwise create a new entry
+            else:
+                request = """INSERT INTO tempaudio (audiouri, xmlid, langid) VALUES
+                    ("%(audiouri)s", "%(xmlid)s", "%(langid)s" ) """ % \
+                    {"audiouri": outfile.name, "xmlid": xmlid, "langid": langid}
+            self.session.execute_query(request)
+    
     def get_sql_for_view_filter(self, view_filter, table):
         sql = ""
         if view_filter == "new":

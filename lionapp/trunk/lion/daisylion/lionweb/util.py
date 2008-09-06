@@ -40,7 +40,7 @@ def get_user(session):
     username, sessionid = read_cookie()
     if username == "" or username == None: return None
     fields = ["users.username", "users.realname", "users.password", "users.email", "users.langid", \
-    "users.lastactivity", "users.svnpath", "users.sessionid", "languages.langname", "languages.translate_for_keyboard"]
+    "users.lastactivity", "users.sessionid", "languages.langname", "languages.translate_for_keyboard"]
     request = """
     SELECT %s FROM users, languages WHERE users.username="%s" AND users.sessionid="%s" AND users.langid = languages.langid""" % \
         (",".join(fields), username, sessionid)
@@ -50,8 +50,6 @@ def get_user(session):
         return None
     else: 
         return dict(zip(fields, row))
-
-
 
 def set_cookie(username, sessionid):
     """Set the login cookie."""

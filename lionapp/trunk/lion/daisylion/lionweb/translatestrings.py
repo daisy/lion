@@ -4,7 +4,7 @@ import util
 
 class TranslateStrings(TranslationPage):
     """The page of all the strings (the main page)"""
-    def __init__(self, session, host, port, masterlang, show_audio_upload):
+    def __init__(self, session, config):
         self.section = "main"
         self.textbox_columns = 64
         self.textbox_rows = 3
@@ -16,7 +16,7 @@ class TranslateStrings(TranslationPage):
         self.warning_message = None
         self.usepages = True
         #this is weird but necessary .. otherwise cheetah complains
-        TranslationPage.__init__(self, session, host, port, masterlang, show_audio_upload)
+        TranslationPage.__init__(self, session, config)
     
     def make_table(self, view_filter, pagenum):
         """Make the form for main page"""
@@ -26,6 +26,7 @@ class TranslateStrings(TranslationPage):
         textflags_sql = self.get_sql_for_view_filter(view_filter, table)
         template_fields = ["xmlid", "textstring", "textflag", "remarks", 
             "ref_string", "our_remarks"]
+        
         dbfields = ["%s.xmlid" % table, "%s.textstring" % table, 
             "%s.textflag" % table, "%s.remarks" % table, "%s.textstring" % mtable, 
             "%s.remarks" % mtable]
@@ -45,12 +46,40 @@ class TranslateStrings(TranslationPage):
         form = "<table>"
         for i in range(start, end):
             r = rows[i]
-            t = tablerow.tablerow(searchList=dict(zip(template_fields, r)))
+            search_list = dict(zip(template_fields, r))
+            t = tablerow.tablerow(searchList=search_list)
             t.instructions = self.instructions
     	    t.width = self.textbox_columns
     	    t.height = self.textbox_rows
     	    t.langid = self.user["users.langid"]
     	    t.pagenum = pagenum
-            form = form + t.respond()
+    	    # find out if there is an audiouri for this item in the tempaudio table
+            audiouri = ""
+            request = """SELECT audiouri FROM tempaudio WHERE xmlid="%s" and langid="%s" """ % \
+                (search_list["xmlid"], self.user["users.langid"])
+            self.session.execute_query(request)
+            if self.session.cursor.rowcount > 0:
+                audiouri = self.session.cursor.fetchone()[0]
+            # otherwise use the audiouri from the language table
+            else:
+                # get the full path to the files' permanent directory.  we need it because audiouris from language
+                # tables are relative
+                request = """SELECT permanenturi, permanenturiparams FROM languages 
+                    WHERE langid="%s" """ % self.user["users.langid"]
+                self.session.execute_query(request)
+                permanenturi, permanenturiparams = self.session.cursor.fetchone()
+                # now select the audiouri itself
+                request = """SELECT audiouri FROM %s WHERE xmlid="%s" """ % \
+                    (self.make_table_name(self.user["users.langid"]), search_list["xmlid"])
+                self.session.execute_query(request)
+                audiouri = self.session.cursor.fetchone()[0]
+                # concatenate the uri strings
+                if permanenturi != "" and not permanenturi.endswith("/"):
+                	permanenturi += "/"
+                if audiouri.startswith("./"):
+                	audiouri = audiouri[2:]
+                audiouri = permanenturi + audiouri + permanenturiparams
+            t.audiouri = audiouri
+    	    form = form + t.respond()
         form = form + "</table>"
         return form, len(rows)

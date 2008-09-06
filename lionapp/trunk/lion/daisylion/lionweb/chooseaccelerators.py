@@ -7,7 +7,7 @@ import re
 class ChooseAccelerators(TranslationPage):
     """The page of all the strings (the main page)"""
     
-    def __init__(self, session, host, port, masterlang, show_audio_upload):
+    def __init__(self, session, config):
         self.section = "accelerators"
         self.textbox_columns = 20
         self.textbox_rows = 1
@@ -17,7 +17,7 @@ class ChooseAccelerators(TranslationPage):
             for your custom shortcuts."
         self.check_conflict = True
         #this is weird but necessary .. otherwise cheetah complains
-        TranslationPage.__init__(self, session, host, port, masterlang, show_audio_upload)    
+        TranslationPage.__init__(self, session, config)    
 
     def make_table(self, view_filter, pagenum):
         """Make the form for main page"""
@@ -131,7 +131,7 @@ class ChooseAccelerators(TranslationPage):
         else:
             return False
     
-    def save_string(self, remarks, status, xmlid, langid, keymask, translation, thekeys):
+    def save_data(self, remarks, status, xmlid, langid, keymask, translation, thekeys):
         if thekeys == None or len(thekeys) == 0:
             return ("""Field cannot be empty.  Press the back button to try again.""")
         
@@ -149,5 +149,5 @@ class ChooseAccelerators(TranslationPage):
         self.session.execute_query(request)
         self.show_no_conflicts = False
         return self.index(self.last_view)
-    save_string.exposed = True
+    save_data.exposed = True
         
