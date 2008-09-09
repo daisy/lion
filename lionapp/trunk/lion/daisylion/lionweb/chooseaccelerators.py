@@ -58,6 +58,7 @@ class ChooseAccelerators(TranslationPage):
             t = acceltablerow.acceltablerow(searchList=data)
             t.instructions = self.instructions
             t.langid = self.user["users.langid"]
+            t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
             form += t.respond()
         #end for
         form += "</table>"
@@ -131,7 +132,7 @@ class ChooseAccelerators(TranslationPage):
         else:
             return False
     
-    def save_data(self, remarks, status, xmlid, langid, keymask, translation, thekeys):
+    def save_data(self, remarks, status, xmlid, langid, keymask, translation, thekeys, audiofile):
         if thekeys == None or len(thekeys) == 0:
             return ("""Field cannot be empty.  Press the back button to try again.""")
         
@@ -148,6 +149,8 @@ class ChooseAccelerators(TranslationPage):
                 "remarks": MySQLdb.escape_string(remarks), "xmlid": xmlid, "textstring": MySQLdb.escape_string(translation)}
         self.session.execute_query(request)
         self.show_no_conflicts = False
+        if audiofile != None: 
+            self.save_audio(audiofile, langid, xmlid)
         return self.index(self.last_view)
     save_data.exposed = True
         

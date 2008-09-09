@@ -35,7 +35,8 @@ class TranslationPage(translate.translate):
         session.execute_query("""SELECT langname from languages WHERE langid="%s" """ \
             % self.masterlang)
         self.masterlangname = session.cursor.fetchone()[0]
-        self.upload_dir = config["upload_dir"]
+        self.temp_audio_dir = config["temp_audio_dir"]
+        self.temp_audio_uri = config["temp_audio_uri"]
         translate.translate.__init__(self)
     
     def index(self, view, id_anchor = ""):
@@ -77,12 +78,24 @@ class TranslationPage(translate.translate):
     save_data.exposed = True
     
     def save_audio(self, infile, langid, xmlid):
+        self.session.trace_msg("infile = %s" % infile)
+        self.session.trace_msg("type of infile %s" % type(infile))
         size = 0
-        if not self.upload_dir.endswith("/"): self.upload_dir += "/"
-        tempdir = self.upload_dir + self.user["users.langid"] + "/"
+        # calculate the filesystem path to the temporary file storage
+        if not self.temp_audio_dir.endswith("/"): self.temp_audio_dir += "/"
+        tempdir = self.temp_audio_dir + self.user["users.langid"] + "/"
         if not os.path.exists(tempdir) or not os.path.isdir(tempdir):
             os.mkdir(tempdir)
-        outfile = file (os.path.join(tempdir, infile.filename), 'wb')
+        outfilename = os.path.join(tempdir, infile.filename)
+        self.session.trace_msg("Going to save to %s" % outfilename)
+        outfile = file (outfilename, 'wb')
+        
+        # this is the URI used to read the temporary file back from the web server
+        # we'll link to the temp file until it gets integrated into the permanent fileset (done manually for now)
+        if not self.temp_audio_uri.endswith("/"): self.temp_audio_uri += "/"
+        wwwdir = self.temp_audio_uri + self.user["users.langid"] + "/"
+        www_filename = wwwdir + infile.filename
+        
         while 1:
             data = infile.file.read(8192)
             if not data: break
@@ -102,12 +115,12 @@ class TranslationPage(translate.translate):
             if self.session.cursor.rowcount > 0:
                 request = """UPDATE tempaudio SET audiouri="%(audiouri)s", xmlid="%(xmlid)s", 
                     langid="%(langid)s" """  % \
-                    {"audiouri": outfile.name, "xmlid": xmlid, "langid": langid}
+                    {"audiouri": www_filename, "xmlid": xmlid, "langid": langid}
             # otherwise create a new entry
             else:
                 request = """INSERT INTO tempaudio (audiouri, xmlid, langid) VALUES
                     ("%(audiouri)s", "%(xmlid)s", "%(langid)s" ) """ % \
-                    {"audiouri": outfile.name, "xmlid": xmlid, "langid": langid}
+                    {"audiouri": www_filename, "xmlid": xmlid, "langid": langid}
             self.session.execute_query(request)
     
     def get_sql_for_view_filter(self, view_filter, table):
@@ -175,5 +188,40 @@ class TranslationPage(translate.translate):
     def make_table_name(self, langid):
         """This is a duplicate of the liondb/liondb.py function.  It will disappear soon as integration improves. """
         return langid.replace("-", "_")
-
-        
+    
+    def get_current_audio_uri(self, xmlid, langid):
+        """utility function to build the most current audio uri
+           if there is anything in the tempaudio table, it is considered the most current.
+           otherwise the audiouri from the specified language table is used, and constructed as a uri
+           using the permanenturi + filename + permanenturiparams format
+           e.g. http://stuff.com/file.mp3?format=raw
+           where permanenturi and permanenturiparams come from the db's languages overview table
+        """
+        # find out if there is an audiouri for this item in the tempaudio table
+        audiouri = ""
+        request = """SELECT audiouri FROM tempaudio WHERE xmlid="%s" and langid="%s" """ % \
+            (xmlid, langid)
+        self.session.execute_query(request)
+        if self.session.cursor.rowcount > 0:
+            audiouri = self.session.cursor.fetchone()[0]
+        # otherwise use the audiouri from the language table
+        else:
+            # get the full path to the files' permanent directory.  we need it because audiouris from language
+            # tables are relative
+            request = """SELECT permanenturi, permanenturiparams FROM languages 
+                WHERE langid="%s" """ % self.user["users.langid"]
+            self.session.execute_query(request)
+            permanenturi, permanenturiparams = self.session.cursor.fetchone()
+            # now select the audiouri itself
+            request = """SELECT audiouri FROM %s WHERE xmlid="%s" """ % \
+                (self.make_table_name(langid), xmlid)
+            self.session.execute_query(request)
+            audiouri = self.session.cursor.fetchone()[0]
+            if audiouri != None and audiouri != "":
+                # concatenate the uri strings
+                if permanenturi != "" and not permanenturi.endswith("/"):
+            	    permanenturi += "/"
+                if audiouri.startswith("./"):
+            	    audiouri = audiouri[2:]
+                audiouri = permanenturi + audiouri + permanenturiparams
+        return audiouri

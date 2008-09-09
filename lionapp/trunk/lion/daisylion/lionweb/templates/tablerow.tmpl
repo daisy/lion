@@ -38,10 +38,12 @@ Template variables:
 	<textarea class="remarks" name="remarks" cols="64" rows="2">$remarks</textarea>
 </td>
 <td>
-	<p><a href="$audiouri">Audio (click to play)</a></p>
-    choose a new file: 
+	#if $audiouri != None and len($audiouri) > 0
+	 	<p><a href="$audiouri">Audio (click to play)</a></p>
+	#end if
+    Choose an MP3 file: 
 	<input type="file" name="audiofile" value="Browse"/>
-</td>	
+</td>
 <td width="100px">
 	<p>Status:</p>
 	<input name="status" type="radio" $ok value="1"/>

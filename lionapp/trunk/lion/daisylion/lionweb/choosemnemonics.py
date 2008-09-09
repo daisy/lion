@@ -70,12 +70,12 @@ class ChooseMnemonics(TranslationPage):
                         % {"item": self.ROLE_DESCRIPTIONS[data["role"]], 
                             "example": masterlang_ref,
                             "masterlangname": self.masterlangname}
-                
                     t = tablerow.tablerow(searchList=data)
                     t.instructions = self.instructions
                     t.width = self.textbox_columns
                     t.height = self.textbox_rows
                     t.langid = self.user["users.langid"]
+                    t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
                     form += t.respond()
                 form += "</table>"
                 group_number += 1

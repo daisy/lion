@@ -46,40 +46,14 @@ class TranslateStrings(TranslationPage):
         form = "<table>"
         for i in range(start, end):
             r = rows[i]
-            search_list = dict(zip(template_fields, r))
-            t = tablerow.tablerow(searchList=search_list)
+            data = dict(zip(template_fields, r))
+            t = tablerow.tablerow(searchList=data)
             t.instructions = self.instructions
     	    t.width = self.textbox_columns
     	    t.height = self.textbox_rows
     	    t.langid = self.user["users.langid"]
     	    t.pagenum = pagenum
-    	    # find out if there is an audiouri for this item in the tempaudio table
-            audiouri = ""
-            request = """SELECT audiouri FROM tempaudio WHERE xmlid="%s" and langid="%s" """ % \
-                (search_list["xmlid"], self.user["users.langid"])
-            self.session.execute_query(request)
-            if self.session.cursor.rowcount > 0:
-                audiouri = self.session.cursor.fetchone()[0]
-            # otherwise use the audiouri from the language table
-            else:
-                # get the full path to the files' permanent directory.  we need it because audiouris from language
-                # tables are relative
-                request = """SELECT permanenturi, permanenturiparams FROM languages 
-                    WHERE langid="%s" """ % self.user["users.langid"]
-                self.session.execute_query(request)
-                permanenturi, permanenturiparams = self.session.cursor.fetchone()
-                # now select the audiouri itself
-                request = """SELECT audiouri FROM %s WHERE xmlid="%s" """ % \
-                    (self.make_table_name(self.user["users.langid"]), search_list["xmlid"])
-                self.session.execute_query(request)
-                audiouri = self.session.cursor.fetchone()[0]
-                # concatenate the uri strings
-                if permanenturi != "" and not permanenturi.endswith("/"):
-                	permanenturi += "/"
-                if audiouri.startswith("./"):
-                	audiouri = audiouri[2:]
-                audiouri = permanenturi + audiouri + permanenturiparams
-            t.audiouri = audiouri
-    	    form = form + t.respond()
+    	    t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
+            form = form + t.respond()
         form = form + "</table>"
         return form, len(rows)
