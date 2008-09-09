@@ -1,3 +1,4 @@
+import os
 from xml.dom import minidom
 from ConfigParser import ConfigParser
 from dbsession import DBSession
@@ -435,5 +436,42 @@ class LionDB(DBSession):
         # re-added to all tables each time anything changes
         self.execute_query("UPDATE %s SET textflag=1 WHERE textflag=2 \
             or textflag=3" % table)
-            
-
+    
+    def accept_all_temp_audio(self, langid):
+        """copy the audio uris from the tempaudio table to the permanent table for the given language.
+        note that the file copying must be done by hand."""
+        request = """SELECT xmlid FROM tempaudio WHERE langid="%s" """ % langid
+        self.execute_query(request)
+        for row in self.cursor.fetchall():
+            self.accept_temp_audio(langid, row[0])
+    
+    def clear_all_temp_audio(self, langid):
+        """clear all rows in the tempaudio table for the given language"""
+        request = """DELETE FROM tempaudio WHERE langid="%s" """ % langid
+        self.execute_query(request)
+    
+    def accept_temp_audio(self, langid, xmlid):
+        """copy a single audio uri from the tempaudio table to the permanent language table
+        note that the file copying must be done by hand."""
+        request = """SELECT audiouri FROM tempaudio WHERE xmlid="%s" and langid="%s" """ \
+            % (xmlid, langid)
+        self.execute_query(request)
+        if self.cursor.rowcount == 0:
+            self.warn("No audio found.")
+            return
+        
+        audio_dir_prefix = self.config.get("main", "audio_dir_prefix")
+        if not audio_dir_prefix.endswith("/"): audio_dir_prefix += "/"
+        audiofile = audio_dir_prefix + os.path.basename(self.cursor.fetchone()[0])
+        self.trace_msg("Saving audio to language table as %s" % audiofile)    
+        request = """UPDATE %s SET audiouri="%s" WHERE xmlid="%s" """ \
+            % (self.make_table_name(langid), audiofile, xmlid)
+        self.execute_query(request)
+        self.clear_temp_audio(langid, xmlid)
+    
+    def clear_temp_audio(self, langid, xmlid):
+        """clear a single row from the tempaudio table for the given language"""
+        request = """DELETE FROM tempaudio WHERE xmlid="%s" and langid="%s" """ \
+            % (xmlid, langid)
+        self.execute_query(request)
+    

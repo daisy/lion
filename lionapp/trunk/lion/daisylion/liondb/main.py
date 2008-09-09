@@ -33,6 +33,15 @@ Usage:
   %(script)s --add_user --langid=id --username=username --password=password --email=email --realname=realname
                                                 Add a user for a pre-existing language
   %(script)s --remove_user --username=username  Remove a user (but not their associated language)
+  %(script)s --accept_temp_audio --stringid=id --langid=id
+                                                Accept a temporary audio file for a language
+  %(script)s --accept_all_temp_audio --langid=id
+                                                Accept all temporary audio files for a language
+  %(script)s --clear_temp_audio --stringid=id --langid=id
+                                                Clear a temporary audio file for a language
+  %(script)s --clear_all_temp_audio --langid=id
+                                                Clear all temporary audio files for a language
+
   
 Other options:
   --application, -a: which application module to use (e.g. "amis" or "obi")
@@ -63,7 +72,8 @@ def main():
     actualkeys = None
     extra = None
     option = 0
-    # if the action is add/remove a language/string/accelerator/user, the parameters are different
+    # if the action is add/remove a language/string/accelerator/user/temp audio file, 
+    # the parameters are different
     # we have to test these actions separately from the generic lambda used below.  
     add_language = False  
     add_string = False
@@ -74,6 +84,10 @@ def main():
     add_user = False
     remove_user = False
     import_xml = False
+    accept_temp_audio = False
+    clear_temp_audio = False
+    accept_all_temp_audio = False
+    clear_all_temp_audio = False
     config="../lion_combo.cfg"
     
     try:
@@ -83,7 +97,9 @@ def main():
                 "username=", "password=", "realname=", "email=", "force", 
                 "stringid=", "text=", "remove_item", "add_string", "refid=", 
                 "keys=", "add_accelerator", "textstrings", "all_strings", 
-                "audio_prompts", "change_item", "extra=", "config=", "add_user", "remove_user"])
+                "audio_prompts", "change_item", "extra=", "config=", "add_user", 
+                "remove_user", "accept_temp_audio", "clear_temp_audio",
+                "accept_all_temp_audio", "clear_all_temp_audio"])
     except getopt.GetoptError, e:
         os.sys.stderr.write("Error: %s" % e.msg)
         usage(1)
@@ -125,7 +141,11 @@ def main():
             action = lambda s, f, l: s.audio_prompts(l, f)
         elif opt in ("--add_user"): add_user = True
         elif opt in ("--remove_user"): remove_user = True
-    
+        elif opt in ("--accept_temp_audio"): accept_temp_audio = True
+        elif opt in ("--clear_temp_audio"): clear_temp_audio = True
+        elif opt in ("--accept_all_temp_audio"): accept_all_temp_audio = True
+        elif opt in ("--clear_all_temp_audio"): clear_all_temp_audio = True
+        
     session = LionDB(config, trace, force, app)
     if add_language == True:
         session.add_language(langid, langname, username, password, realname, email)
@@ -145,6 +165,14 @@ def main():
         session.remove_user(username)
     elif import_xml == True:
         session.import_xml(file, langid, option)
+    elif accept_temp_audio == True:
+        session.accept_temp_audio(langid, stringid)
+    elif clear_temp_audio == True:
+        session.clear_temp_audio(langid, stringid)
+    elif accept_all_temp_audio == True:
+        session.accept_all_temp_audio(langid)
+    elif clear_all_temp_audio == True:
+        session.clear_all_temp_audio(langid)
     else:
         action(session, file, langid)
 
