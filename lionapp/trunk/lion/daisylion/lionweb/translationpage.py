@@ -113,8 +113,8 @@ class TranslationPage(translate.translate):
             self.session.execute_query(request)
             # if so, just update it
             if self.session.cursor.rowcount > 0:
-                request = """UPDATE tempaudio SET audiouri="%(audiouri)s", xmlid="%(xmlid)s", 
-                    langid="%(langid)s" """  % \
+                request = """UPDATE tempaudio SET audiouri="%(audiouri)s" WHERE 
+                    xmlid="%(xmlid)s" AND langid="%(langid)s" """  % \
                     {"audiouri": www_filename, "xmlid": xmlid, "langid": langid}
             # otherwise create a new entry
             else:
