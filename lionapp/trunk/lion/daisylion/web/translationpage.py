@@ -1,7 +1,7 @@
 import os
 import MySQLdb
 import util
-import daisylion.liondb.dbsession
+import daisylion.db.liondb
 from templates import translate, error
 import cherrypy
 from cherrypy.lib import static
@@ -184,11 +184,7 @@ class TranslationPage(translate.translate):
         else:
             return None
     change_page.exposed = True
-    
-    def make_table_name(self, langid):
-        """This is a duplicate of the liondb/liondb.py function.  It will disappear soon as integration improves. """
-        return langid.replace("-", "_")
-    
+        
     def get_current_audio_uri(self, xmlid, langid):
         """utility function to build the most current audio uri
            if there is anything in the tempaudio table, it is considered the most current.
@@ -214,7 +210,7 @@ class TranslationPage(translate.translate):
             permanenturi, permanenturiparams = self.session.cursor.fetchone()
             # now select the audiouri itself
             request = """SELECT audiouri FROM %s WHERE xmlid="%s" """ % \
-                (self.make_table_name(langid), xmlid)
+                (self.session.make_table_name(langid), xmlid)
             self.session.execute_query(request)
             audiouri = self.session.cursor.fetchone()[0]
             if audiouri != None and audiouri != "":

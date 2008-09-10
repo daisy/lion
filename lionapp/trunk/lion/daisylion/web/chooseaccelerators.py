@@ -20,8 +20,8 @@ class ChooseAccelerators(TranslationPage):
 
     def make_table(self, view_filter, pagenum):
         """Make the form for main page"""
-        table = self.make_table_name(self.user["users.langid"])
-        mtable = self.make_table_name(self.masterlang)
+        table = self.session.make_table_name(self.user["users.langid"])
+        mtable = self.session.get_masterlang_table()
         langid = self.user["users.langid"]
         textflags_sql = self.get_sql_for_view_filter(view_filter, table)
         template_fields = ["xmlid", "textstring", "textflag", "remarks", 

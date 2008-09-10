@@ -88,7 +88,7 @@ def main():
     clear_temp_audio = False
     accept_all_temp_audio = False
     clear_all_temp_audio = False
-    config="../lion_combo.cfg"
+    config="../config/lion.cfg"
     
     try:
         opts, args = getopt.getopt(os.sys.argv[1:], "a:ef:hil:e",

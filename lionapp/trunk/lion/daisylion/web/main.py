@@ -10,7 +10,7 @@ import translatestrings
 import choosemnemonics
 import chooseaccelerators
 from templates import login, mainmenu, error, xhtml
-import daisylion.liondb.liondb
+import daisylion.db.liondb
 
 class Login(login.login):
     """Things relating to logging in"""
@@ -86,7 +86,7 @@ def main():
         if opt in ("--trace"): trace = True
         if opt in ("--force"): force = True
     
-    session = daisylion.liondb.liondb.LionDB(config_file, trace, force, None)
+    session = daisylion.db.liondb.LionDB(config_file, trace, force, None)
     session.trace_msg("Starting the Lion website")
 
     # initialize the object hierarchy that cherrypy will use

@@ -62,7 +62,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         return langid.replace("-", "_")
 
     def get_masterlang_table(self):
-        return make_table_name(self.masterlang)
+        return self.make_table_name(self.masterlang)
     
     # add a single string from the master table
     def add_string(self, langid, textstring, stringid):

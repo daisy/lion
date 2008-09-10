@@ -1,7 +1,7 @@
 from amisxml import AmisUiDoc
 from xml.dom import Node
 import os
-from daisylion.liondb import *
+from liondb import *
 from xml.dom import minidom, Node
 
 class AmisImport():

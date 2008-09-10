@@ -5,7 +5,7 @@ import os
 import datetime
 import MySQLdb
 import cherrypy
-import daisylion.liondb.dbsession
+import daisylion.db.liondb
 
 def get_uuid():
     """Get a uuid from the os to act as a session id."""
