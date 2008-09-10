@@ -10,16 +10,15 @@ import translatestrings
 import choosemnemonics
 import chooseaccelerators
 from templates import login, mainmenu, error, xhtml
-import daisylion.liondb.dbsession
-from daisylion.config_parser import *
+import daisylion.liondb.liondb
 
 class Login(login.login):
     """Things relating to logging in"""
     
-    def __init__(self, session, config):
+    def __init__(self, session):
         self.session = session
-        self.host = config["webhost"]
-        self.port = config["webport"]
+        self.host = self.session.config["main"]["webhost"]
+        self.port = self.session.config["main"]["webport"]
         login.login.__init__(self)
     
     def index(self):
@@ -49,10 +48,10 @@ class Login(login.login):
 class MainMenu(mainmenu.mainmenu):
     """This menu gives the tasks for the translators"""
     
-    def __init__(self, session, config):
+    def __init__(self, session):
         self.session = session
-        self.host = config["webhost"]
-        self.port = config["webport"]
+        self.host = self.session.config["main"]["webhost"]
+        self.port = self.session.config["main"]["webport"]
         mainmenu.mainmenu.__init__(self)
     
     def index(self):
@@ -87,24 +86,15 @@ def main():
         if opt in ("--trace"): trace = True
         if opt in ("--force"): force = True
     
-    config = parse_config_section(config_file, "main")
-    
-    # for trace and force, read the values from the config file
-    # override if they were turned on via the command line
-    trace = config["trace"] | trace
-    force = config["force"] | force
-    dbhost = config["dbhost"]
-    dbname = config["dbname"]
-    
-    session = daisylion.liondb.dbsession.DBSession(dbhost, dbname, trace, force)
+    session = daisylion.liondb.liondb.LionDB(config_file, trace, force, None)
     session.trace_msg("Starting the Lion website")
 
     # initialize the object hierarchy that cherrypy will use
-    root = Login(session, config)
-    root.MainMenu = MainMenu(session, config)
-    root.TranslateStrings = translatestrings.TranslateStrings(session, config)
-    root.ChooseMnemonics = choosemnemonics.ChooseMnemonics(session, config)
-    root.ChooseAccelerators = chooseaccelerators.ChooseAccelerators(session, config)
+    root = Login(session)
+    root.MainMenu = MainMenu(session)
+    root.TranslateStrings = translatestrings.TranslateStrings(session)
+    root.ChooseMnemonics = choosemnemonics.ChooseMnemonics(session)
+    root.ChooseAccelerators = chooseaccelerators.ChooseAccelerators(session)
     root.style = "./style/"
     app = cherrypy.tree.mount(root, script_name='/')
     
@@ -113,8 +103,8 @@ def main():
     cherrypy.config.update({'environment': 'production',
         'log.error_file': 'site.log',
         'log.screen': True,
-        'server.socket_host': '%s' % config["webhost"],
-        'server.socket_port': config["webport"],
+        'server.socket_host': '%s' % session.config["main"]["webhost"],
+        'server.socket_port': session.config["main"]["webport"],
         'server.thread_pool': 10,
         'tools.encode.on':True,
         'tools.encode.encoding':'utf8'})

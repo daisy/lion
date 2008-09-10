@@ -16,7 +16,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         self.masterlang = self.config["main"]["masterlang"]
         
         # for trace and force, read the values from the config file
-        # override if they were turned on via the command line
+        # override if they were turned on via the init parameters
         trace = self.config["main"]["trace"] | trace
         force = self.config["main"]["force"] | force
         

@@ -26,17 +26,17 @@ class TranslationPage(translate.translate):
     session = None
     pagenum = 0
     
-    def __init__(self, session, config):
+    def __init__(self, session):
         self.session = session
-        self.host = config["webhost"]
-        self.port = config["webport"]
-        self.masterlang = config["masterlang"]
-        self.show_audio_upload = config["show_audio_upload"]
+        self.host = self.session.config["main"]["webhost"]
+        self.port = self.session.config["main"]["webport"]
+        self.masterlang = self.session.config["main"]["masterlang"]
+        self.show_audio_upload = self.session.config["main"]["show_audio_upload"]
         session.execute_query("""SELECT langname from languages WHERE langid="%s" """ \
             % self.masterlang)
         self.masterlangname = session.cursor.fetchone()[0]
-        self.temp_audio_dir = config["temp_audio_dir"]
-        self.temp_audio_uri = config["temp_audio_uri"]
+        self.temp_audio_dir = self.session.config["main"]["temp_audio_dir"]
+        self.temp_audio_uri = self.session.config["main"]["temp_audio_uri"]
         translate.translate.__init__(self)
     
     def index(self, view, id_anchor = ""):
