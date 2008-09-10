@@ -11,6 +11,7 @@ import choosemnemonics
 import chooseaccelerators
 from templates import login, mainmenu, error, xhtml
 import daisylion.liondb.dbsession
+from daisylion.config_parser import *
 
 class Login(login.login):
     """Things relating to logging in"""
@@ -121,32 +122,6 @@ def main():
                 'tools.staticdir.dir': os.path.join(current_dir,'style')}}
     cherrypy.quickstart(root, '/', config=conf)
 
-def parse_config_section(file, section):
-    """Return a dictionary of options/values for the given section in the configuration file """
-    config = ConfigParser()
-    try:
-        config.read(file)
-    except e:
-        os.sys.stderr.write("Error: %s" % e.msg)
-        exit(1)
-    
-    data = {}
-    for o in config.options(section):
-        value = config.get(section, o)
-        # make all the true/false strings boolean
-        # also convert ints to ints
-        if value.lower() == "true": 
-            value = True
-        elif value.lower() == "false": 
-            value = False
-        else:
-            try:
-                value = int(value)
-            except Exception, e:
-                value = value
-        data[o] = value
-    
-    return data
-    
+
 if __name__ == '__main__': main()
     

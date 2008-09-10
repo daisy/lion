@@ -1,29 +1,27 @@
 import os
 from xml.dom import minidom
-from ConfigParser import ConfigParser
 from dbsession import DBSession
 import modules.lion_module
+from daisylion.config_parser import *
+from liondb_audio_mixin import *
+from liondb_module_mixin import *
+from liondb_output_mixin import *
+from liondb_user_mgmt_mixin import *
 
-class LionDB(DBSession):
-    def __init__(self, config, trace=False, force=False, app=None):
+class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
+    LionDBUserMgmtMixIn, DBSession):
+    def __init__(self, configfile, trace=False, force=False, app=None):
         # read the settings
-        self.config = ConfigParser()
-        self.config.read(config)
-        self.masterlang = self.config.get("main", "masterlang")
+        self.config = parse_config(configfile)
+        self.masterlang = self.config["main"]["masterlang"]
         
         # for trace and force, read the values from the config file
         # override if they were turned on via the command line
-        if self.config.get("main", "trace") == "true":
-            trace = True
-        else:
-            trace = False | trace
-        if self.config.get("main", "force") == "true":
-            force = True
-        else:
-            force = False | force
+        trace = self.config["main"]["trace"] | trace
+        force = self.config["main"]["force"] | force
         
-        host = self.config.get("main", "dbhost")    
-        dbname = self.config.get("main", "dbname")
+        host = self.config["main"]["dbhost"]
+        dbname = self.config["main"]["dbname"]
         
         DBSession.__init__(self, host, dbname, trace, force)
         
@@ -33,22 +31,8 @@ class LionDB(DBSession):
         self.trace_msg("Trace = %s" % str(trace))
         self.trace_msg("Force = %s" % str(force))
         
-        if app:
-            # Import the application module, which lives here:
-            # top-level/modules/APP/lionio_APP.someclass
-            # someclass is defined in the config file and it inherits from LionIOModule
-            module_name = "modules." + app + ".lionio_" + app
-            self.trace_msg("import %s" % module_name)
-            try:
-                module = __import__(module_name, globals(), locals(), [''], -1)
-                classname = self.config.get(app, "lioniomodule")
-                lioniomodule = module_name + "." + classname    
-                obj = eval(lioniomodule)
-                self.dbio = obj()
-            
-            except Exception, e :
-                self.die("""Could not load module for application "%s" (%s)""" % (app, e))
-    
+        LionDBModuleMixIn.__init__(self, app)
+        
     def check_language(self, langid):
         """Check the existence of a table for the given language id."""
         self.execute_query("SELECT langname FROM languages WHERE langid='%s'" \
@@ -79,74 +63,6 @@ class LionDB(DBSession):
 
     def get_masterlang_table(self):
         return make_table_name(self.masterlang)
-    
-    def import_xml(self, file, langid, option):
-        """Import from XML to the database."""
-        if not file: self.die("No XML file given.")
-        if not self.check_language(langid):
-            self.die("No table for language %s." % langid)
-        self.trace_msg("Import from %s for %s" % (file, langid))
-        self.dbio.import_xml(self, file, langid, option)
-        removed_ids = self.dbio.get_removed_ids_after_import()
-        if langid == self.masterlang:
-            self.__process_changes(langid, removed_ids)
-    
-    def export(self, file, langid, option, extra):
-        print self.dbio.export(self, file, langid, option, extra)
-    
-    def all_strings(self, langid):
-        """Export all strings to stdout"""
-        self.trace_msg("Export all strings to stdout")
-        table = self.make_table_name(langid)
-        self.execute_query("""SELECT textstring FROM """ + table + """
-            where (role="STRING" or role="MENUITEM" or role="DIALOG" or \
-            role="CONTROL") and translate=1""")
-        strings = self.cursor.fetchall()
-        print self.__stringlist_to_xml(strings, langid)
-    
-    def textstrings(self, langid):
-        """Export all strings to stdout"""
-        self.trace_msg("Export strings to stdout")
-        table = self.make_table_name(langid)
-        self.execute_query("SELECT textstring FROM " + table)
-        strings = self.cursor.fetchall()
-        print self.__stringlist_to_xml(strings, langid)
-    
-    def __stringlist_to_xml(self, results, langid):
-        """Get all strings that have the given roles"""
-        output = """<?xml version="1.0"?>\n<strings langid=\"""" + langid + "\">"
-        for item in results:
-            output += "<s>" + item[0].encode("utf-8") + "</s>"
-        output += "</strings>"
-        return output
-    
-    def import_audio_prompts(self, langid, ncx):
-        """Fill up the database with prompts file names. We use the NCX file
-        from the Obi export and match the navPoint text label with textstrins
-        in the DB."""
-        self.trace_msg("Getting audio prompts from NCX")
-        try:
-            dom = minidom.parse(ncx)
-        except Exception, e:
-            self.die("""Couldn't open "%s" (%s)""" % (ncx, e))
-        self.execute_query("SELECT id, textstring FROM " +
-                self.make_table_name(langid))
-        strings = self.cursor.fetchall()
-        labels = dom.getElementsByTagNameNS(
-            "http://www.daisy.org/z3986/2005/ncx/", "navLabel")
-        self.trace_msg("Got %d labels for %d strings" %
-            (labels.__len__(), strings.__len__()))
-        for label, string in zip(labels, strings):
-            text = label.getElementsByTagNameNS(
-                "http://www.daisy.org/z3986/2005/ncx/", "text")[0].firstChild.data
-            audio_src = label.getElementsByTagNameNS(
-                "http://www.daisy.org/z3986/2005/ncx/", "audio")[0].getAttribute("src")
-            if string[1] == text:
-                self.execute_query("""UPDATE %s SET audiouri="%s", audioflag=1 WHERE id=%d""" %
-                        (self.make_table_name(langid), audio_src, string[0]))
-            else:
-                self.warn("""No match between db string="%s" and ncx label="%s"?!""" %
-                        (string[1], text))
     
     # add a single string from the master table
     def add_string(self, langid, textstring, stringid):
@@ -284,110 +200,6 @@ class LionDB(DBSession):
         if row == None or len(row) == 0: return None
         else: return row[0]
     
-    def add_user(self, langid, username, password, realname, email):
-        """Add a user for an existing language"""
-        if self.check_language(langid) == None:
-            self.die("Language does not exist")
-            return
-
-        if self.check_username(username) != None:
-            self.die("Username already exists")
-            return
-
-        self.__add_user_to_database(langid, username, password, realname, email)
-
-    def remove_user(self, username):
-        """Remove a user but not their language"""
-        if self.check_username(username) == None:
-            self.die("User does not exist")
-            return
-
-        # safety check
-        can_remove = self.force
-        if self.force == False:
-            rly = raw_input("Do you REALLY want to remove a user?  Type your answer (yes/no) ")
-            if rly == "yes":
-                can_remove = True
-            else:
-                can_remove = False
-
-        if can_remove == True:    
-            self.__remove_user_from_database(username)    
-
-    def add_language(self, langid, langname, username, password, realname, email):
-        """Add a new language and a user for that language"""
-        if self.check_language(langid) != None:
-            self.die("Language already exists.")
-            return
-
-        if self.check_username(username) != None:
-            self.die("Username already exists.")
-            return
-
-        self.__add_language_to_database(langid, langname, username, password, realname, email)
-
-
-    def remove_language(self, langid):
-        """Remove a language and the user associated with it"""
-        if self.check_language(langid) == None:
-            self.die("Language not found.")
-            return
-
-        # safety check
-        can_remove = self.force
-        if self.force == False:
-            rly = raw_input("Do you REALLY want to remove a language?  This is serious.\n \
-                Type your answer (definitely/no)  ")
-            if rly == "definitely":
-                can_remove = True
-            else:
-                can_remove = False
-        # really delete it!
-        if can_remove == True:
-            self.__remove_language_from_database(langid)
-            self.trace_msg("Language %s deleted!" % langid)
-
-
-    def __add_language_to_database(self, langid, langname, username, password, realname, email):
-        """add the new language and new user"""
-        # add the language to the languages table
-        self.execute_query("""INSERT INTO languages (langid, langname) VALUES \
-            ("%(id)s", "%(name)s")""" % {"id": langid, "name": langname})
-
-        self.__add_user_to_database(langid, username, password, realname, email)
-
-        # create the new table as a copy of the master language table
-        table = self.make_table_name(langid)
-        self.execute_query("CREATE TABLE %s SELECT * from %s" % (table, self.get_masterlang_table()))
-
-        # flag all "TODO" and clear some fields
-        self.execute_query("UPDATE %s SET textflag=3, audioflag=2, \
-            audiodata=NULL, audiouri=NULL, remarks=NULL" % table)
-
-    def __remove_language_from_database(self, langid):
-        """remove the language from the database"""
-        # remove the user for this language
-        self.execute_query("""SELECT username FROM users WHERE langid="%s" """ % langid)
-        user = self.cursor.fetchone()
-        __remove_user_from_database(user)
-
-        # remove the entry in the languages table
-        self.execute_query("""DELETE FROM languages WHERE langid="%s" """ % langid)
-
-        # drop the table with the language data
-        table = self.make_table_name(langid)
-        self.execute_query("""DROP TABLE %s""" % table)
-
-    def __add_user_to_database(self, langid, username, password, realname, email):
-        """add user to the users table.  their associated language should already exist"""
-        self.execute_query("""INSERT INTO users (username, realname, password, \
-            email, langid) VALUES ("%(u)s", "%(r)s", "%(p)s", "%(e)s", "%(lid)s")""" \
-            % {"u": username, "r": realname, "p": password, "e": email, "lid": langid})    
-
-    def __remove_user_from_database(self, username):
-        """remove a user but not their language"""
-        self.execute_query("""DELETE FROM users WHERE username="%s" """ % username)
-        
     def __process_changes(self, langid, removed_ids):
         """Process the textflag values (2: changed, 3: new)
         and remove the IDs from all tables"""
@@ -437,41 +249,4 @@ class LionDB(DBSession):
         self.execute_query("UPDATE %s SET textflag=1 WHERE textflag=2 \
             or textflag=3" % table)
     
-    def accept_all_temp_audio(self, langid):
-        """copy the audio uris from the tempaudio table to the permanent table for the given language.
-        note that the file copying must be done by hand."""
-        request = """SELECT xmlid FROM tempaudio WHERE langid="%s" """ % langid
-        self.execute_query(request)
-        for row in self.cursor.fetchall():
-            self.accept_temp_audio(langid, row[0])
-    
-    def clear_all_temp_audio(self, langid):
-        """clear all rows in the tempaudio table for the given language"""
-        request = """DELETE FROM tempaudio WHERE langid="%s" """ % langid
-        self.execute_query(request)
-    
-    def accept_temp_audio(self, langid, xmlid):
-        """copy a single audio uri from the tempaudio table to the permanent language table
-        note that the file copying must be done by hand."""
-        request = """SELECT audiouri FROM tempaudio WHERE xmlid="%s" and langid="%s" """ \
-            % (xmlid, langid)
-        self.execute_query(request)
-        if self.cursor.rowcount == 0:
-            self.warn("No audio found.")
-            return
-        
-        audio_dir_prefix = self.config.get("main", "audio_dir_prefix")
-        if not audio_dir_prefix.endswith("/"): audio_dir_prefix += "/"
-        audiofile = audio_dir_prefix + os.path.basename(self.cursor.fetchone()[0])
-        self.trace_msg("Saving audio to language table as %s" % audiofile)    
-        request = """UPDATE %s SET audiouri="%s" WHERE xmlid="%s" """ \
-            % (self.make_table_name(langid), audiofile, xmlid)
-        self.execute_query(request)
-        self.clear_temp_audio(langid, xmlid)
-    
-    def clear_temp_audio(self, langid, xmlid):
-        """clear a single row from the tempaudio table for the given language"""
-        request = """DELETE FROM tempaudio WHERE xmlid="%s" and langid="%s" """ \
-            % (xmlid, langid)
-        self.execute_query(request)
     

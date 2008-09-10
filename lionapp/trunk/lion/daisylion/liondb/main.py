@@ -80,10 +80,10 @@ def main():
     remove_item = False
     add_accel = False
     change_item = False
-    export = False
+    module_export = False
     add_user = False
     remove_user = False
-    import_xml = False
+    module_import = False
     accept_temp_audio = False
     clear_temp_audio = False
     accept_all_temp_audio = False
@@ -120,12 +120,12 @@ def main():
         elif opt in ("--refid"): refid = arg
         elif opt in ("--keys"): actualkeys = arg
         elif opt in ("--extra"): extra = arg
-        elif opt in ("-e", "--export"): export = True
+        elif opt in ("-e", "--export"): module_export = True
         elif opt in ("--option"): option = int(arg)
         elif opt in ("--config"): config = arg
         elif opt in ("-h", "--help"):
             action = lambda s, f, l: usage()
-        elif opt in ("-i", "--import"): import_xml = True
+        elif opt in ("-i", "--import"): module_import = True
         elif opt in ("--add_language"): add_language = True
         elif opt in ("--remove_language"):
             action = lambda s, f, l: s.remove_language(l)
@@ -157,14 +157,14 @@ def main():
         session.add_accelerator(langid, textstring, stringid, refid, actualkeys)
     elif change_item == True:
         session.change_item(langid, textstring, stringid)
-    elif export == True:
-        session.export(file, langid, option, extra)
+    elif module_export == True:
+        session.module_export(file, langid, option, extra)
     elif add_user == True:
         session.add_user(langid, username, password, realname, email)
     elif remove_user == True:
         session.remove_user(username)
-    elif import_xml == True:
-        session.import_xml(file, langid, option)
+    elif module_import == True:
+        session.module_import(file, langid, option)
     elif accept_temp_audio == True:
         session.accept_temp_audio(langid, stringid)
     elif clear_temp_audio == True:
