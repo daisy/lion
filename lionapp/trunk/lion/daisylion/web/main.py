@@ -1,7 +1,7 @@
 import sys
 import os
 os.sys.path.append("./templates")
-import getopt
+from optparse import OptionParser
 from ConfigParser import ConfigParser
 import MySQLdb
 import cherrypy
@@ -67,26 +67,22 @@ class MainMenu(mainmenu.mainmenu):
             return self.respond()
     index.exposed = True
 
-
 def main():
     """The entry point for the web app"""
-    # read the command line arguments
-    try:
-        opts, args = getopt.getopt(os.sys.argv[1:], "c", ["config=", "force", "trace"])
     
-    except getopt.GetoptError, e:
-        os.sys.stderr.write("Error: %s" % e.msg)
-        exit(1)
+    usage = "usage: %prog [options] configFile"
     
-    config_file = None
-    trace = False
-    force = False
-    for opt, arg in opts:
-        if opt in ("-c", "--config"): config_file = arg
-        if opt in ("--trace"): trace = True
-        if opt in ("--force"): force = True
-    
-    session = daisylion.db.liondb.LionDB(config_file, trace, force, None)
+    parser = OptionParser(usage=usage)
+    parser.add_option("-t", "--trace", dest="trace", action="store_true",
+                    help="Turn on program trace")
+    (options, args) = parser.parse_args()
+    if args == None or len(args) <= 0:
+        print usage
+        sys.exit(1)
+    config_file = args[0]
+        
+    # force (3rd parameter) is off -- we don't need to use it
+    session = daisylion.db.liondb.LionDB(config_file, parser.trace, False, None)
     session.trace_msg("Starting the Lion website")
 
     # initialize the object hierarchy that cherrypy will use

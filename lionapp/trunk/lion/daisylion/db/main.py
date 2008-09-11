@@ -52,7 +52,6 @@ Other options:
 """ % {"script": os.sys.argv[0]}
     os.sys.exit(code)
 
-
 def main():
     """Parse command line arguments and run."""
     app = "amis"
