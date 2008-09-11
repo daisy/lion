@@ -74,7 +74,7 @@ def main():
     
     parser = OptionParser(usage=usage)
     parser.add_option("-t", "--trace", dest="trace", action="store_true",
-                    help="Turn on program trace")
+                    default=False, help="Turn on program trace")
     (options, args) = parser.parse_args()
     if args == None or len(args) <= 0:
         print usage
@@ -82,7 +82,7 @@ def main():
     config_file = args[0]
         
     # force (3rd parameter) is off -- we don't need to use it
-    session = daisylion.db.liondb.LionDB(config_file, parser.trace, False, None)
+    session = daisylion.db.liondb.LionDB(config_file, options.trace, False, None)
     session.trace_msg("Starting the Lion website")
 
     # initialize the object hierarchy that cherrypy will use
