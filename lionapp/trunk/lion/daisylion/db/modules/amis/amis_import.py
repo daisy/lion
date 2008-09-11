@@ -1,7 +1,7 @@
 from amisxml import AmisUiDoc
 from xml.dom import Node
 import os
-from liondb import *
+from daisylion.db.liondb import *
 from xml.dom import minidom, Node
 
 class AmisImport():
@@ -133,7 +133,7 @@ class AmisImport():
             items = self.doc.get_items_in_container(elem)
             
             self.session.trace_msg("group id = %d" % groupid)
-            self.doc.printelements(items)
+            self.doc.printelements(self.session, items)
             
             self.__get_mnemonics_and_write_data(items, groupid)
             groupid += 1
@@ -143,7 +143,7 @@ class AmisImport():
             items = self.doc.get_items_in_dialog(elem)
             self.__get_mnemonics_and_write_data(items, groupid)
             self.session.trace_msg("group id = %d" % groupid)
-            self.doc.printelements(items)
+            self.doc.printelements(self.session, items)
             groupid += 1
 
 

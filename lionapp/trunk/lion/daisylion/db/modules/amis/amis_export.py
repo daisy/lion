@@ -1,5 +1,5 @@
 import os
-from liondb import *
+from daisylion.db.liondb import *
 import codecs
 import amisxml
 import fill_rc
@@ -67,3 +67,6 @@ def export_keys_book(session, xmlfile, langid, folder):
     session.trace_msg ("Keyboard shortcuts book export for %s" % (langid))
     keys_book.export_keys_book(session, xmlfile, langid, folder)
     session.trace_msg("Saved in %s.  Just add the audio clips!" % folder)
+
+if __name__ == "__main__":
+    export_keys_book(None, "", "", "")

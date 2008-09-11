@@ -1,5 +1,5 @@
 import os
-from liondb import *
+from daisylion.db.liondb import *
 
 class FillRC():
     # note that VK_ADD and VK_SUBTRACT (number pad +/-) are permanently mapped

@@ -1,11 +1,11 @@
 class LionDBUserMgmtMixIn():
     def add_user(self, langid, username, password, realname, email):
         """Add a user for an existing language"""
-        if self.check_language(langid) == None:
+        if self.check_language(langid) == False:
             self.die("Language does not exist")
             return
 
-        if self.check_username(username) != None:
+        if self.check_username(username) != False:
             self.die("Username already exists")
             return
 
@@ -13,7 +13,7 @@ class LionDBUserMgmtMixIn():
 
     def remove_user(self, username):
         """Remove a user but not their language"""
-        if self.check_username(username) == None:
+        if self.check_username(username) == False:
             self.die("User does not exist")
             return
 
@@ -31,11 +31,11 @@ class LionDBUserMgmtMixIn():
 
     def add_language(self, langid, langname, username, password, realname, email):
         """Add a new language and a user for that language"""
-        if self.check_language(langid) != None:
+        if self.check_language(langid) != False:
             self.die("Language already exists.")
             return
 
-        if self.check_username(username) != None:
+        if self.check_username(username) != False:
             self.die("Username already exists.")
             return
 
@@ -44,7 +44,7 @@ class LionDBUserMgmtMixIn():
 
     def remove_language(self, langid):
         """Remove a language and the user associated with it"""
-        if self.check_language(langid) == None:
+        if self.check_language(langid) == False:
             self.die("Language not found.")
             return
 
@@ -84,7 +84,7 @@ class LionDBUserMgmtMixIn():
         # remove the user for this language
         self.execute_query("""SELECT username FROM users WHERE langid="%s" """ % langid)
         user = self.cursor.fetchone()
-        __remove_user_from_database(user)
+        self.__remove_user_from_database(user)
 
         # remove the entry in the languages table
         self.execute_query("""DELETE FROM languages WHERE langid="%s" """ % langid)

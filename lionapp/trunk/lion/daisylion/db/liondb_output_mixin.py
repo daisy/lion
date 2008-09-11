@@ -1,6 +1,6 @@
 class LionDBOutputMixIn():
-    def all_strings(self, langid):
-        """Export all strings to stdout"""
+    def textstrings(self, langid):
+        """Export all text strings to stdout.  Exclude mnemonic and accelerator items."""
         self.trace_msg("Export all strings to stdout")
         table = self.make_table_name(langid)
         self.execute_query("""SELECT textstring FROM """ + table + """
@@ -9,7 +9,7 @@ class LionDBOutputMixIn():
         strings = self.cursor.fetchall()
         print self.__stringlist_to_xml(strings, langid)
     
-    def textstrings(self, langid):
+    def all_strings(self, langid):
         """Export all strings to stdout"""
         self.trace_msg("Export strings to stdout")
         table = self.make_table_name(langid)

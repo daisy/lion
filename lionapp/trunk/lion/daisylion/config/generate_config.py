@@ -14,7 +14,7 @@ show_audio_upload=true
 dbname=lionutf8
 webport=8080
 audio_dir_prefix=./audio/
-application_module=amis
+target_app=amis
 """
 
 DYNAMIC_MAIN_SECTION = {

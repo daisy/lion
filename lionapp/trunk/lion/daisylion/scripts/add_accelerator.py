@@ -2,7 +2,7 @@ from global_options_parser import *
 from daisylion.db.liondb import LionDB
 
 def main():
-    usage = """usage: %prog [options] langid stringid string refid keys
+    usage = """usage: %prog [options] langid string stringid refid keys
     string: the human-readable name for the accelerator shortcut
     refid: the id of the string label for the command referenced by the accelerator
     keys: the actual keys used to access the accelerator shortcut
@@ -12,8 +12,11 @@ def main():
     
     """
     parser = GlobalOptionsParser(usage=usage)
-    session = LionDB(parser.options.config, parser.options.trace, parser.options.force)
-    langid, string, stringid, refid, keys = parser.args
+    (options, args) = parser.parse_args()
+    parser.check_args(5, args)
+    
+    session = LionDB(options.config, options.trace, options.force, options.app)    
+    langid, string, stringid, refid, keys = args
     session.add_accelerator(langid, string, stringid, refid, keys)
 
 if __name__=="__main__": main()

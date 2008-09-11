@@ -1,24 +1,34 @@
-import modules
+import daisylion.db.modules
 
 class LionDBModuleMixIn():
     """The module functionality"""
-    def __init__(self, app=None):
-        if app:
-            # Import the application module, which lives here:
-            # top-level/modules/APP/lionio_APP.someclass
-            # someclass is defined in the config file and it inherits from LionIOModule
-            module_name = "modules." + app + "." + self.config[app]["lioniomodule"]
-            self.trace_msg("import %s" % module_name)
-            try:
-                module = __import__(module_name, globals(), locals(), [''], -1)
-                classname = self.config[app]["lionioclass"]
-                lionioclass = module_name + "." + classname    
-                obj = eval(lionioclass)
-                self.dbio = obj()
-            
-            except Exception, e :
-                self.die("""Could not load module for application "%s" (%s)""" % (app, e))
+    def __init__(self):
+        # Import the application module, which lives here:
+        # top-level/modules/APP/lionio_APP.someclass
+        # someclass is defined in the config file and it inherits from LionIOModule
+        self.dbio = self.load_module(self.target_app, 
+            self.config[self.target_app]["lioniomodule"],
+            self.config[self.target_app]["lionioclass"])
+    
+    def load_module(self, app, module_file, class_name):
+        # Import the application module, which lives here:
+        # top-level/modules/APP/lionio_APP.someclass
+        # someclass is defined in the config file and it inherits from LionIOModule
+        module_name = "daisylion.db.modules." + app + "." + module_file
+        self.trace_msg("import %s" % module_name)
+        module_object = None
+        try:
+            module = __import__(module_name, globals(), locals(), [''], -1)
+            lionioclass = module_name + "." + class_name    
+            obj = eval(lionioclass)
+            module_object = obj()
+
+        except Exception, e:
+            self.die("""Could not load module for application "%s" (%s)""" \
+                % (self.target_app, e))
         
+        return module_object
+    
     def module_import(self, file, langid, option):
         """Import from XML to the database."""
         if not file: self.die("No XML file given.")
@@ -30,5 +40,5 @@ class LionDBModuleMixIn():
         if langid == self.masterlang:
             self.__process_changes(langid, removed_ids)
     
-    def module_export(self, file, langid, option, extra):
-        print self.dbio.export(self, file, langid, option, extra)
+    def module_export(self, langid, option, output_dir):
+        print self.dbio.export(self, langid, option, output_dir)

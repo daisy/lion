@@ -15,11 +15,12 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         self.config = parse_config(configfile)
         self.masterlang = self.config["main"]["masterlang"]
         
-        # for trace and force, read the values from the config file
+        # for trace, force, and app, read the values from the config file
         # override if they were turned on via the init parameters
         trace = self.config["main"]["trace"] | trace
         force = self.config["main"]["force"] | force
-        
+        self.target_app = self.config["main"]["target_app"]
+        if app != None: self.target_app = app
         host = self.config["main"]["dbhost"]
         dbname = self.config["main"]["dbname"]
         
@@ -31,31 +32,28 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         self.trace_msg("Trace = %s" % str(trace))
         self.trace_msg("Force = %s" % str(force))
         
-        LionDBModuleMixIn.__init__(self, app)
+        LionDBModuleMixIn.__init__(self)
         
     def check_language(self, langid):
         """Check the existence of a table for the given language id."""
-        self.execute_query("SELECT langname FROM languages WHERE langid='%s'" \
+        self.execute_query("SELECT * FROM languages WHERE langid='%s'" \
             % langid)
-        row = self.cursor.fetchone()
-        if row != None: return row[0]
-        else: return None
+        if self.cursor.rowcount == 0: return False
+        else: return True
     
     def check_username(self, username):
         """Check the existence of a user with the given username"""
-        self.execute_query("SELECT username FROM users WHERE username='%s'" \
+        self.execute_query("SELECT * FROM users WHERE username='%s'" \
             % username)
-        row = self.cursor.fetchone()
-        if row != None: return row[0]
-        else: return None
+        if self.cursor.rowcount == 0: return False
+        else: return True
     
     def check_string_id(self, langid, stringid):
         """Check the existence of a string with the given xmlid"""
-        self.execute_query("SELECT textstring FROM %(table)s WHERE xmlid='%(xmlid)s'" \
+        self.execute_query("SELECT * FROM %(table)s WHERE xmlid='%(xmlid)s'" \
             % {"table": self.make_table_name(langid), "xmlid": stringid})
-        row = self.cursor.fetchone()
-        if row != None: return row[0]
-        else: return None
+        if self.cursor.rowcount == 0: return False
+        else: return True
     
     def make_table_name(self, langid):
         """Formalize our way of naming a table based on language ID"""
@@ -72,7 +70,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
             This function is ONLY for adding anything with role=STRING"""
 
         # make sure the stringid doesn't already exist
-        if self.check_string_id(langid, stringid) != None:
+        if self.check_string_id(langid, stringid) != False:
             self.die("String with ID %s already exists." % stringid)
         
         table = self.make_table_name(langid)
@@ -91,7 +89,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
             langid = master table
             stringid = xmlid for the string"""
         # make sure the stringid exists
-        if self.check_string_id(langid, stringid) == None:
+        if self.check_string_id(langid, stringid) == False:
             self.die("String with ID %s does not exist." % stringid)
 
         # safety check
@@ -122,7 +120,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         refid = the XMLID value of the entry that this is an accelerator for.  
         keys = the actual keys (Ctrl+O or Space or whatever)"""
         # make sure the stringid doesn't already exist
-        if self.check_string_id(langid, stringid) != None:
+        if self.check_string_id(langid, stringid) != False:
             self.die("String with ID %s already exists." % stringid)
         
         table = self.make_table_name(langid)
@@ -143,7 +141,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         Assumed: the language given by langid is the master language"""
         
         # make sure the item exists
-        if self.check_string_id(langid, stringid) == None:
+        if self.check_string_id(langid, stringid) == False:
             self.die("String with ID %s does not exist" % stringid)
 
         table = self.make_table_name(langid)

@@ -2,7 +2,7 @@ import templates.ncc
 import templates.smil
 import templates.xhtml_daisy_text
 import os
-from liondb import *
+from daisylion.db.liondb import *
 import amisxml
 from xml.dom import minidom, Node
 import xml.dom.minidom
