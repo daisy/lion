@@ -1,9 +1,10 @@
 from translationpage import *
 from templates import tablerow
 import util
+from validate_keys import *
 
 class ChooseMnemonics(TranslationPage):
-    """The page of all the strings (the main page)"""
+    """The page for mnemonics"""
     ROLE_DESCRIPTIONS = {
         "CONTROL": "control, such as a button",
         "DIALOG": "title of a dialog window",
@@ -129,3 +130,17 @@ class ChooseMnemonics(TranslationPage):
         self.show_no_conflicts = not conflict_found
         return self.index(self.last_view)
     check_conflicts.exposed = True
+    
+    def validate(self, data, xmlid, langid):
+        is_valid = False
+        msg = ""
+        if data == None or data == "":
+            msg = "Data is empty.")        
+        else:
+            if validate_keys(data):
+                is_valid = True
+            else:
+                msg = "Keys are not valid"
+        #TODO: check for conflicts
+        return (is_valid, msg)
+        

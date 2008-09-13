@@ -5,7 +5,7 @@ class FillRC():
     # note that VK_ADD and VK_SUBTRACT (number pad +/-) are permanently mapped
     # to the +/- keys in the template
     # we had to map +/- to VK_OEM keys here because those are suspected to be more common
-    vkeys = {"Ctrl": "CONTROL",
+    vkeys = {"ctrl": "CONTROL",
         "alt": "ALT",
         "shift": "SHIFT",
         "up": "VK_UP",

@@ -5,7 +5,7 @@ import util
 import re
 
 class ChooseAccelerators(TranslationPage):
-    """The page of all the strings (the main page)"""
+    """The page for accelerators"""
     
     def __init__(self, session):
         self.section = "accelerators"

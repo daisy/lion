@@ -12,7 +12,8 @@ VIEW_DESCRIPTIONS = {"all": "all items",
     "todo": "all to-do items"}
 
 class TranslationPage(translate.translate):
-    """The base class for a page of items to be translated"""
+    """The base class for a page of items to be translated
+    This class is not directly usable as a page; use a subclassed page instead"""
     last_view = None
     roles_sql = None
     user = None
@@ -63,6 +64,9 @@ class TranslationPage(translate.translate):
     
     def save_data(self, translation, remarks, status, xmlid, langid, pagenum, audiofile):
         table = langid.replace("-", "_")
+        # TODO: take action if invalid
+        self.validate(translation, xmlid, langid)
+        
         request = """UPDATE %(table)s SET textflag="%(status)s", \
             textstring="%(translation)s", remarks="%(remarks)s" WHERE \
             xmlid="%(xmlid)s" """ % \
@@ -221,3 +225,12 @@ class TranslationPage(translate.translate):
             	    audiouri = audiouri[2:]
                 audiouri = permanenturi + audiouri + permanenturiparams
         return audiouri
+    
+    def make_table(self, view, page_number):
+        """The subclasses must override this function"""
+        return NotImplemented
+    
+    def validate(self, data, xmlid, langid):
+        """The subclass must override this function, which returns a value and a message"""
+        return (NotImplemented, "Not implemented")
+    
