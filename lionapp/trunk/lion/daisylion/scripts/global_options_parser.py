@@ -29,5 +29,5 @@ class GlobalOptionsParser(OptionParser):
 def default_config_file():
     # the default config file
     config_default = daisylion.config.__path__[0]
-    config_default = os.path.join(config_default, "default.cfg")
+    config_default = os.path.join(config_default, "lion.cfg")
     return config_default

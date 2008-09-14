@@ -22,8 +22,13 @@ python "$THIS_DIR"/../config/generate_config.py --type=$1 > "$THIS_DIR"/../confi
 
 # compile the template files
 TEMPLATES_DIR="$THIS_DIR"/../web/templates
+echo "Compiling Cheetah templates in $TEMPLATES_DIR"
 cd "$TEMPLATES_DIR"
+rm -rf *.pyc
+rm -rf *.py
 cheetah compile *.tmpl
+# restore this empty file
+touch "__init__.py"
 cd "$THIS_DIR"
 
 echo "Starting..."

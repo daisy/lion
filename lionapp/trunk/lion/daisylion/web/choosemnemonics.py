@@ -1,5 +1,6 @@
 from translationpage import *
 from templates import tablerow
+from templates import warnings
 import util
 from validate_keys import *
 
@@ -21,7 +22,6 @@ class ChooseMnemonics(TranslationPage):
         self.about = "This is the mnemonics page.  Mnemonics are shortcut \
             letters in a menu item or button.  Each item in a group must have \
             a unique mnemonic."
-        self.check_conflict = True
         TranslationPage.__init__(self, session)    
 
     def make_table(self, view_filter, pagenum):
@@ -102,15 +102,15 @@ class ChooseMnemonics(TranslationPage):
             return word[0:pos] + ("""<span style="text-decoration: \
                 underline">%s</span>""" % word[pos]) + word[pos+1:len(word)]
     
-    def check_conflicts(self):
-        """check the mnemonic groups for conflicts"""
+    def get_warnings(self):
+        """check the mnemonic groups for conflicts and summarize as a list of links"""
         table = self.user["users.langid"].replace("-", "_")
         request = "SELECT DISTINCT mnemonicgroup FROM %s WHERE mnemonicgroup >= 0" % table
         self.session.execute_query(request)
         rows = self.session.cursor.fetchall()
         # for each mnemonic group, make sure that each entry is unique
         conflict_found = False
-        self.warning_links = []
+        warning_links = []
         for r in rows:
             group_id = r[0]
             #first get all the items in this mnemonic group
@@ -125,22 +125,53 @@ class ChooseMnemonics(TranslationPage):
             #if they returned different numbers of results, then probably a mnemonic was repeated
             if len(first_set) != len(second_set):
                 group_link = "group_%d" % group_id
-                self.warning_links.append(group_link)
-                conflict_found = True
-        self.show_no_conflicts = not conflict_found
-        return self.index(self.last_view)
-    check_conflicts.exposed = True
+                warning_links.append(group_link)
+        
+        if len(warning_links) == 0:
+            return (True, "")
+        else:
+            t = warnings.warnings()
+            t.warning_links = warning_links
+            return (False, t.respond())
     
+        
     def validate(self, data, xmlid, langid):
         is_valid = False
         msg = ""
         if data == None or data == "":
-            msg = "Data is empty.")        
+            msg = "Data is empty."       
         else:
             if validate_keys(data):
                 is_valid = True
             else:
-                msg = "Keys are not valid"
-        #TODO: check for conflicts
-        return (is_valid, msg)
+                msg = "This key choice is not valid.  Please choose from %s" % validate_keys.VALID_KEYS
         
+        # conflicts are allowed as part of the workflow
+        # but it's good to identify them
+        if is_valid:
+            (has_conflict, conflict_msg) = self.check_potential_conflict(data, xmlid, langid)
+            if has_conflict:
+                msg = conflict_msg
+        
+        return (is_valid, msg)
+    
+    def check_potential_conflict(self, data, xmlid, langid):
+        """Check if the data would cause a conflict"""
+        table = self.session.make_table_name(langid)
+        request = """SELECT mnemonicgroup FROM %s WHERE xmlid="%s" """ \
+            % (table, xmlid)
+        self.session.execute_query(request)
+        if self.session.cursor.rowcount == 0:
+            # if this element isn't in the table, or isn't a mnemonic, then no conflict 
+            return False
+        mnemonicgroup = self.session.cursor.fetchone()[0]
+        # see if there is another item in this mnemonic group with the same string
+        request = """SELECT id FROM %s WHERE mnemonicgroup=%d AND textstring="%s"
+            AND xmlid != "%s" """ \
+            % (table, mnemonicgroup, MySQLdb.escape_string(data), xmlid)
+        self.session.execute_query(request)
+        if self.session.cursor.rowcount > 0:
+            return (True, "This conflicts with an existing mnemonic")
+        else:
+            return (False, "")
+

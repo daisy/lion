@@ -1,5 +1,6 @@
 import re
 
+VALID_KEYS = "A-Z, Ctrl, Alt, Shift, Up, Down, Left, Right, Esc, Space, +, -"
 def validate_keys(key):
     """Make sure the key falls within the valid range"""
     # A-Z

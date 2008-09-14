@@ -19,8 +19,6 @@ class TranslationPage(translate.translate):
     user = None
     warning_links = None
     warning_message = ""
-    check_conflict = False
-    show_no_conflicts = False
     pagenum = 0
     items_per_page = 50
     total_num_items = 0
@@ -38,6 +36,7 @@ class TranslationPage(translate.translate):
         self.masterlangname = session.cursor.fetchone()[0]
         self.temp_audio_dir = self.session.config["main"]["temp_audio_dir"]
         self.temp_audio_uri = self.session.config["main"]["temp_audio_uri"]
+        self.warning = ""
         translate.translate.__init__(self)
     
     def index(self, view, id_anchor = ""):
@@ -64,20 +63,19 @@ class TranslationPage(translate.translate):
     
     def save_data(self, translation, remarks, status, xmlid, langid, pagenum, audiofile):
         table = langid.replace("-", "_")
-        # TODO: take action if invalid
-        self.validate(translation, xmlid, langid)
-        
-        request = """UPDATE %(table)s SET textflag="%(status)s", \
-            textstring="%(translation)s", remarks="%(remarks)s" WHERE \
-            xmlid="%(xmlid)s" """ % \
-            {"table": table, "status": status, "translation": MySQLdb.escape_string(translation), \
-                "remarks": MySQLdb.escape_string(remarks), "xmlid": xmlid}
-        self.session.execute_query(request)
-        self.show_no_conflicts = False
+        (is_valid, msg) = self.validate(translation, xmlid, langid)
+        if is_valid == False:
+            self.warning = (xmlid, msg)    
+        else:
+            request = """UPDATE %(table)s SET textflag="%(status)s", \
+                textstring="%(translation)s", remarks="%(remarks)s" WHERE \
+                xmlid="%(xmlid)s" """ % \
+                {"table": table, "status": status, "translation": MySQLdb.escape_string(translation), \
+                    "remarks": MySQLdb.escape_string(remarks), "xmlid": xmlid}
+            self.session.execute_query(request)
+            if audiofile != None and audiofile.filename != "": 
+                self.save_audio(audiofile, langid, xmlid)
         self.pagenum = int(pagenum)
-        self.session.trace_msg("On page %d" % self.pagenum)
-        if audiofile != None: 
-            self.save_audio(audiofile, langid, xmlid)
         return self.index(self.last_view, xmlid)
     save_data.exposed = True
     
@@ -231,6 +229,15 @@ class TranslationPage(translate.translate):
         return NotImplemented
     
     def validate(self, data, xmlid, langid):
-        """The subclass must override this function, which returns a value and a message"""
+        """The subclass must override this function, which returns a value and a message.
+        Validation can include checking characters and data length, and also
+        reporting on valid but conflicting data.
+        This function is called before the data is stored"""
         return (NotImplemented, "Not implemented")
+    
+    def get_warnings(self):
+        """This function generates a summary of warnings for the section.
+        It returns a value and a message."""
+        return (NotImplemented, "Not implemented")
+
     
