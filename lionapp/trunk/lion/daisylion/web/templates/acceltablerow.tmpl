@@ -31,7 +31,10 @@ Identical to tablerow except for the dataentry part.This should really be derive
 <tr>
 <form action="save_data" method="POST" enctype="multipart/form-data">
 <td width="30%%">$ref_string</td>
-<td>
+<td id="$xmlid" >
+	#if $error != None and $error != "":
+		<p class="error">$error</p>
+	#end if
     <p class="comments">$our_remarks</p>
     
 	## start of dataentry area
@@ -47,7 +50,7 @@ Identical to tablerow except for the dataentry part.This should really be derive
 	<br/>
 	## and then another text box for entering the label for the entire shortcut
 	<p>Now type the human-readable version of the shortcut.  For example, your language might have its own words or abbreviations for Space or Control.</p>
-	<textarea id="$xmlid" name="translation" cols="30" rows="3" class="$classattr">$textstring</textarea>
+	<textarea name="translation" cols="30" rows="3" class="$classattr">$textstring</textarea>
 	<input type="hidden" name="keymask" value="$keymask"/>
 	## end of dataentry area
 	

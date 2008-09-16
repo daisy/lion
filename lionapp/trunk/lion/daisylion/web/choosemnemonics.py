@@ -76,6 +76,10 @@ class ChooseMnemonics(TranslationPage):
                     t.height = self.textbox_rows
                     t.langid = self.user["users.langid"]
                     t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
+                    if self.error != "" and self.error_id == data["xmlid"]:
+            	        t.error = self.error
+            	    else:
+            	        t.error = ""
                     form += t.respond()
                 form += "</table>"
                 group_number += 1
@@ -102,7 +106,7 @@ class ChooseMnemonics(TranslationPage):
             return word[0:pos] + ("""<span style="text-decoration: \
                 underline">%s</span>""" % word[pos]) + word[pos+1:len(word)]
     
-    def get_warnings(self):
+    def get_all_warnings(self):
         """check the mnemonic groups for conflicts and summarize as a list of links"""
         table = self.user["users.langid"].replace("-", "_")
         request = "SELECT DISTINCT mnemonicgroup FROM %s WHERE mnemonicgroup >= 0" % table
@@ -128,14 +132,14 @@ class ChooseMnemonics(TranslationPage):
                 warning_links.append(group_link)
         
         if len(warning_links) == 0:
-            return (True, "")
+            return ""
         else:
             t = warnings.warnings()
-            t.warning_links = warning_links
-            return (False, t.respond())
+            t.warning_data = warning_links
+            return t.respond()
     
         
-    def validate(self, data, xmlid, langid):
+    def validate_single_item(self, data, xmlid, langid):
         is_valid = False
         msg = ""
         if data == None or data == "":
@@ -144,15 +148,12 @@ class ChooseMnemonics(TranslationPage):
             if validate_keys(data):
                 is_valid = True
             else:
-                msg = "This key choice is not valid.  Please choose from %s" % validate_keys.VALID_KEYS
+                msg = """The key "%s" is not valid.  Please choose from %s""" % (data, VALID_KEYS)
         
         # conflicts are allowed as part of the workflow
         # but it's good to identify them
         if is_valid:
-            (has_conflict, conflict_msg) = self.check_potential_conflict(data, xmlid, langid)
-            if has_conflict:
-                msg = conflict_msg
-        
+            msg = self.check_potential_conflict(data, xmlid, langid)
         return (is_valid, msg)
     
     def check_potential_conflict(self, data, xmlid, langid):
@@ -163,12 +164,15 @@ class ChooseMnemonics(TranslationPage):
         self.session.execute_query(request)
         if self.session.cursor.rowcount == 0:
             # if this element isn't in the table, or isn't a mnemonic, then no conflict 
-            return False
+            return (False, "")
         mnemonicgroup = self.session.cursor.fetchone()[0]
         # see if there is another item in this mnemonic group with the same string
-        request = """SELECT id FROM %s WHERE mnemonicgroup=%d AND textstring="%s"
-            AND xmlid != "%s" """ \
-            % (table, mnemonicgroup, MySQLdb.escape_string(data), xmlid)
+        request = """SELECT id FROM %(table)s WHERE mnemonicgroup=%(mnemonicgroup)d 
+            AND textstring="%(textstring)s" AND xmlid != "%(xmlid)s" 
+            AND role="MNEMONIC" """ \
+            % {"table": table, "mnemonicgroup": mnemonicgroup, 
+                "textstring": MySQLdb.escape_string(data), "xmlid": xmlid}
+        print request
         self.session.execute_query(request)
         if self.session.cursor.rowcount > 0:
             return (True, "This conflicts with an existing mnemonic")

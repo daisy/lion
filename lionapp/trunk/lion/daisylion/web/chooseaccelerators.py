@@ -1,8 +1,9 @@
 import MySQLdb
 from translationpage import *
-from templates import tablerow, acceltablerow
+from templates import tablerow, acceltablerow, warnings
 import util
 import re
+from validate_keys import *
 
 class ChooseAccelerators(TranslationPage):
     """The page for accelerators"""
@@ -58,6 +59,10 @@ class ChooseAccelerators(TranslationPage):
             t.instructions = self.instructions
             t.langid = self.user["users.langid"]
             t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
+            if self.error != "" and self.error_id == data["xmlid"]:
+    	        t.error = self.error
+    	    else:
+    	        t.error = ""
             form += t.respond()
         #end for
         form += "</table>"
@@ -95,32 +100,6 @@ class ChooseAccelerators(TranslationPage):
                 last_part = keys[pos+1:len(keys)]
             return keys[0:pos+1], last_part
     
-    def check_conflicts(self):
-        """Look for accelerator key conflicts.  This function checks all accelerators, not just the ones from the form, and
-        it ignores Space because that one is used twice (play/pause) and is not allowed to be changed by the user."""
-        conflict_found = False
-        table = self.user["users.langid"].replace("-", "_")
-        request = "SELECT DISTINCT actualkeys FROM %s WHERE role=\"ACCELERATOR\" and actualkeys != \"Space\"" % table
-        self.session.execute_query(request)
-        first_count = self.session.cursor.rowcount
-        request = "SELECT id FROM %s WHERE role=\"ACCELERATOR\" and actualkeys != \"Space\"" % table
-        self.session.execute_query(request)
-        second_count = self.session.cursor.rowcount
-        msg = "Checking for conflicts. Found %d distinct items versus %d total items in the table %s" \
-            % (first_count, second_count, table)
-        self.session.trace_msg(msg)
-        if first_count != second_count:
-            self.warning_message = "There is a conflict because two commands are using the same keyboard shortcut."
-            conflict_found = True
-            self.session.warn(self.warning_message)
-        else:
-            conflict_found = False
-            self.warning_message = ""
-        self.show_no_conflicts = not conflict_found
-        
-        return self.index(self.last_view)
-    check_conflicts.exposed = True
-    
     def is_excluded(self, actualkeys):
         """True if keys contains Alt or F-anything. """
         # excluded patterns are Alt+__, F__
@@ -140,16 +119,72 @@ class ChooseAccelerators(TranslationPage):
             actualkeys = keymask + thekeys
         else:
             actualkeys = keymask
-        
-        request = """UPDATE %(table)s SET textflag="%(status)s", \
-            textstring="%(textstring)s", remarks="%(remarks)s", actualkeys="%(actualkeys)s" WHERE \
-            xmlid="%(xmlid)s" """ % \
-            {"table": table, "status": status, "actualkeys": MySQLdb.escape_string(actualkeys), \
-                "remarks": MySQLdb.escape_string(remarks), "xmlid": xmlid, "textstring": MySQLdb.escape_string(translation)}
-        self.session.execute_query(request)
-        self.show_no_conflicts = False
-        if audiofile != None: 
-            self.save_audio(audiofile, langid, xmlid)
-        return self.index(self.last_view)
+        (is_valid, msg) = self.validate_single_item(actualkeys, xmlid, langid)
+        self.error, self.error_id = msg, xmlid
+        if is_valid:
+            request = """UPDATE %(table)s SET textflag="%(status)s",
+                textstring="%(textstring)s", remarks="%(remarks)s", 
+                actualkeys="%(actualkeys)s" WHERE xmlid="%(xmlid)s" """ % \
+                    {"table": table, "status": status, "actualkeys": 
+                        MySQLdb.escape_string(actualkeys),"remarks": MySQLdb.escape_string(remarks), 
+                        "xmlid": xmlid, "textstring": MySQLdb.escape_string(translation)}
+            self.session.execute_query(request)
+            self.show_no_conflicts = False
+            if audiofile != None and audiofile.filename != "": 
+                self.save_audio(audiofile, langid, xmlid)
+        return self.index(self.last_view, xmlid)
     save_data.exposed = True
+    
+    def get_all_warnings(self):
+        """Look for accelerator key conflicts.  This function checks all accelerators, not just the ones from the form, and
+        it ignores Space because that one is used twice (play/pause) and is not allowed to be changed by the user."""
+        table = self.user["users.langid"].replace("-", "_")
+        request = "SELECT DISTINCT actualkeys FROM %s WHERE role=\"ACCELERATOR\" and actualkeys != \"Space\"" % table
+        self.session.execute_query(request)
+        first_count = self.session.cursor.rowcount
+        request = "SELECT id FROM %s WHERE role=\"ACCELERATOR\" and actualkeys != \"Space\"" % table
+        self.session.execute_query(request)
+        second_count = self.session.cursor.rowcount
+        msg = "Checking for conflicts. Found %d distinct items versus %d total items in the table %s" \
+            % (first_count, second_count, table)
+        self.session.trace_msg(msg)
+        if first_count != second_count:
+            warning_message = "There is a conflict because two commands are using the same keyboard shortcut."
+            self.session.warn(warning_message)
+            t = warnings.warnings()
+            t.warning_data = [warning_message]
+            return t.respond()
+        else:
+            return ""
+    
         
+    def validate_single_item(self, data, xmlid, langid):
+        is_valid = False
+        msg = ""
+        if data == None or data == "":
+            msg = "Data is empty."       
+        else:
+            if validate_keys(data):
+                is_valid = True
+            else:
+                msg = """The key "%s" is not valid.  Please choose from %s""" % (data, VALID_KEYS)
+        
+        # conflicts are allowed as part of the workflow
+        # but it's good to identify them
+        if is_valid:
+            msg = self.check_potential_conflict(data, langid)
+        return (is_valid, msg)
+    
+    def check_potential_conflict(self, data, langid):
+        """Check if the data would cause a conflict"""
+        table = self.session.make_table_name(langid)
+        request = """SELECT id FROM %s WHERE role=\"ACCELERATOR\" 
+            AND actualkeys = "%s" """ % (table, MySQLdb.escape_string(data))
+        print request  
+        self.session.execute_query(request)
+        if self.session.cursor.rowcount == 0:
+            return "No conflict"
+        else:
+            return "This conflicts with an existing accelerator"
+    
+    

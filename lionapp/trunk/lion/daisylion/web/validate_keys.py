@@ -1,6 +1,7 @@
 import re
 
 VALID_KEYS = "A-Z, Ctrl, Alt, Shift, Up, Down, Left, Right, Esc, Space, +, -"
+
 def validate_keys(key):
     """Make sure the key falls within the valid range"""
     # A-Z
@@ -9,9 +10,9 @@ def validate_keys(key):
         "+", "-", "uparrow", "downarrow", "rightarrow", "leftarrow")
     
     p = re.compile(expr, re.IGNORECASE)
-    if p.match(key):
+    if p.match(key) and len(key) == 1:
         return True
-    if p.lower() in named_keys:
+    if key.lower() in named_keys:
         return True
     
     return False

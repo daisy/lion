@@ -53,14 +53,21 @@ class TranslateStrings(TranslationPage):
     	    t.langid = self.user["users.langid"]
     	    t.pagenum = pagenum
     	    t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
+    	    if self.error != "" and self.error_id == data["xmlid"]:
+    	        t.error = self.error
+    	    else:
+    	        t.error = ""
             form = form + t.respond()
         form = form + "</table>"
         return form, len(rows)
     
-    def validate(self, data, xmlid, langid):
+    def validate_single_item(self, data, xmlid, langid):
         if data == None or data == "":
             return (False, "Data is empty.")
         else:
             return (True, "")
 
+    def get_all_warnings(self):
+        return ""
+    
     

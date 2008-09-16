@@ -17,8 +17,6 @@ class TranslationPage(translate.translate):
     last_view = None
     roles_sql = None
     user = None
-    warning_links = None
-    warning_message = ""
     pagenum = 0
     items_per_page = 50
     total_num_items = 0
@@ -36,7 +34,9 @@ class TranslationPage(translate.translate):
         self.masterlangname = session.cursor.fetchone()[0]
         self.temp_audio_dir = self.session.config["main"]["temp_audio_dir"]
         self.temp_audio_uri = self.session.config["main"]["temp_audio_uri"]
-        self.warning = ""
+        self.error = ""
+        self.error_id = ""
+        self.warnings = ""
         translate.translate.__init__(self)
     
     def index(self, view, id_anchor = ""):
@@ -53,7 +53,7 @@ class TranslationPage(translate.translate):
         self.targetid = id_anchor
         # calculate the num pages for the base class
         self.total_num_pages = self.get_total_num_pages()
-            
+        self.warnings = self.get_all_warnings()
         return self.respond()
     index.exposed = True
     
@@ -63,10 +63,9 @@ class TranslationPage(translate.translate):
     
     def save_data(self, translation, remarks, status, xmlid, langid, pagenum, audiofile):
         table = langid.replace("-", "_")
-        (is_valid, msg) = self.validate(translation, xmlid, langid)
-        if is_valid == False:
-            self.warning = (xmlid, msg)    
-        else:
+        (is_valid, msg) = self.validate_single_item(translation, xmlid, langid)
+        self.error, self.error_id = msg, xmlid
+        if is_valid:
             request = """UPDATE %(table)s SET textflag="%(status)s", \
                 textstring="%(translation)s", remarks="%(remarks)s" WHERE \
                 xmlid="%(xmlid)s" """ % \
@@ -228,16 +227,17 @@ class TranslationPage(translate.translate):
         """The subclasses must override this function"""
         return NotImplemented
     
-    def validate(self, data, xmlid, langid):
+    def validate_single_item(self, data, xmlid, langid):
         """The subclass must override this function, which returns a value and a message.
         Validation can include checking characters and data length, and also
         reporting on valid but conflicting data.
         This function is called before the data is stored"""
         return (NotImplemented, "Not implemented")
     
-    def get_warnings(self):
+    def get_all_warnings(self):
         """This function generates a summary of warnings for the section.
-        It returns a value and a message."""
-        return (NotImplemented, "Not implemented")
+        It uses data that has already been saved.
+        It returns a string"""
+        return "BASE CLASS"
 
     

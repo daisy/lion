@@ -9,6 +9,7 @@ Template variables:
 	width = the width of the text box for the translation
 	height = the height of the text box for the translation
 	langid = the id of the language being translated into
+	error = error with data input
 *#
 #def $pagenum
 0
@@ -30,10 +31,13 @@ Template variables:
 <form action="save_data" method="POST" enctype="multipart/form-data">
 <td>$xmlid</td>
 <td width="30%%">$ref_string</td>
-<td>
+<td id="$xmlid" >
+	#if $error != None and $error != "":
+		<p class="error">$error</p>
+	#end if
     <p class="comments">$our_remarks</p>
     $instructions  Remember to <em>Save</em>.<br/>
-	<textarea id="$xmlid" name="translation" cols="$width" rows="$height" class="$classattr">$textstring</textarea>
+	<textarea name="translation" cols="$width" rows="$height" class="$classattr">$textstring</textarea>
     <p class="comments">Remarks from you:</p>
 	<textarea class="remarks" name="remarks" cols="64" rows="2">$remarks</textarea>
 </td>

@@ -9,6 +9,7 @@ Template variables:
 	usepages = if True, this represents a page
 	total_num_pages = the total number of pages
 	pagenum = the current page number
+	all_warnings = html-formatted list of warnings about the page
 *#
 
 #from xhtml import xhtml
@@ -54,6 +55,10 @@ False
 </div>
 <br/>
 
+## "warnings" variable contains preformatted HTML
+#if $warnings != None and $warnings != "":
+	$warnings
+#end if
 ## the big table
 <div>$form</div>
 

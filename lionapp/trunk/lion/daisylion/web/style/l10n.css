@@ -20,3 +20,4 @@ input { margin-left: 2em; border: thin black solid; }
 #header {font-size: smaller; border-bottom: thin black solid; padding-bottom: 2em;}
 em {font-weight: bold;}
 div.page_nav {margin-top: 2em; font-size: medium;}
+.warnings, .error {background-color: #F93;}

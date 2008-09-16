@@ -8,7 +8,7 @@ COMMENT = """# daisylion configuration file
 STATIC_MAIN_SECTION = """
 [main]
 masterlang=eng-US
-trace=true
+trace=false
 force=false
 show_audio_upload=true
 dbname=lionutf8
