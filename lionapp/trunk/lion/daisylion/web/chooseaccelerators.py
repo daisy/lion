@@ -181,7 +181,6 @@ class ChooseAccelerators(TranslationPage):
         table = self.session.make_table_name(langid)
         request = """SELECT id FROM %s WHERE role=\"ACCELERATOR\" 
             AND actualkeys = "%s" """ % (table, MySQLdb.escape_string(data))
-        print request  
         self.session.execute_query(request)
         if self.session.cursor.rowcount == 0:
             return "No conflict"

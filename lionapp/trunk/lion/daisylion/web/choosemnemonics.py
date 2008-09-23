@@ -16,7 +16,7 @@ class ChooseMnemonics(TranslationPage):
     
     def __init__(self, session):
         self.section = "mnemonics"
-        self.textbox_columns = 10
+        self.textbox_columns = 1
         self.textbox_rows = 1
         self.instructions = "Enter a single letter."
         self.about = "This is the mnemonics page.  Mnemonics are shortcut \
@@ -153,7 +153,8 @@ class ChooseMnemonics(TranslationPage):
         # conflicts are allowed as part of the workflow
         # but it's good to identify them
         if is_valid:
-            msg = self.check_potential_conflict(data, xmlid, langid)
+            has_conflict, msg = self.check_potential_conflict(data, xmlid, langid)
+        
         return (is_valid, msg)
     
     def check_potential_conflict(self, data, xmlid, langid):
@@ -172,7 +173,6 @@ class ChooseMnemonics(TranslationPage):
             AND role="MNEMONIC" """ \
             % {"table": table, "mnemonicgroup": mnemonicgroup, 
                 "textstring": MySQLdb.escape_string(data), "xmlid": xmlid}
-        print request
         self.session.execute_query(request)
         if self.session.cursor.rowcount > 0:
             return (True, "This conflicts with an existing mnemonic")

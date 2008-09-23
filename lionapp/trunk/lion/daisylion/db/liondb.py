@@ -2,7 +2,7 @@ import os
 from xml.dom import minidom
 from dbsession import DBSession
 import modules.lion_module
-from daisylion.config_parser import *
+from daisylion.config.config_parser import *
 from liondb_audio_mixin import *
 from liondb_module_mixin import *
 from liondb_output_mixin import *

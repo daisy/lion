@@ -15,7 +15,7 @@ SERVER=92.243.13.151
 # the parent folder of the daisylion folder
 SERVERWWW_PARENT=$SERVER:/srv/d_daisylion/www/
 # the parent folder of the DB connection info folder
-SERVERDB_PARENT=$SERVER:/srv/www/
+SERVERDB_PARENT=$SERVER:/srv/d_daisylion/
 
 # your SSH key
 KEY=/Users/marisa/.ssh/gandi

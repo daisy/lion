@@ -63,7 +63,7 @@ class TranslationPage(translate.translate):
     
     def save_data(self, translation, remarks, status, xmlid, langid, pagenum, audiofile):
         table = langid.replace("-", "_")
-        (is_valid, msg) = self.validate_single_item(translation, xmlid, langid)
+        is_valid, msg = self.validate_single_item(translation, xmlid, langid)
         self.error, self.error_id = msg, xmlid
         if is_valid:
             request = """UPDATE %(table)s SET textflag="%(status)s", \
