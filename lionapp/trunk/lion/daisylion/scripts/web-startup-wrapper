@@ -1,0 +1,2 @@
+echo "Starting the Lion (web configuration)"
+nohup ./start-lion-web web &

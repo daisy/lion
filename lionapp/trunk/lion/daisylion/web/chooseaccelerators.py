@@ -164,7 +164,8 @@ class ChooseAccelerators(TranslationPage):
         if data == None or data == "":
             msg = "Data is empty."       
         else:
-            if validate_keys(data):
+            mask, keys = self.parse_key_masks(data)
+            if validate_keys(keys):
                 is_valid = True
             else:
                 msg = """The key "%s" is not valid.  Please choose from %s""" % (data, VALID_KEYS)
