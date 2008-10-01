@@ -41,11 +41,12 @@ class LionDBUserMgmtMixIn():
 
     def list_all_languages(self):
         """list all languages and their associated users"""
-        request = """SELECT languages.langid, languages.langname, users.realname FROM 
-            users, languages WHERE users.langid=languages.langid"""
+        request = """SELECT languages.langid, languages.langname, users.realname, users.username, users.password
+            FROM languages LEFT OUTER JOIN users ON users.langid=languages.langid ORDER BY langid"""  
+    
         self.execute_query(request)        
         return self.cursor.fetchall()
-        
+    
     def __add_language_to_database(self, langid, langname, username, password, realname, email):
         """add the new language and new user"""
         # add the language to the languages table
