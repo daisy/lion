@@ -34,6 +34,6 @@ class AmisLionIO (daisylion.db.modules.lion_module.LionIOModule):
             sz = len(output_folder)
             # make sure the folder path ends with a slash
             if sz > 0 and output_folder[sz-1] != '/':
-                output_folder.append('/')
+                output_folder += '/'
             return amis_export.export_keys_book(session, xml_filepath, langid, output_folder)
     
