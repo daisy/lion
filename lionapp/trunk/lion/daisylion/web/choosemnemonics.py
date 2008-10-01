@@ -135,7 +135,7 @@ class ChooseMnemonics(TranslationPage):
             return ""
         else:
             t = warnings.warnings()
-            t.warning_data = warning_links
+            t.warning_links = warning_links
             return t.respond()
     
         
@@ -178,4 +178,9 @@ class ChooseMnemonics(TranslationPage):
             return (True, "This conflicts with an existing mnemonic")
         else:
             return (False, "")
-
+    
+    def save_data(self, translation, remarks, status, xmlid, langid, pagenum, audiofile):
+        """override of TranslationPage.save_data so we can adjust the case of the data"""
+        data = translation.upper()
+        return TranslationPage.save_data(self, data, remarks, status, xmlid, langid, pagenum, audiofile)
+    save_data.exposed = True

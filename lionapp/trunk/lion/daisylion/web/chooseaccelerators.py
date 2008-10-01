@@ -116,7 +116,11 @@ class ChooseAccelerators(TranslationPage):
         
         table = langid.replace("-", "_")
         if thekeys != "XXXX":
-            actualkeys = keymask + thekeys
+            # force single characters to be upper-case
+            if len(thekeys) == 1:
+                actualkeys = keymask + thekeys.upper()
+            else:
+                actualkeys = keymask + thekeys
         else:
             actualkeys = keymask
         (is_valid, msg) = self.validate_single_item(actualkeys, xmlid, langid)
@@ -152,7 +156,8 @@ class ChooseAccelerators(TranslationPage):
             warning_message = "There is a conflict because two commands are using the same keyboard shortcut."
             self.session.warn(warning_message)
             t = warnings.warnings()
-            t.warning_data = [warning_message]
+            t.warning_links = None
+            t.warning_message = warning_message
             return t.respond()
         else:
             return ""
@@ -173,14 +178,15 @@ class ChooseAccelerators(TranslationPage):
         # conflicts are allowed as part of the workflow
         # but it's good to identify them
         if is_valid:
-            msg = self.check_potential_conflict(data, langid)
+            msg = self.check_potential_conflict(data, langid, xmlid)
         return (is_valid, msg)
     
-    def check_potential_conflict(self, data, langid):
+    def check_potential_conflict(self, data, langid, xmlid):
         """Check if the data would cause a conflict"""
         table = self.session.make_table_name(langid)
         request = """SELECT id FROM %s WHERE role=\"ACCELERATOR\" 
-            AND actualkeys = "%s" """ % (table, MySQLdb.escape_string(data))
+            AND actualkeys = "%s" AND xmlid !="%s"  """ \
+            % (table, MySQLdb.escape_string(data), xmlid)
         self.session.execute_query(request)
         if self.session.cursor.rowcount == 0:
             return "No conflict"
