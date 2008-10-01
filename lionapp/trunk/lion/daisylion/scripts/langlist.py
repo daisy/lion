@@ -7,7 +7,7 @@ def main():
     (options, args) = parser.parse_args()
     parser.check_args(0, args)
     
-    session = LionDB(options.config, options.trace, options.force, options.app)    
+    session = LionDB(options.config, options.trace, options.app)    
     results = session.list_all_languages()
     for r in results:
         print "%s\t\t%s\t\t\t%s" % (r[0], r[1], r[2])

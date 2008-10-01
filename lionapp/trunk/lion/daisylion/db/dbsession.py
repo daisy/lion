@@ -6,11 +6,10 @@ import DB.connect  # Harcoded DB connection info, not stored in SVN
 class DBSession:
     """A session with the DB."""
     
-    def __init__(self, host, dbname, trace=False, force=False):
+    def __init__(self, host, dbname, trace=False):
         self.trace = trace      # trace flag
         self.warnings = 0       # warnings during operation
         self.connected = False  # no connection yet
-        self.force = force      # force flag
         self.host = host
         self.dbname = dbname
     

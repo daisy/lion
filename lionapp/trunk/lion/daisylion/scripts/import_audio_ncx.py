@@ -7,7 +7,7 @@ def main():
     (options, args) = parser.parse_args()
     parser.check_args(2, args)
     
-    session = LionDB(options.config, options.trace, options.force, options.app)
+    session = LionDB(options.config, options.trace, options.app)    
     langid, ncx_file = args
     session.import_audio_prompts(langid, ncx_file)
 

@@ -14,17 +14,14 @@ def main():
     (options, args) = parser.parse_args()
     parser.check_args(2, args)
     
-    session = LionDB(options.config, options.trace, options.force, options.app)
+    session = LionDB(options.config, options.trace, options.app)    
     langid, action = args
     
-    # confirm this action
-    do_action = options.force
-    if options.stringid == None and options.force == False:
-        rly = raw_input("%s ALL temporary audio files for %s? (y/n)" % (action, langid))
-        if rly == "y" or rly == "yes":
-            do_action = True
-    else:
-        do_action = True
+    # warn the user before they blow away all their files
+    do_action = True
+    if options.stringid == None:
+        warning = "%s ALL temporary audio files for %s? (y/n)" % (action, langid)
+        do_action = parser.safety_check(warning)
     
     if do_action == True:
         if action == "accept":

@@ -15,7 +15,7 @@ def main():
     (options, args) = parser.parse_args()
     parser.check_args(5, args)
     
-    session = LionDB(options.config, options.trace, options.force, options.app)    
+    session = LionDB(options.config, options.trace, options.app)    
     langid, string, stringid, refid, keys = args
     session.add_accelerator(langid, string, stringid, refid, keys)
 

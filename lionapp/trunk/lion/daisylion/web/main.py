@@ -80,9 +80,8 @@ def main():
         print usage
         sys.exit(1)
     config_file = args[0]
-        
-    # force (3rd parameter) is off -- we don't need to use it
-    session = daisylion.db.liondb.LionDB(config_file, options.trace, False, None)
+    
+    session = daisylion.db.liondb.LionDB(config_file, options.trace, None)
     session.trace_msg("Starting the Lion website")
 
     # initialize the object hierarchy that cherrypy will use

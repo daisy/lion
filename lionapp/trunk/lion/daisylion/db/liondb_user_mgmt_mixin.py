@@ -16,18 +16,7 @@ class LionDBUserMgmtMixIn():
         if self.check_username(username) == False:
             self.die("User does not exist")
             return
-
-        # safety check
-        can_remove = self.force
-        if self.force == False:
-            rly = raw_input("Do you REALLY want to remove a user?  Type your answer (yes/no) ")
-            if rly == "yes":
-                can_remove = True
-            else:
-                can_remove = False
-
-        if can_remove == True:    
-            self.__remove_user_from_database(username)    
+        self.__remove_user_from_database(username)    
 
     def add_language(self, langid, langname, username, password, realname, email):
         """Add a new language and a user for that language"""
@@ -47,20 +36,8 @@ class LionDBUserMgmtMixIn():
         if self.check_language(langid) == False:
             self.die("Language not found.")
             return
-
-        # safety check
-        can_remove = self.force
-        if self.force == False:
-            rly = raw_input("Do you REALLY want to remove a language?  This is serious.\n \
-                Type your answer (definitely/no)  ")
-            if rly == "definitely":
-                can_remove = True
-            else:
-                can_remove = False
-        # really delete it!
-        if can_remove == True:
-            self.__remove_language_from_database(langid)
-            self.trace_msg("Language %s deleted!" % langid)
+        self.__remove_language_from_database(langid)
+        self.trace_msg("Language %s deleted!" % langid)
 
     def list_all_languages(self):
         """list all languages and their associated users"""

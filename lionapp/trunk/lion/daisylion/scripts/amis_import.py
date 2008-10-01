@@ -15,7 +15,7 @@ def main():
     (options, args) = parser.parse_args()
     parser.check_args(2, args)
     
-    session = LionDB(options.config, options.trace, options.force, "amis")
+    session = LionDB(options.config, options.trace, "amis")
     langid, file = args
     session.module_import(file, langid, options.import_type)
 

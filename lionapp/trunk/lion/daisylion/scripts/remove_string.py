@@ -7,9 +7,11 @@ def main():
     (options, args) = parser.parse_args()
     parser.check_args(2, args)
     
-    session = LionDB(options.config, options.trace, options.force, options.app)
+    session = LionDB(options.config, options.trace, options.app)    
     langid, stringid = args
-    session.remove_string(langid, stringid)
+    # do a safety check to see if the user really wants to remove a string
+    if parser.safety_check("remove a string") == True:
+        session.remove_string(langid, stringid)
 
 if __name__=="__main__": main()
 

@@ -10,27 +10,25 @@ from liondb_user_mgmt_mixin import *
 
 class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
     LionDBUserMgmtMixIn, DBSession):
-    def __init__(self, configfile, trace=False, force=False, app=None):
+    def __init__(self, configfile, trace=False, app=None):
         # read the settings
         self.config = parse_config(configfile)
         self.masterlang = self.config["main"]["masterlang"]
         
-        # for trace, force, and app, read the values from the config file
+        # for trace and app, read the values from the config file
         # override if they were turned on via the init parameters
         trace = self.config["main"]["trace"] | trace
-        force = self.config["main"]["force"] | force
         self.target_app = self.config["main"]["target_app"]
         if app != None: self.target_app = app
         host = self.config["main"]["dbhost"]
         dbname = self.config["main"]["dbname"]
         
-        DBSession.__init__(self, host, dbname, trace, force)
+        DBSession.__init__(self, host, dbname, trace)
         
         self.trace_msg("Master language = %s" % self.masterlang)
         self.trace_msg("Host = %s" % host)
         self.trace_msg("DB = %s" % dbname)
         self.trace_msg("Trace = %s" % str(trace))
-        self.trace_msg("Force = %s" % str(force))
         
         LionDBModuleMixIn.__init__(self)
         
@@ -92,22 +90,11 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         if self.check_string_id(langid, stringid) == False:
             self.die("String with ID %s does not exist." % stringid)
 
-        # safety check
-        can_remove = session.force
-        if self.force == False:
-            rly = raw_input("Do you REALLY want to remove a string?  This is serious.\n \
-                Type your answer (definitely/no)  ")
-            if rly == "definitely":
-                can_remove = True
-            else:
-                can_remove = False
-
         table = self.make_table_name(langid)
-        # really delete it!
-        if can_remove == True:
-            self.execute_query("""DELETE FROM %(table)s \
-                WHERE xmlid="%(xmlid)s" """ % \
-                {"table": table, "xmlid": stringid})
+        # delete it!
+        self.execute_query("""DELETE FROM %(table)s \
+            WHERE xmlid="%(xmlid)s" """ % \
+            {"table": table, "xmlid": stringid})
 
         if langid == self.masterlang:
             self.__process_changes(langid, removed_ids)

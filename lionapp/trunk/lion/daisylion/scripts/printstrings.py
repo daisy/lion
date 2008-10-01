@@ -11,11 +11,11 @@ def main():
     (options, args) = parser.parse_args()
     parser.check_args(1, args)
     
-    session = LionDB(options.config, options.trace, options.force, options.app)
+    session = LionDB(options.config, options.trace, options.app)    
     langid = args[0]
     if options.all == True:
-        print "all"
-        session.all_strings(langid)
+        if parser.safety_check("for fun"):
+            session.all_strings(langid)
     else:
         session.textstrings(langid)
 

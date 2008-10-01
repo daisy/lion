@@ -18,6 +18,7 @@ class GlobalOptionsParser(OptionParser):
             help="Configuration file", default=default_config_file())
         self.add_option("-a", "--app", dest="app", default="amis", 
             help="The target application module")
+        self.force = False
 
     def check_args(self, num_required, args):
         if args == None: l = 0
@@ -25,6 +26,24 @@ class GlobalOptionsParser(OptionParser):
         if l != num_required:
             self.error("Error: wrong number of arguments (expected %d, got %d)" \
                 % (num_required, len(args)))
+                
+    def safety_check(self, desc):
+        if self.force == False:
+            rly = raw_input("Do you REALLY want to %s?  This is serious.\n \
+                Type your answer (definitely/no)  " % desc)
+            if rly == "definitely":
+                return True
+            else:
+                return False
+        else:
+            print "force is true"
+            return True
+    
+    def parse_args(self):
+        opts, args = OptionParser.parse_args(self)
+        self.force = opts.force
+        return opts, args
+        
 
 def default_config_file():
     # the default config file

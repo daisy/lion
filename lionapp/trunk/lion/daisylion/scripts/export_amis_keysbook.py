@@ -8,7 +8,7 @@ def main():
     (options, args) = parser.parse_args()
     parser.check_args(2, args)
     
-    session = LionDB(options.config, options.trace, options.force, "amis")
+    session = LionDB(options.config, options.trace, "amis")
     langid = args[0]
     outputdir = args[1]
     session.module_export(langid, 3, outputdir)

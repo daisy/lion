@@ -13,7 +13,7 @@ def main():
     (options, args) = parser.parse_args()
     parser.check_args(3, args)
     
-    session = LionDB(options.config, options.trace, options.force, options.app)
+    session = LionDB(options.config, options.trace, options.app)
     langid, username, pwd = args
     session.add_language(langid, options.langname, username, pwd, options.realname, options.email)
 

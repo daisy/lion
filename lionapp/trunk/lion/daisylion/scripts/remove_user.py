@@ -7,9 +7,10 @@ def main():
     (options, args) = parser.parse_args()
     parser.check_args(1, args)
     
-    session = LionDB(options.config, options.trace, options.force, options.app)
+    session = LionDB(options.config, options.trace, options.app)    
     username = args[0]
-    session.remove_user(username)
+    if parser.safety_check("remove a user") == True:
+        session.remove_user(username)
 
 if __name__=="__main__": main()
 
