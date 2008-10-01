@@ -8,7 +8,7 @@ def main():
     
     import_description = '\n'.join(["%d: %s" % (a, b) for a, b in import_choices.items()])
     
-    usage = """usage: %prog [options] langid"""
+    usage = """usage: %prog [options] langid file"""
     parser = GlobalOptionsParser(usage=usage)
     parser.add_option("-e", "--import_type", dest="import_type", type="int", default=1, 
         help=import_description)
