@@ -61,7 +61,7 @@ class TranslationPage(translate.translate):
         return self.index(viewfilter)
     change_view.exposed = True
     
-    def save_data(self, translation, remarks, status, xmlid, langid, pagenum, audiofile):
+    def save_data(self, translation, remarks, xmlid, langid, pagenum, audiofile, status=1):
         table = langid.replace("-", "_")
         is_valid, msg = self.validate_single_item(translation, xmlid, langid)
         self.error, self.error_id = msg, xmlid

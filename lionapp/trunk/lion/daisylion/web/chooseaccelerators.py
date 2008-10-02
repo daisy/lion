@@ -110,7 +110,7 @@ class ChooseAccelerators(TranslationPage):
         else:
             return False
     
-    def save_data(self, remarks, status, xmlid, langid, keymask, translation, thekeys, audiofile):
+    def save_data(self, remarks, xmlid, langid, keymask, translation, thekeys, audiofile, status=1):
         if thekeys == None or len(thekeys) == 0:
             return ("""Field cannot be empty.  Press the back button to try again.""")
         

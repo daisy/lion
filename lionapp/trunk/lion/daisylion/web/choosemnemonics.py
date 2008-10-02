@@ -176,8 +176,8 @@ class ChooseMnemonics(TranslationPage):
         else:
             return (False, "")
     
-    def save_data(self, translation, remarks, status, xmlid, langid, pagenum, audiofile):
+    def save_data(self, translation, remarks, xmlid, langid, pagenum, audiofile, status=1):
         """override of TranslationPage.save_data so we can adjust the case of the data"""
         data = translation.upper()
-        return TranslationPage.save_data(self, data, remarks, status, xmlid, langid, pagenum, audiofile)
+        return TranslationPage.save_data(self, data, remarks, xmlid, langid, pagenum, audiofile, status)
     save_data.exposed = True
