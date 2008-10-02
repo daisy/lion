@@ -56,7 +56,11 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
     def make_table_name(self, langid):
         """Formalize our way of naming a table based on language ID"""
         return langid.replace("-", "_")
-
+    
+    def make_id_from_table_name(self, table):
+        """get the ID given the table name for a language"""
+        return table.replace("_", "-")
+    
     def get_masterlang_table(self):
         return self.make_table_name(self.masterlang)
     
@@ -65,7 +69,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         and then add it to all other tables too
         This function is ONLY for adding anything with role=STRING"""
         self.add_string(self.masterlang, textstring, stringid)
-        self.__process_changes(langid, None)
+        self.__process_changes(None)
     
     def add_string(self, langid, textstring, stringid):
         """Add a new string to a language table
@@ -86,7 +90,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         results through all other tables"""
         self.remove_item(self.masterlang, stringid)
         removed_ids = stringid,
-        self.__process_changes(langid, removed_ids)
+        self.__process_changes(removed_ids)
     
     def remove_item(self, langid, stringid):
         """Remove a string from a table"""
@@ -103,8 +107,9 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
     def add_accelerator_master(self, textstring, stringid, refid, keys):
         """Add an accelerator to the master language table and propagate the
         changes through all other tables"""
+        print self.masterlang
         self.add_accelerator(self.masterlang, textstring, stringid, refid, keys)
-        self.__process_changes(langid, None)
+        self.__process_changes(None)
     
     def add_accelerator(self, langid, textstring, stringid, refid, keys):
         """Add an accelerator to a table.  
@@ -128,9 +133,14 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
                 "keys": keys, "refid": refid})
         self.trace_msg("Remember to change the next-id value in the AMIS XML file.")
     
+    def change_item_master(self, textstring, stringid):
+        """Change the text of the item at the given id in the master table.
+        Reflect the change in all other tables"""
+        self.change_item(self.masterlang, textstring, stringid)
+        self.__process_changes(None)
+    
     def change_item(self, langid, textstring, stringid):
-        """Change the text of the item at the given ID.  Reflect the change in the other tables.
-        Assumed: the language given by langid is the master language"""
+        """Change the text of the item at the given ID."""
         
         # make sure the item exists
         if self.check_string_id(langid, stringid) == False:
@@ -140,8 +150,30 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         self.execute_query("""UPDATE %(table)s SET textstring="%(textstring)s",\
             textflag=2 WHERE xmlid="%(xmlid)s" """ %\
             {"table": table, "textstring": textstring, "xmlid": stringid})
-        if langid == self.masterlang:
-            self.__process_changes(langid, None)
+    
+    def copy_item(self, stringid, sourcelang, destlang):
+        """Copy an item from one table to another"""
+        if self.check_string_id(sourcelang, stringid) == False:
+            self.die("String with ID %s does not exist in %s" % (stringid, sourcelang))
+        if self.check_string_id(destlang, stringid) != False:
+            self.die("String with ID %s already exists in %s" % (stringid, destlang))
+        
+        sourcetbl = self.make_table_name(sourcelang)
+        desttbl = self.make_table_name(destlang)
+        request = """SELECT textstring, role, mnemonicgroup, target, actualkeys 
+            FROM %s WHERE xmlid="%s" """ % (sourcetbl, stringid)
+        self.execute_query(request)
+        data = self.cursor.fetchone()
+        text, role, mnem, target, keys = data
+        
+        request = """INSERT INTO %(table)s (textstring, xmlid, role, 
+            mnemonicgroup, target, actualkeys, textflag, audioflag)
+            VALUES ("%(text)s", "%(xmlid)s", "%(role)s", "%(mnem)s", 
+            "%(target)s", "%(keys)s", 3, 2)""" % \
+            {"table": desttbl, "text": text, "xmlid": stringid, 
+                "role": role, "mnem": mnem, "target": target, 
+                "keys": keys}
+        self.execute_query(request)
     
     def get_textstring(self, table, strid):
         """Get the text string for the string given by strid"""
@@ -190,13 +222,13 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         if row == None or len(row) == 0: return None
         else: return row[0]
     
-    def __process_changes(self, langid, removed_ids):
+    def __process_changes(self, removed_ids):
         """Process the textflag values (2: changed, 3: new)
         and remove the IDs from all tables"""
-        table = self.make_table_name(langid)
-        # get all the other language tables except the master (langid)
+        table = self.get_masterlang_table()
+        # get all the other language tables except the master
         self.execute_query("SELECT langid FROM languages WHERE langid != '%s'" \
-            % langid)
+            % self.masterlang)
         languages = self.cursor.fetchall()
         # we can't do anything if there are no other languages
         if languages == None: return;

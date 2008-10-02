@@ -68,7 +68,8 @@ class LionDBUserLangMgmtMixIn():
             LEFT JOIN %(shorter)s ON %(shorter)s.xmlid = %(longer)s.xmlid 
             WHERE %(shorter)s.xmlid is NULL""" % {"longer": longer, "shorter": shorter}
         self.execute_query(request)
-        return (longer, shorter, self.cursor.fetchall())
+        return (self.make_id_from_table_name(longer), self.make_id_from_table_name(shorter), 
+            self.cursor.fetchall())
             
     def __add_language_to_database(self, langid, langname, username, password, realname, email):
         """add the new language and new user"""
