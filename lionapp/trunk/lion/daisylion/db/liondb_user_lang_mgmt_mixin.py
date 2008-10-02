@@ -1,4 +1,4 @@
-class LionDBUserMgmtMixIn():
+class LionDBUserLangMgmtMixIn():
     def add_user(self, langid, username, password, realname, email):
         """Add a user for an existing language"""
         if self.check_language(langid) == False:
@@ -47,6 +47,29 @@ class LionDBUserMgmtMixIn():
         self.execute_query(request)        
         return self.cursor.fetchall()
     
+    def list_langtable_diffs(self, langid1, langid2):
+        """see if one table is longer than the other, and return a list of A not in B"""
+        table1 = self.make_table_name(langid1)
+        table2 = self.make_table_name(langid2)
+        
+        request = "SELECT (SELECT count(*) from %s) - (SELECT count(*) from %s) AS diff_rows" % (table1, table2)
+        self.execute_query(request)
+        diff = self.cursor.fetchone()[0]
+        if diff == 0:
+            return None
+        elif diff < 0:
+            longer = table2
+            shorter = table1
+        else:
+            longer = table1
+            shorter = table2
+        
+        request = """SELECT %(longer)s.xmlid, %(longer)s.textstring from %(longer)s 
+            LEFT JOIN %(shorter)s ON %(shorter)s.xmlid = %(longer)s.xmlid 
+            WHERE %(shorter)s.xmlid is NULL""" % {"longer": longer, "shorter": shorter}
+        self.execute_query(request)
+        return (longer, shorter, self.cursor.fetchall())
+            
     def __add_language_to_database(self, langid, langname, username, password, realname, email):
         """add the new language and new user"""
         # add the language to the languages table

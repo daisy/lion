@@ -143,16 +143,12 @@ class ChooseAccelerators(TranslationPage):
         """Look for accelerator key conflicts.  This function checks all accelerators, not just the ones from the form, and
         it ignores Space because that one is used twice (play/pause) and is not allowed to be changed by the user."""
         table = self.user["users.langid"].replace("-", "_")
-        request = "SELECT DISTINCT actualkeys FROM %s WHERE role=\"ACCELERATOR\" and actualkeys != \"Space\"" % table
+        expr1 = "SELECT count(DISTINCT actualkeys) FROM %s WHERE role=\"ACCELERATOR\" and actualkeys != \"Space\"" % table
+        expr2 = "SELECT count(*) FROM %s WHERE role=\"ACCELERATOR\" and actualkeys != \"Space\"" % table
+        request = "SELECT (%s) - (%s) AS diff_rows" % (expr1, expr2)
         self.session.execute_query(request)
-        first_count = self.session.cursor.rowcount
-        request = "SELECT id FROM %s WHERE role=\"ACCELERATOR\" and actualkeys != \"Space\"" % table
-        self.session.execute_query(request)
-        second_count = self.session.cursor.rowcount
-        msg = "Checking for conflicts. Found %d distinct items versus %d total items in the table %s" \
-            % (first_count, second_count, table)
-        self.session.trace_msg(msg)
-        if first_count != second_count:
+        # if there is a difference in the lengths of the two sets, there must be a conflict
+        if self.session.cursor.fetchone()[0] != 0:
             warning_message = "There is a conflict because two commands are using the same keyboard shortcut."
             self.session.warn(warning_message)
             t = warnings.warnings()
@@ -182,7 +178,7 @@ class ChooseAccelerators(TranslationPage):
         return (is_valid, msg)
     
     def check_potential_conflict(self, data, langid, xmlid):
-        """Check if the data would cause a conflict"""
+        """Check if the new single data item would cause a conflict"""
         table = self.session.make_table_name(langid)
         request = """SELECT id FROM %s WHERE role=\"ACCELERATOR\" 
             AND actualkeys = "%s" AND xmlid !="%s"  """ \

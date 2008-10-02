@@ -117,17 +117,14 @@ class ChooseMnemonics(TranslationPage):
         warning_links = []
         for r in rows:
             group_id = r[0]
-            #first get all the items in this mnemonic group
-            request = "SELECT id FROM %s WHERE mnemonicgroup = %d" % (table, group_id)
+            # get the difference between the total items in the mnemonic group and the
+            # distinct strings in the mnemonic group
+            expr1 = "SELECT count(*) FROM %s WHERE mnemonicgroup = %d" % (table, group_id)
+            expr2 = "SELECT count(DISTINCT textstring) FROM %s WHERE mnemonicgroup = %d" % (table, group_id)
+            request = "SELECT (%s) - (%s) AS diff_rows" % (expr1, expr2)
             self.session.execute_query(request)
-            first_set = self.session.cursor.fetchall()
-            #then get all unique textstrings from this mnemonic group.  
-            #this relies on MYSQL being case-insensitive in its comparisons.
-            request = "SELECT DISTINCT textstring FROM %s WHERE mnemonicgroup = %d" % (table, group_id)
-            self.session.execute_query(request)
-            second_set = self.session.cursor.fetchall()
-            #if they returned different numbers of results, then probably a mnemonic was repeated
-            if len(first_set) != len(second_set):
+            # if the two sets are not the same length, there is a conflict somewhere
+            if self.session.cursor.fetchone()[0] != 0:
                 group_link = "group_%d" % group_id
                 warning_links.append(group_link)
         
@@ -158,7 +155,7 @@ class ChooseMnemonics(TranslationPage):
         return (is_valid, msg)
     
     def check_potential_conflict(self, data, xmlid, langid):
-        """Check if the data would cause a conflict"""
+        """Check if the new single data item would cause a conflict"""
         table = self.session.make_table_name(langid)
         request = """SELECT mnemonicgroup FROM %s WHERE xmlid="%s" """ \
             % (table, xmlid)

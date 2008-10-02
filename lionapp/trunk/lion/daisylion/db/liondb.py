@@ -6,10 +6,10 @@ from daisylion.config.config_parser import *
 from liondb_audio_mixin import *
 from liondb_module_mixin import *
 from liondb_output_mixin import *
-from liondb_user_mgmt_mixin import *
+from liondb_user_lang_mgmt_mixin import *
 
 class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
-    LionDBUserMgmtMixIn, DBSession):
+    LionDBUserLangMgmtMixIn, DBSession):
     def __init__(self, configfile, trace=False, app=None):
         # read the settings
         self.config = parse_config(configfile)
@@ -60,32 +60,36 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
     def get_masterlang_table(self):
         return self.make_table_name(self.masterlang)
     
-    # add a single string from the master table
+    def add_string_master(self, textstring, stringid):
+        """add a single string to the master language table, 
+        and then add it to all other tables too
+        This function is ONLY for adding anything with role=STRING"""
+        self.add_string(self.masterlang, textstring, stringid)
+        self.__process_changes(langid, None)
+    
     def add_string(self, langid, textstring, stringid):
-        """Add a new string to all tables
-            langid = master table
-            stringid = xmlid for the string
-            This function is ONLY for adding anything with role=STRING"""
-
+        """Add a new string to a language table
+        This function is ONLY for adding anything with role=STRING"""
         # make sure the stringid doesn't already exist
         if self.check_string_id(langid, stringid) != False:
             self.die("String with ID %s already exists." % stringid)
         
         table = self.make_table_name(langid)
-
-        # add the string to the master table
         self.execute_query("""INSERT INTO %(table)s (textstring, textflag, \
             audioflag, xmlid, role) VALUES ("%(textstring)s", 3, \
             2, "%(xmlid)s", "STRING")""" % \
             {"table": table, "textstring": textstring, "xmlid": stringid})
-        self.trace_msg("Remember to change the next-id value in the AMIS XML file.")
-        if langid == self.masterlang:
-            self.__process_changes(langid, None)
-
+        self.trace_msg("Remember to change the next-id value in the AMIS XML file.")    
+    
+    def remove_item_master(self, stringid):
+        """Remove an item from the master language table and propagate the 
+        results through all other tables"""
+        self.remove_item(self.masterlang, stringid)
+        removed_ids = stringid,
+        self.__process_changes(langid, removed_ids)
+    
     def remove_item(self, langid, stringid):
-        """Remove a string from all the tables
-            langid = master table
-            stringid = xmlid for the string"""
+        """Remove a string from a table"""
         # make sure the stringid exists
         if self.check_string_id(langid, stringid) == False:
             self.die("String with ID %s does not exist." % stringid)
@@ -94,13 +98,16 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         # delete it!
         self.execute_query("""DELETE FROM %(table)s \
             WHERE xmlid="%(xmlid)s" """ % \
-            {"table": table, "xmlid": stringid})
-
-        if langid == self.masterlang:
-            self.__process_changes(langid, removed_ids)
-
+            {"table": table, "xmlid": stringid})  
+    
+    def add_accelerator_master(self, textstring, stringid, refid, keys):
+        """Add an accelerator to the master language table and propagate the
+        changes through all other tables"""
+        self.add_accelerator(self.masterlang, textstring, stringid, refid, keys)
+        self.__process_changes(langid, None)
+    
     def add_accelerator(self, langid, textstring, stringid, refid, keys):
-        """Add an accelerator to all language tables.  
+        """Add an accelerator to a table.  
         textstring = the name of the keys (e.g. Space/Espacio)
         stringid = the XMLID value (even if it's not in the XML file, you need
         to give it a unique value as if it were)
@@ -120,9 +127,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
             {"table": table, "textstring": textstring, "xmlid": stringid,
                 "keys": keys, "refid": refid})
         self.trace_msg("Remember to change the next-id value in the AMIS XML file.")
-        if langid == self.masterlang:
-            self.__process_changes(langid, None)
-
+    
     def change_item(self, langid, textstring, stringid):
         """Change the text of the item at the given ID.  Reflect the change in the other tables.
         Assumed: the language given by langid is the master language"""
