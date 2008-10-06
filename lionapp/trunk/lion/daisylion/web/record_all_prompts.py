@@ -1,10 +1,7 @@
 import os
-import MySQLdb
-import util
 import daisylion.db.liondb
+import util
 from templates import batchofprompts, error
-import cherrypy
-from cherrypy.lib import static
 
 class RecordAllPrompts(batchofprompts.batchofprompts):
     user = None
@@ -31,8 +28,14 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
     
     def generate_prompts_as_xhtml(self):
         """Generate an XHTML file of all the prompts and offer it to the user for download"""
-        f = self.session.all_strings(self.user["users.langid"])
-        return f
+        strings_xml = self.session.all_strings(self.user["users.langid"])
+        tmpfile = "/tmp/" + self.user["users.langid"] + "-strings"
+        file = open(tmpfile, "w")
+        file.write(strings_xml)
+        file.close()
+        strings_xhtml = os.popen("xsltproc obi_xhtml.xslt %s" % tmpfile)
+        return strings_xhtml
+        
     generate_prompts_as_xhtml.exposed = True
     
     def upload_zipfile_of_prompts(self, zipfile):
