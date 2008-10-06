@@ -33,7 +33,8 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
         file = open(tmpfile, "w")
         file.write(strings_xml)
         file.close()
-        ret = os.popen("xsltproc /Users/marisa/Devel/lion/lionapp/trunk/lion/daisylion/web/xslt/obi_xhtml.xslt %s" % tmpfile)
+        xslt = "http://" + self.host + ":" + str(self.port) + "/xslt/obi_xhtml.xslt"
+        ret = os.popen("xsltproc %s %s" % (xslt, tmpfile))
         strings_xhtml = ""
         for i in ret:
             strings_xhtml += i
