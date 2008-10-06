@@ -9,13 +9,13 @@ def main():
     parser.add_option("-d", "--all", dest="all", default="False", action="store_true",
         help="Output all strings, including keyboard-related items.")
     (options, args) = parser.parse_args()
+    
     parser.check_args(1, args)
     
     session = LionDB(options.config, options.trace, options.app)    
     langid = args[0]
     if options.all == True:
-        if parser.safety_check("for fun"):
-            print session.all_strings(langid)
+        print session.all_strings(langid)
     else:
         print session.textstrings(langid)
 

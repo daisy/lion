@@ -107,6 +107,8 @@ def main():
         'tools.encode.encoding':'utf8'})
     conf = {'/style': {'tools.staticdir.on': True,
                 'tools.staticdir.dir': os.path.join(current_dir,'style')}}
+    conf = {'/xslt': {'tools.staticdir.on': True,
+                'tools.staticdir.dir': os.path.join(current_dir, 'xslt')}}
     cherrypy.quickstart(root, '/', config=conf)
 
 
