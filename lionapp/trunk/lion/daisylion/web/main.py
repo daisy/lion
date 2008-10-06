@@ -51,6 +51,7 @@ class MainMenu(mainmenu.mainmenu):
     
     def __init__(self, session):
         self.session = session
+        self.application = self.session.config["main"]["target_app"]
         self.host = self.session.config["main"]["webhost"]
         self.port = self.session.config["main"]["webport"]
         mainmenu.mainmenu.__init__(self)
@@ -65,6 +66,9 @@ class MainMenu(mainmenu.mainmenu):
             self.user = user["users.realname"]
             self.language = user["languages.langname"]
             self.translate_for_keyboard = user["languages.translate_for_keyboard"]
+            self.session.execute_query("""SELECT addldocsuri, addldocsdesc FROM
+                application WHERE name="%s" """ % self.application)
+            self.addldocsuri, self.addldocsdesc = self.session.cursor.fetchone()
             return self.respond()
     index.exposed = True
 

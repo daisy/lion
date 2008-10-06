@@ -3,6 +3,8 @@ Template variables:
 	user = user's real name
 	language = language name
 	actions = list of menu links
+    addldocsuri = URI for additional documents download
+    addldocsdesc = description of the additional documents
 *#
 
 #from xhtml import xhtml
@@ -24,9 +26,8 @@ False
 	<li><a href="../ChooseMnemonics?view=all">Choose mnemonics</a> (single-letter shortcuts)</li>
 	#end if
 	<li><a href="../RecordAllPrompts">Record your prompts with Obi and upload the data</a></li>
-	## this needs to be more generic
-	<li><a href="http://daisy-trac.cvsdude.com/amis/browser/amisapp/trunk/amis/src/DefaultLangpack/amis3_help_unrecorded.zip?format=raw">Download additional documents for translation</a></li>
-	
-	
+    #if $addldocsuri != ""
+	<li><a href="$addldocsuri">Download additional documents for translation</a> ($addldocsdesc)</li>
+    #end if
 </ul>
 #end def
