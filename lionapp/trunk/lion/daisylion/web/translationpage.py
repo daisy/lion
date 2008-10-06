@@ -25,6 +25,7 @@ class TranslationPage(translate.translate):
     
     def __init__(self, session):
         self.session = session
+        self.application = self.session.config["main"]["target_app"]
         self.host = self.session.config["main"]["webhost"]
         self.port = self.session.config["main"]["webport"]
         self.masterlang = self.session.config["main"]["masterlang"]
@@ -205,10 +206,16 @@ class TranslationPage(translate.translate):
         else:
             # get the full path to the files' permanent directory.  we need it because audiouris from language
             # tables are relative
-            request = """SELECT permanenturi, permanenturiparams FROM languages 
-                WHERE langid="%s" """ % self.user["users.langid"]
+            # And now this is split in two: the directory/param part is from
+            # the application table, plus a language-specific directory part.
+            request = """SELECT permanenturi, permanenturiparams FROM
+            application WHERE name="%s" """ % self.application
             self.session.execute_query(request)
             permanenturi, permanenturiparams = self.session.cursor.fetchone()
+            request = """SELECT audiodir FROM languages WHERE langid="%s" """ %\
+                self.user["users.langid"]
+            self.session.execute_query(request)
+            audiodir, = self.session.cursor.fetchone()
             # now select the audiouri itself
             request = """SELECT audiouri FROM %s WHERE xmlid="%s" """ % \
                 (self.session.make_table_name(langid), xmlid)
@@ -220,7 +227,9 @@ class TranslationPage(translate.translate):
             	    permanenturi += "/"
                 if audiouri.startswith("./"):
             	    audiouri = audiouri[2:]
-                audiouri = permanenturi + audiouri + permanenturiparams
+                if audiodir != "" and not audiodir.endswith("/"):
+                    audiodir += "/"
+                audiouri = permanenturi + audiodir + audiouri + permanenturiparams
         return audiouri
     
     def make_table(self, view, page_number):
