@@ -7,7 +7,7 @@ class LionDBOutputMixIn():
             where (role="STRING" or role="MENUITEM" or role="DIALOG" or \
             role="CONTROL") and translate=1""")
         strings = self.cursor.fetchall()
-        print self.__stringlist_to_xml(strings, langid)
+        return self.__stringlist_to_xml(strings, langid)
     
     def all_strings(self, langid):
         """Export all strings to stdout"""
@@ -15,7 +15,7 @@ class LionDBOutputMixIn():
         table = self.make_table_name(langid)
         self.execute_query("SELECT textstring FROM " + table)
         strings = self.cursor.fetchall()
-        print self.__stringlist_to_xml(strings, langid)
+        return self.__stringlist_to_xml(strings, langid)
     
     def __stringlist_to_xml(self, results, langid):
         """Get all strings that have the given roles"""

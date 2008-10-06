@@ -1,0 +1,41 @@
+import os
+import MySQLdb
+import util
+import daisylion.db.liondb
+from templates import batchofprompts, error
+import cherrypy
+from cherrypy.lib import static
+
+class RecordAllPrompts(batchofprompts.batchofprompts):
+    user = None
+    session = None
+    
+    def __init__(self, session):
+        self.session = session
+        self.host = self.session.config["main"]["webhost"]
+        self.port = self.session.config["main"]["webport"]
+        self.error = ""
+        self.error_id = ""
+        self.warnings = ""
+        batchofprompts.batchofprompts.__init__(self)
+    
+    def index(self):
+        """Show the page"""
+        user = util.get_user(self.session)
+        if user == None:
+            return error.error().respond()
+        self.user = user
+        self.language = user["languages.langname"]
+        return self.respond()
+    index.exposed = True
+    
+    def generate_prompts_as_xhtml(self):
+        """Generate an XHTML file of all the prompts and offer it to the user for download"""
+        f = self.session.all_strings(self.user["users.langid"])
+        return f
+    generate_prompts_as_xhtml.exposed = True
+    
+    def upload_zipfile_of_prompts(self, zipfile):
+        """Accept a zipfile of the prompts + ncx file."""
+        return """<h1>O HAI!</h1> <p><a href="../MainMenu">Back to the main menu</a></p>"""
+    upload_zipfile_of_prompts.exposed = True

@@ -9,6 +9,7 @@ import util
 import translatestrings
 import choosemnemonics
 import chooseaccelerators
+import record_all_prompts
 from templates import login, mainmenu, error, xhtml
 import daisylion.db.liondb
 
@@ -90,6 +91,7 @@ def main():
     root.TranslateStrings = translatestrings.TranslateStrings(session)
     root.ChooseMnemonics = choosemnemonics.ChooseMnemonics(session)
     root.ChooseAccelerators = chooseaccelerators.ChooseAccelerators(session)
+    root.RecordAllPrompts = record_all_prompts.RecordAllPrompts(session)
     root.style = "./style/"
     app = cherrypy.tree.mount(root, script_name='/')
     

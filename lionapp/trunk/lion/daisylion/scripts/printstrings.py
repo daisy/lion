@@ -15,8 +15,8 @@ def main():
     langid = args[0]
     if options.all == True:
         if parser.safety_check("for fun"):
-            session.all_strings(langid)
+            print session.all_strings(langid)
     else:
-        session.textstrings(langid)
+        print session.textstrings(langid)
 
 if __name__=="__main__": main()
