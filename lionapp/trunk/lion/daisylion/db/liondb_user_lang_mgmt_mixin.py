@@ -84,8 +84,7 @@ class LionDBUserLangMgmtMixIn():
         self.execute_query("CREATE TABLE %s SELECT * from %s" % (table, self.get_masterlang_table()))
 
         # flag all "TODO" and clear some fields
-        self.execute_query("UPDATE %s SET textflag=3, audioflag=2, \
-            audiodata=NULL, audiouri=NULL, remarks=NULL" % table)
+        self.execute_query("UPDATE %s SET textflag=3, audiouri=NULL, remarks=NULL" % table)
 
     def __remove_language_from_database(self, langid):
         """remove the language from the database"""

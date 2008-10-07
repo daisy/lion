@@ -59,7 +59,7 @@ class LionDBAudioMixIn():
             audio_src = label.getElementsByTagNameNS(
                 "http://www.daisy.org/z3986/2005/ncx/", "audio")[0].getAttribute("src")
             if string[1] == text and audio_src != "":
-                self.execute_query("""UPDATE %s SET audiouri="%s", audioflag=1 WHERE id=%d""" %
+                self.execute_query("""UPDATE %s SET audiouri="%s" WHERE id=%d""" %
                         (self.make_table_name(langid), audio_src, string[0]))
             else:
                 self.warn("""No match between db string="%s" and ncx label="%s"?!""" %

@@ -80,8 +80,8 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         
         table = self.make_table_name(langid)
         self.execute_query("""INSERT INTO %(table)s (textstring, textflag, \
-            audioflag, xmlid, role) VALUES ("%(textstring)s", 3, \
-            2, "%(xmlid)s", "STRING")""" % \
+            xmlid, role) VALUES ("%(textstring)s", 3, \
+            "%(xmlid)s", "STRING")""" % \
             {"table": table, "textstring": textstring, "xmlid": stringid})
         self.trace_msg("Remember to change the next-id value in the AMIS XML file.")    
     
@@ -126,8 +126,8 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
 
         # add the string to the master table
         self.execute_query("""INSERT INTO %(table)s (textstring, textflag, \
-            audioflag, xmlid, actualkeys, target, role) VALUES \
-            ("%(textstring)s", 3, 2, "%(xmlid)s", "%(keys)s", "%(refid)s", \
+            xmlid, actualkeys, target, role) VALUES \
+            ("%(textstring)s", 3, "%(xmlid)s", "%(keys)s", "%(refid)s", \
             "ACCELERATOR")""" % \
             {"table": table, "textstring": textstring, "xmlid": stringid,
                 "keys": keys, "refid": refid})
@@ -167,9 +167,9 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         text, role, mnem, target, keys = data
         
         request = """INSERT INTO %(table)s (textstring, xmlid, role, 
-            mnemonicgroup, target, actualkeys, textflag, audioflag)
+            mnemonicgroup, target, actualkeys, textflag)
             VALUES ("%(text)s", "%(xmlid)s", "%(role)s", "%(mnem)s", 
-            "%(target)s", "%(keys)s", 3, 2)""" % \
+            "%(target)s", "%(keys)s", 3)""" % \
             {"table": desttbl, "text": text, "xmlid": stringid, 
                 "role": role, "mnem": mnem, "target": target, 
                 "keys": keys}
@@ -255,7 +255,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
             langtable = self.make_table_name(lang[0])
             if changed != None:
                 for row in changed:
-                    self.execute_query("UPDATE %(table)s SET textflag=2, audioflag=2 \
+                    self.execute_query("UPDATE %(table)s SET textflag=2\
                         WHERE xmlid='%(xmlid)s'" % \
                         {"table": langtable, "xmlid": row[0]})
             if newstuff != None:
@@ -263,9 +263,9 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
                     text, xmlid, role, mnem, target, keys = row
                     self.execute_query("""INSERT INTO %(table)s (textstring, \
                         xmlid, role, mnemonicgroup, target, actualkeys, \
-                        textflag, audioflag) VALUES ("%(text)s", "%(xmlid)s", \
+                        textflag) VALUES ("%(text)s", "%(xmlid)s", \
                         "%(role)s", "%(mnem)s", "%(target)s", "%(keys)s", \
-                        3, 2)""" % \
+                        3)""" % \
                         {"table": langtable, "text": text, "xmlid": xmlid, \
                             "role": role, "mnem": mnem, "target": target, \
                             "keys": keys})

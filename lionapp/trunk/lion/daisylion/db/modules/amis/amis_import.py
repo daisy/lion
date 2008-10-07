@@ -26,17 +26,17 @@ class AmisImport():
         for elem in self.doc.getElementsByTagName("text"):
             data = self.doc.parse_text_element(elem)
             if data:
-                textstring, audiouri, xmlid, textflag, audioflag = data
+                textstring, audiouri, xmlid, textflag = data
                 # keys = the actual keys associated with a command
                 keys = elem.parentNode.tagName == "accelerator" and \
                     elem.parentNode.getAttribute("keys") or "NULL"
         
             self.session.execute_query(
-            """INSERT INTO %(table)s (textstring, textflag, audioflag, audiouri, xmlid,
-            actualkeys) VALUES ("%(textstring)s", %(textflag)d, %(audioflag)d,
+            """INSERT INTO %(table)s (textstring, textflag, audiouri, xmlid,
+            actualkeys) VALUES ("%(textstring)s", %(textflag)d,
             "%(audiouri)s", "%(xmlid)s", "%(keys)s")""" % \
             {"table": self.table, "textstring": textstring, "textflag": textflag,
-                "audioflag": audioflag, "audiouri": audiouri, "xmlid": xmlid,
+                "audiouri": audiouri, "xmlid": xmlid,
                 "keys": keys})
     
         # specify relationships 
@@ -58,13 +58,13 @@ class AmisImport():
         for elem in self.doc.getElementsByTagName("text"):
             data = self.doc.parse_text_element(elem)
             if data:
-                textstring, audiouri, xmlid, textflag, audioflag = data
+                textstring, audiouri, xmlid, textflag = data
             
             self.session.execute_query(
             """UPDATE %(table)s SET textstring="%(textstring)s", textflag=%(textflag)d, 
-            audioflag=%(audioflag)d, audiouri="%(audiouri)s" WHERE xmlid="%(xmlid)s" """ % \
+            audiouri="%(audiouri)s" WHERE xmlid="%(xmlid)s" """ % \
             {"table": self.table, "textstring": textstring, "textflag": textflag,
-            "audioflag": audioflag, "audiouri": audiouri, "xmlid": xmlid})
+            "audiouri": audiouri, "xmlid": xmlid})
     
     def import_xml_audio_only(self, filepath, langid):
         """Import the audio URIs from the XML file"""
@@ -80,12 +80,11 @@ class AmisImport():
         for elem in self.doc.getElementsByTagName("text"):
             data = self.doc.parse_text_element(elem)
             if data:
-                textstring, audiouri, xmlid, textflag, audioflag = data
+                textstring, audiouri, xmlid, textflag = data
         
             self.session.execute_query(
-            """UPDATE %(table)s SET audioflag=%(audioflag)d, 
-            audiouri="%(audiouri)s" WHERE xmlid="%(xmlid)s" """ % \
-            {"table": self.table, "audioflag": audioflag, "audiouri": audiouri, 
+            """UPDATE %(table)s SET audiouri="%(audiouri)s" WHERE xmlid="%(xmlid)s" """ % \
+            {"table": self.table, "audiouri": audiouri, 
             "xmlid": xmlid})
         
     def __set_roles(self):
