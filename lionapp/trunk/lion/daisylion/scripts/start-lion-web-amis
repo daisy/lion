@@ -1,8 +1,13 @@
 #!/bin/bash
 # start the lion web server
 
-if [ -z "$1" ]; then
-    echo "usage:  [local|web|combo]"
+if [ -z "$1" ];then
+    echo "usage: appname [local|web|combo]"
+    exit
+fi
+
+if [ -z "$2" ];then
+    echo "usage: appname [local|web|combo]"
     exit
 fi
 
@@ -18,7 +23,7 @@ fi
 THIS_DIR=$(dirname $THIS_FILE_PATH)
 
 # generate the configuration file for the option
-python "$THIS_DIR"/../config/generate_config.py --type=$1 > "$THIS_DIR"/../config/lion.cfg
+python "$THIS_DIR"/../config/generate_config.py $1 $2 > "$THIS_DIR"/../config/lion.cfg
 
 # compile the template files
 TEMPLATES_DIR="$THIS_DIR"/../web/templates
