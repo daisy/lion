@@ -222,6 +222,15 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         if row == None or len(row) == 0: return None
         else: return row[0]
     
+    def set_remarks(self, langid, textstring, stringid):
+        """Add a remark for a string"""
+        if self.check_string_id(langid, stringid) == False:
+            self.die("String %s does not exist for language %s" % (stringid, langid))
+        table = self.make_table_name(langid)
+        request = """UPDATE %s SET remarks="%s" WHERE xmlid="%s" """ \
+            % (table, textstring, stringid)
+        self.execute_query(request)
+    
     def __process_changes(self, removed_ids):
         """Process the textflag values (2: changed, 3: new)
         and remove the IDs from all tables"""

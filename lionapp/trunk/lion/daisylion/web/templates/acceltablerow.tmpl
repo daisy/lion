@@ -31,19 +31,28 @@ Identical to tablerow except for the dataentry part.This should really be derive
 #end if
 <tr>
 <form action="save_data" method="POST" enctype="multipart/form-data">
-<td width="30%%">$ref_string</td>
-<td id="$xmlid" >
+<td width="30%%">
+	<p>$ref_string</p>
+	#if $our_remarks != None and $our_remarks != "":
+		<div class="comments">
+			<p class="instructions">Our remarks:</p>
+			<p>$our_remarks</p>
+		</div>
+	#end if
+</td>
+<td id="$xmlid">
 	#if $error != None and $error != "":
 		<p class="error">$error</p>
 	#end if
-    <p class="comments">$our_remarks</p>
-    
+	
 	## start of dataentry area
 	## this looks like KEYMASK + small textbox for entering a letter 
-	#if len($thekeys) > 0
-	$instructions 
-	#end if
-	Remember to <em>Save</em>.<br/><br/>
+	<p class="instructions">
+		#if len($thekeys) > 0
+			$instructions 
+		#end if
+		Remember to <em>Save</em>.
+	</p>
 	Shortcut: <span class="$classattr">$keymask</span>
 	#if len($thekeys) > 0
 	<textarea id="keys_$xmlid" name="thekeys" cols="5" rows="1" class="$classattr">$thekeys</textarea>
@@ -55,7 +64,7 @@ Identical to tablerow except for the dataentry part.This should really be derive
 	<input type="hidden" name="keymask" value="$keymask"/>
 	## end of dataentry area
 	
-	<p class="comments">Remarks from you:</p>
+	<p>Remarks from you:</p>
 	<textarea class="remarks" name="remarks" cols="64" rows="2">$remarks</textarea>
 </td>
 #if $show_audio_upload == True:

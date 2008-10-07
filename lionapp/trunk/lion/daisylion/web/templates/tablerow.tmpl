@@ -30,16 +30,24 @@ Template variables:
 #end if
 <tr>
 <form action="save_data" method="POST" enctype="multipart/form-data">
-<td>$xmlid</td>
-<td width="30%%">$ref_string</td>
+<td class="xmlid">$xmlid</td>
+<td width="30%%">
+	<p>$ref_string</p>
+	#if $our_remarks != None and $our_remarks != "":
+		<div class="comments">
+			<p class="instructions">Our remarks:</p>
+			<p>$our_remarks</p>
+		</div>
+	#end if
+</td>
 <td id="$xmlid" >
 	#if $error != None and $error != "":
 		<p class="error">$error</p>
 	#end if
-    <p class="comments">$our_remarks</p>
-    $instructions  Remember to <em>Save</em>.<br/>
+    
+	<p class="instructions">$instructions  Remember to <em>Save</em>.</p>
 	<textarea name="translation" cols="$width" rows="$height" class="$classattr">$textstring</textarea>
-    <p class="comments">Remarks from you:</p>
+    <p>Remarks from you:</p>
 	<textarea class="remarks" name="remarks" cols="64" rows="2">$remarks</textarea>
 </td>
 #if $self.show_audio_upload == True:

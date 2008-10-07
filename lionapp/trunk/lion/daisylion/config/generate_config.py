@@ -18,7 +18,7 @@ audio_dir_prefix=./audio/
 DYNAMIC_APP_SECTION = {
 "amis": 
 """show_audio_upload=true
-dbname=lionutf8
+dbname=amislion
 target_app=amis
 """,
 
