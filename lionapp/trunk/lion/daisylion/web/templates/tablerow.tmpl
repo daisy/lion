@@ -10,6 +10,7 @@ Template variables:
 	height = the height of the text box for the translation
 	langid = the id of the language being translated into
 	error = error with data input
+	show_audio_upload = whether to show the audio upload field
 *#
 #def $pagenum
 0
@@ -41,6 +42,7 @@ Template variables:
     <p class="comments">Remarks from you:</p>
 	<textarea class="remarks" name="remarks" cols="64" rows="2">$remarks</textarea>
 </td>
+#if $self.show_audio_upload == True:
 <td>
 	#if $audiouri != None and len($audiouri) > 0
 	 	<p><a href="$audiouri">Audio (click to play)</a></p>
@@ -48,6 +50,10 @@ Template variables:
     Choose an MP3 file: 
 	<input type="file" name="audiofile" value="Browse"/>
 </td>
+#else:
+    ## a dummy audiofile so as not to alter the function signature
+	<input type="hidden" name="audiofile" value=""/>
+#end if
 <td width="100px">
 	<p>Status:</p>
 	<input name="status" type="radio" $ok value="1"/>

@@ -73,7 +73,7 @@ class TranslationPage(translate.translate):
                 {"table": table, "status": status, "translation": MySQLdb.escape_string(translation), \
                     "remarks": MySQLdb.escape_string(remarks), "xmlid": xmlid}
             self.session.execute_query(request)
-            if audiofile != None and audiofile.filename != "": 
+            if audiofile != None and audiofile != "" and audiofile.filename != "": 
                 self.save_audio(audiofile, langid, xmlid)
         self.pagenum = int(pagenum)
         return self.index(self.last_view, xmlid)

@@ -25,8 +25,10 @@ False
 	<li><a href="../ChooseAccelerators?view=all">Assign keyboard shortcuts</a></li>
 	<li><a href="../ChooseMnemonics?view=all">Choose mnemonics</a> (single-letter shortcuts)</li>
 	#end if
-	<li><a href="../RecordAllPrompts">Record your prompts with Obi and upload the data</a></li>
-    #if $addldocsuri != ""
+	#if $show_audio_upload == True:
+		<li><a href="../RecordAllPrompts">Record your prompts with Obi and upload the data</a></li>
+    #end if
+	#if $addldocsuri != None and $addldocsuri != ""
 	<li><a href="$addldocsuri">Download additional documents for translation</a> ($addldocsdesc)</li>
     #end if
 </ul>

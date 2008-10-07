@@ -34,12 +34,10 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
         file.write(strings_xml)
         file.close()
         xslt = "http://" + self.host + ":" + str(self.port) + "/xslt/obi_xhtml.xslt"
-        ret = os.popen("xsltproc %s %s" % (xslt, tmpfile))
         strings_xhtml = ""
-        for i in ret:
+        for i in os.popen("xsltproc %s %s" % (xslt, tmpfile)):
             strings_xhtml += i
         return strings_xhtml
-        
     generate_prompts_as_xhtml.exposed = True
     
     def upload_zipfile_of_prompts(self, zipfile):

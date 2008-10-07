@@ -11,7 +11,7 @@ STATIC_MAIN_SECTION = """
 [main]
 masterlang=eng-US
 trace=false
-show_audio_upload=true
+show_audio_upload=false
 dbname=lionutf8
 webport=8080
 audio_dir_prefix=./audio/

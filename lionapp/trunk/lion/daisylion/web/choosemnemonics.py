@@ -76,6 +76,7 @@ class ChooseMnemonics(TranslationPage):
                     t.height = self.textbox_rows
                     t.langid = self.user["users.langid"]
                     t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
+                    t.show_audio_upload = self.show_audio_upload
                     if self.error != "" and self.error_id == data["xmlid"]:
             	        t.error = self.error
             	    else:

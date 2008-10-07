@@ -59,6 +59,7 @@ class ChooseAccelerators(TranslationPage):
             t.instructions = self.instructions
             t.langid = self.user["users.langid"]
             t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
+            t.show_audio_upload = self.show_audio_upload
             if self.error != "" and self.error_id == data["xmlid"]:
     	        t.error = self.error
     	    else:
@@ -134,7 +135,7 @@ class ChooseAccelerators(TranslationPage):
                         "xmlid": xmlid, "textstring": MySQLdb.escape_string(translation)}
             self.session.execute_query(request)
             self.show_no_conflicts = False
-            if audiofile != None and audiofile.filename != "": 
+            if audiofile != None and audiofile !="" and audiofile.filename != "": 
                 self.save_audio(audiofile, langid, xmlid)
         return self.index(self.last_view, xmlid)
     save_data.exposed = True

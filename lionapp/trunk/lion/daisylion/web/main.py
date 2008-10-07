@@ -54,6 +54,7 @@ class MainMenu(mainmenu.mainmenu):
         self.application = self.session.config["main"]["target_app"]
         self.host = self.session.config["main"]["webhost"]
         self.port = self.session.config["main"]["webport"]
+        self.show_audio_upload = self.session.config["main"]["show_audio_upload"]
         mainmenu.mainmenu.__init__(self)
     
     def index(self):
