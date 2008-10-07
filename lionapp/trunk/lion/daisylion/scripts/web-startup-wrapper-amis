@@ -1,2 +1,3 @@
 echo "Starting the Lion (web configuration)"
+rm -f nohup.out
 nohup ./start-lion-website amis web &

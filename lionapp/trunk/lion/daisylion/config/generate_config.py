@@ -39,7 +39,7 @@ temp_audio_uri=file:///tmp/daisylionaudio
 """,
 
 "web": """# site and db are on gandi (92.243.13.151)
-dbhost=92.243.13.151
+dbhost=localhost
 webhost=92.243.13.151
 webport=8080
 temp_audio_dir=/srv/d_daisylion/www/www.example.net/htdocs/daisylionaudio
