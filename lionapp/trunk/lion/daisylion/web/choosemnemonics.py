@@ -12,7 +12,7 @@ class ChooseMnemonics(TranslationPage):
         "STRING": "general string",
         "MENUITEM": "menu item",
         "ACCELERATOR": "keyboard shortcut",
-        "MNEMONIC": "letter (underlined) to press to activate the item"}
+        "MNEMONIC": "letter (underlined) to press to activate the command"}
     
     def __init__(self, session):
         self.section = "mnemonics"
@@ -22,6 +22,7 @@ class ChooseMnemonics(TranslationPage):
         self.about = "This is the mnemonics page.  Mnemonics are shortcut \
             letters in a menu item or button.  Each item in a group must have \
             a unique mnemonic."
+        self.url = "ChooseMnemonics"
         TranslationPage.__init__(self, session)    
 
     def make_table(self, view_filter, pagenum):
@@ -180,5 +181,5 @@ class ChooseMnemonics(TranslationPage):
     def save_data(self, translation, remarks, xmlid, langid, pagenum, audiofile, status=1):
         """override of TranslationPage.save_data so we can adjust the case of the data"""
         data = translation.upper()
-        return TranslationPage.save_data(self, data, remarks, xmlid, langid, pagenum, audiofile, status)
+        TranslationPage.save_data(self, data, remarks, xmlid, langid, pagenum, audiofile, status)
     save_data.exposed = True

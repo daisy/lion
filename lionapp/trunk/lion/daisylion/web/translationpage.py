@@ -22,6 +22,7 @@ class TranslationPage(translate.translate):
     total_num_items = 0
     session = None
     pagenum = 0
+    url = None
     
     def __init__(self, session):
         self.session = session
@@ -38,6 +39,7 @@ class TranslationPage(translate.translate):
         self.error = ""
         self.error_id = ""
         self.warnings = ""
+        self.url_string = "../%s?view=%s&id_anchor=%s"
         translate.translate.__init__(self)
     
     def index(self, view, id_anchor = ""):
@@ -59,7 +61,8 @@ class TranslationPage(translate.translate):
     index.exposed = True
     
     def change_view(self, viewfilter):
-        return self.index(viewfilter)
+        self.last_view = viewfilter
+        self.redirect()
     change_view.exposed = True
     
     def save_data(self, translation, remarks, xmlid, langid, pagenum, audiofile, status=1):
@@ -76,7 +79,7 @@ class TranslationPage(translate.translate):
             if audiofile != None and audiofile != "" and audiofile.filename != "": 
                 self.save_audio(audiofile, langid, xmlid)
         self.pagenum = int(pagenum)
-        return self.index(self.last_view, xmlid)
+        self.redirect(xmlid)
     save_data.exposed = True
     
     def save_audio(self, infile, langid, xmlid):
@@ -164,7 +167,7 @@ class TranslationPage(translate.translate):
         if self.pagenum + 1 >= 0 and self.pagenum + 1 < self.get_total_num_pages():
             self.pagenum += 1        
             self.session.trace_msg("Going to the next page (%d)" % self.pagenum)
-            return self.index(self.last_view)
+            self.redirect()
         else:
             return None
     next_page.exposed = True
@@ -173,7 +176,7 @@ class TranslationPage(translate.translate):
         if self.pagenum - 1 >= 0 and self.pagenum - 1 < self.get_total_num_pages():
             self.pagenum -= 1        
             self.session.trace_msg("Going to the previous page (%d)" % self.pagenum)
-            return self.index(self.last_view)
+            self.redirect()
         else:
             return None
     previous_page.exposed = True
@@ -182,7 +185,7 @@ class TranslationPage(translate.translate):
         self.session.trace_msg("Change page to %d" % int(pagenum))
         if int(pagenum) >= 0 and int(pagenum) < self.get_total_num_pages():
             self.pagenum = int(pagenum)        
-            return self.index(self.last_view)
+            self.redirect()
         else:
             return None
     change_page.exposed = True
@@ -249,4 +252,5 @@ class TranslationPage(translate.translate):
         It returns a string"""
         return "BASE CLASS"
 
-    
+    def redirect(self, id=""):
+        raise cherrypy.InternalRedirect(self.url_string % (self.url, self.last_view, id))

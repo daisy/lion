@@ -17,6 +17,7 @@ class ChooseAccelerators(TranslationPage):
             You may use A-Z (U.S. Ascii characters), plus (+), minus (-), Up, Down, Left, Right, or Esc \
             for your custom shortcuts."
         self.check_conflict = True
+        self.url = "ChooseAccelerators"
         TranslationPage.__init__(self, session)    
 
     def make_table(self, view_filter, pagenum):
@@ -137,7 +138,7 @@ class ChooseAccelerators(TranslationPage):
             self.show_no_conflicts = False
             if audiofile != None and audiofile !="" and audiofile.filename != "": 
                 self.save_audio(audiofile, langid, xmlid)
-        return self.index(self.last_view, xmlid)
+        self.redirect(xmlid)
     save_data.exposed = True
     
     def get_all_warnings(self):

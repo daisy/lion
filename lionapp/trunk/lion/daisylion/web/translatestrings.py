@@ -15,6 +15,7 @@ class TranslateStrings(TranslationPage):
         self.check_conflict = False
         self.warning_message = None
         self.usepages = True
+        self.url = "TranslateStrings"
         TranslationPage.__init__(self, session)
     
     def make_table(self, view_filter, pagenum):
