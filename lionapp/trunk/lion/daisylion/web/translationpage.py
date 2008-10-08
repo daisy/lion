@@ -5,6 +5,7 @@ import daisylion.db.liondb
 from templates import translate, error
 import cherrypy
 from cherrypy.lib import static
+import keys
 
 VIEW_DESCRIPTIONS = {"all": "all items", 
     "newtodo": "all items marked new or to-do", 
@@ -30,7 +31,7 @@ class TranslationPage(translate.translate):
         self.host = self.session.config["main"]["webhost"]
         self.port = self.session.config["main"]["webport"]
         self.masterlang = self.session.config["main"]["masterlang"]
-        self.show_audio_upload = self.session.config["main"]["show_audio_upload"]
+        self.audio_support = self.session.config["main"]["audio_support"]
         session.execute_query("""SELECT langname from languages WHERE langid="%s" """ \
             % self.masterlang)
         self.masterlangname = session.cursor.fetchone()[0]
@@ -40,6 +41,7 @@ class TranslationPage(translate.translate):
         self.error_id = ""
         self.warnings = ""
         self.url_string = "../%s?view=%s&id_anchor=%s"
+        
         translate.translate.__init__(self)
     
     def index(self, view, id_anchor = ""):
@@ -50,13 +52,15 @@ class TranslationPage(translate.translate):
             return error.error().respond()
         self.user = user
         self.language = user["languages.langname"]
-        self.translate_for_keyboard = user["languages.translate_for_keyboard"]
         self.view_description = VIEW_DESCRIPTIONS[view]
         self.form, self.count = self.make_table(view, self.pagenum)
         self.targetid = id_anchor
         # calculate the num pages for the base class
         self.total_num_pages = self.get_total_num_pages()
         self.warnings = self.get_all_warnings()
+        self.translate_mnemonics, self.translate_accelerators = \
+            keys.get_keyboard_translation_flags(self.session)
+        
         return self.respond()
     index.exposed = True
     
@@ -198,6 +202,8 @@ class TranslationPage(translate.translate):
            e.g. http://stuff.com/file.mp3?format=raw
            where permanenturi and permanenturiparams come from the db's languages overview table
         """
+        if self.audio_support == False: return ""
+        
         # find out if there is an audiouri for this item in the tempaudio table
         audiouri = ""
         request = """SELECT audiouri FROM tempaudio WHERE xmlid="%s" and langid="%s" """ % \

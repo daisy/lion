@@ -3,7 +3,7 @@ from translationpage import *
 from templates import tablerow, acceltablerow, warnings
 import util
 import re
-from validate_keys import *
+from keys import *
 
 class ChooseAccelerators(TranslationPage):
     """The page for accelerators"""
@@ -60,7 +60,7 @@ class ChooseAccelerators(TranslationPage):
             t.instructions = self.instructions
             t.langid = self.user["users.langid"]
             t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
-            t.show_audio_upload = self.show_audio_upload
+            t.audio_support = self.audio_support
             if self.error != "" and self.error_id == data["xmlid"]:
     	        t.error = self.error
     	    else:

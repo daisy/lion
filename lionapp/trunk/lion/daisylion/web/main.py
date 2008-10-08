@@ -12,6 +12,7 @@ import chooseaccelerators
 import record_all_prompts
 from templates import login, mainmenu, error, xhtml
 import daisylion.db.liondb
+import keys
 
 class Login(login.login):
     """Things relating to logging in"""
@@ -54,7 +55,7 @@ class MainMenu(mainmenu.mainmenu):
         self.application = self.session.config["main"]["target_app"]
         self.host = self.session.config["main"]["webhost"]
         self.port = self.session.config["main"]["webport"]
-        self.show_audio_upload = self.session.config["main"]["show_audio_upload"]
+        self.audio_support = self.session.config["main"]["audio_support"]
         mainmenu.mainmenu.__init__(self)
     
     def index(self):
@@ -66,10 +67,12 @@ class MainMenu(mainmenu.mainmenu):
         else:
             self.user = user["users.realname"]
             self.language = user["languages.langname"]
-            self.translate_for_keyboard = user["languages.translate_for_keyboard"]
             self.session.execute_query("""SELECT addldocsuri, addldocsdesc FROM
                 application WHERE name="%s" """ % self.application)
             self.addldocsuri, self.addldocsdesc = self.session.cursor.fetchone()
+            self.translate_mnemonics, self.translate_accelerators = \
+                keys.get_keyboard_translation_flags(self.session)
+            
             return self.respond()
     index.exposed = True
 
@@ -89,7 +92,7 @@ def main():
     
     session = daisylion.db.liondb.LionDB(config_file, options.trace, None)
     session.trace_msg("Starting the Lion website")
-
+    
     # initialize the object hierarchy that cherrypy will use
     root = Login(session)
     root.MainMenu = MainMenu(session)

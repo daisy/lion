@@ -17,13 +17,13 @@ audio_dir_prefix=./audio/
 
 DYNAMIC_APP_SECTION = {
 "amis": 
-"""show_audio_upload=true
+"""audio_support=true
 dbname=amislion
 target_app=amis
 """,
 
 "obi": 
-"""show_audio_upload=false
+"""audio_support=false
 dbname=obi_resx
 target_app=obi
 """

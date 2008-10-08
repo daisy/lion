@@ -20,16 +20,15 @@ AMIS translation for $language: $section section
 #def usepages
 False
 #end def
-#def translate_for_keyboard
-False
-#end def
 #def body
 <h1>$title</h1>
 <div id="navigation">
 	<a href="../TranslateStrings?view=all">Translate strings</a>
 	| 
-	#if $translate_for_keyboard == True:
+	#if $translate_accelerators == True:
 	<a href="../ChooseAccelerators?view=all">Assign keyboard shortcuts</a> | 
+	#end if
+	#if $translate_mnemonics == True:
 	<a href="../ChooseMnemonics?view=all">Choose mnemonics</a> (single-letter shortcuts) | 
 	#end if
 	<a href="../MainMenu">Main</a>

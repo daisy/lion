@@ -53,7 +53,7 @@ class TranslateStrings(TranslationPage):
     	    t.height = self.textbox_rows
     	    t.langid = self.user["users.langid"]
     	    t.pagenum = pagenum
-    	    t.show_audio_upload = self.show_audio_upload
+    	    t.audio_support = self.audio_support
     	    t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
     	    if self.error != "" and self.error_id == data["xmlid"]:
     	        t.error = self.error

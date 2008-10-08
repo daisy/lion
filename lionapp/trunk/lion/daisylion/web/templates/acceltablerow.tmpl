@@ -10,7 +10,7 @@ Template variables:
 	width = the width of the text box for the translation
 	height = the height of the text box for the translation
 	langid = the id of the language being translated into
-	show_audio_upload = whether to show the audio upload field
+	audio_support = whether to show the audio upload field
 	
 Identical to tablerow except for the dataentry part.This should really be derived from tablerow but it's not working; I suspect because Cheetah #blocks can't have arguments.
 
@@ -67,7 +67,7 @@ Identical to tablerow except for the dataentry part.This should really be derive
 	<p>Remarks from you:</p>
 	<textarea class="remarks" name="remarks" cols="64" rows="2">$remarks</textarea>
 </td>
-#if $show_audio_upload == True:
+#if $audio_support == True:
 <td>
 	#if $audiouri != None and len($audiouri) > 0
 	 	<p><a href="$audiouri">Audio (click to play)</a></p>

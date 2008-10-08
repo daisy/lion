@@ -2,7 +2,7 @@ from translationpage import *
 from templates import tablerow
 from templates import warnings
 import util
-from validate_keys import *
+from keys import *
 
 class ChooseMnemonics(TranslationPage):
     """The page for mnemonics"""
@@ -77,7 +77,7 @@ class ChooseMnemonics(TranslationPage):
                     t.height = self.textbox_rows
                     t.langid = self.user["users.langid"]
                     t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
-                    t.show_audio_upload = self.show_audio_upload
+                    t.audio_support = self.audio_support
                     if self.error != "" and self.error_id == data["xmlid"]:
             	        t.error = self.error
             	    else:
