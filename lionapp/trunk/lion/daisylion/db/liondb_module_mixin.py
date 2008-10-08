@@ -29,7 +29,7 @@ class LionDBModuleMixIn():
         
         return module_object
     
-    def module_import(self, file, langid, option):
+    def module_import(self, file, langid, option=None):
         """Import from XML to the database."""
         if not file: self.die("No XML file given.")
         if not self.check_language(langid):
@@ -38,6 +38,7 @@ class LionDBModuleMixIn():
         self.dbio.import_xml(self, file, langid, option)
         removed_ids = self.dbio.get_removed_ids_after_import()
         if langid == self.masterlang:
+            self.trace_msg("Process changes (%s)" % self)
             self.__process_changes(langid, removed_ids)
     
     def module_export(self, langid, option, output_dir):

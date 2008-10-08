@@ -24,9 +24,16 @@ class GlobalOptionsParser(OptionParser):
         if args == None: l = 0
         else: l = len(args)
         if l != num_required:
-            self.error("Error: wrong number of arguments (expected %d, got %d)" \
-                % (num_required, len(args)))
-                
+            self.error("Error: wrong number of arguments (expected %d, got %d)"\
+                    % (num_required, l))
+
+    def check_args_atleast(self, num_required, args):
+        """Check that there are at least num_required args."""
+        l = args != None and len(args) or 0
+        if l < num_required:
+            self.error("Error: wrong number of arguments (expected at least %d, got %d"\
+                    % (num_required, l))
+
     def safety_check(self, desc):
         if self.force == False:
             rly = raw_input("Do you REALLY want to %s?  This is serious.\n \
