@@ -1,4 +1,5 @@
 import os
+import re
 from xml.dom import minidom
 from dbsession import DBSession
 import modules.lion_module
@@ -266,7 +267,9 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
                         textflag) VALUES ("%(text)s", "%(xmlid)s", \
                         "%(role)s", "%(mnem)s", "%(target)s", "%(keys)s", \
                         3)""" % \
-                        {"table": langtable, "text": text, "xmlid": xmlid, \
+                        {"table": langtable, \
+                            "text": re.sub("""(['"])""", r"\\\1", text), \
+                            "xmlid": xmlid, \
                             "role": role, "mnem": mnem, "target": target, \
                             "keys": keys})
             if removed_ids != None:

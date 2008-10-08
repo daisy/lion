@@ -29,7 +29,7 @@ class LionDBModuleMixIn():
         
         return module_object
     
-    def module_import(self, file, langid, option=None):
+    def module_import(self, file, langid, option):
         """Import from XML to the database."""
         if not file: self.die("No XML file given.")
         if not self.check_language(langid):

@@ -11,7 +11,7 @@ COMMENT = """# daisylion configuration file
 STATIC_MAIN_SECTION = """
 [main]
 masterlang=eng-US
-trace=false
+trace=true
 audio_dir_prefix=./audio/
 """
 
