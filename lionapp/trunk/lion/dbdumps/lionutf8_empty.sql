@@ -44,6 +44,37 @@ LOCK TABLES `application` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `eng_US`
+--
+
+DROP TABLE IF EXISTS `eng_US`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `eng_US` (
+  `id` int(10) unsigned NOT NULL default '0',
+  `textstring` text character set utf8,
+  `audiouri` varchar(255) character set utf8 default NULL,
+  `textflag` int(11) default NULL,
+  `remarks` text character set utf8,
+  `xmlid` varchar(255) character set utf8 default NULL,
+  `role` varchar(11) character set utf8 default NULL,
+  `mnemonicgroup` int(11) default NULL,
+  `target` varchar(4) character set utf8 default NULL,
+  `actualkeys` varchar(100) character set utf8 default NULL,
+  `translate` tinyint(1) default '1'
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping data for table `eng_US`
+--
+
+LOCK TABLES `eng_US` WRITE;
+/*!40000 ALTER TABLE `eng_US` DISABLE KEYS */;
+/*!40000 ALTER TABLE `eng_US` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `languages`
 --
 
@@ -51,14 +82,11 @@ DROP TABLE IF EXISTS `languages`;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
 CREATE TABLE `languages` (
-  `langid` varchar(6) collate utf8_unicode_ci NOT NULL default '',
-  `langname` varchar(50) collate utf8_unicode_ci default NULL,
-  `audiodir` varchar(255) collate utf8_unicode_ci default NULL,
-  `translate_for_keyboard` tinyint(1) default '1',
-  `permanenturi` varchar(255) collate utf8_unicode_ci default NULL,
-  `permanenturiparams` varchar(255) collate utf8_unicode_ci default NULL,
-  PRIMARY KEY  (`langid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `langid` varchar(6) character set utf8 collate utf8_unicode_ci NOT NULL default '',
+  `langname` varchar(50) character set utf8 collate utf8_unicode_ci default NULL,
+  `audiodir` varchar(255) character set utf8 collate utf8_unicode_ci default NULL,
+  `translate_for_keyboard` tinyint(1) default '1'
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -67,65 +95,8 @@ SET character_set_client = @saved_cs_client;
 
 LOCK TABLES `languages` WRITE;
 /*!40000 ALTER TABLE `languages` DISABLE KEYS */;
+INSERT INTO `languages` VALUES ('eng-US','English (United States)',NULL,1);
 /*!40000 ALTER TABLE `languages` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `tempaudio`
---
-
-DROP TABLE IF EXISTS `tempaudio`;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
-CREATE TABLE `tempaudio` (
-  `id` int(11) NOT NULL auto_increment,
-  `audiouri` varchar(255) default NULL,
-  `langid` varchar(6) default NULL,
-  `xmlid` varchar(4) default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-SET character_set_client = @saved_cs_client;
-
---
--- Dumping data for table `tempaudio`
---
-
-LOCK TABLES `tempaudio` WRITE;
-/*!40000 ALTER TABLE `tempaudio` DISABLE KEYS */;
-/*!40000 ALTER TABLE `tempaudio` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `test`
---
-
-DROP TABLE IF EXISTS `test`;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
-CREATE TABLE `test` (
-  `id` int(10) unsigned NOT NULL default '0',
-  `textstring` text,
-  `audiodata` longblob,
-  `audiouri` varchar(255) default NULL,
-  `textflag` int(11) default NULL,
-  `audioflag` int(11) default NULL,
-  `remarks` text,
-  `xmlid` varchar(4) default NULL,
-  `role` varchar(11) default NULL,
-  `mnemonicgroup` int(11) default NULL,
-  `target` varchar(4) default NULL,
-  `actualkeys` varchar(100) default NULL,
-  `translate` tinyint(1) default '1'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-SET character_set_client = @saved_cs_client;
-
---
--- Dumping data for table `test`
---
-
-LOCK TABLES `test` WRITE;
-/*!40000 ALTER TABLE `test` DISABLE KEYS */;
-/*!40000 ALTER TABLE `test` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -136,17 +107,16 @@ DROP TABLE IF EXISTS `users`;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
 CREATE TABLE `users` (
-  `username` varchar(20) collate utf8_unicode_ci default NULL,
-  `realname` varchar(100) collate utf8_unicode_ci default NULL,
-  `password` varchar(20) collate utf8_unicode_ci default NULL,
-  `email` varchar(50) collate utf8_unicode_ci default NULL,
-  `langid` varchar(6) collate utf8_unicode_ci default NULL,
+  `username` varchar(20) character set utf8 collate utf8_unicode_ci default NULL,
+  `realname` varchar(100) character set utf8 collate utf8_unicode_ci default NULL,
+  `password` varchar(20) character set utf8 collate utf8_unicode_ci default NULL,
+  `email` varchar(50) character set utf8 collate utf8_unicode_ci default NULL,
+  `langid` varchar(6) character set utf8 collate utf8_unicode_ci default NULL,
   `lastlogin` datetime default NULL,
   `lastactivity` datetime default NULL,
-  `sessionid` varchar(36) collate utf8_unicode_ci default NULL,
-  `id` int(11) NOT NULL auto_increment,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=22 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci COMMENT='svnpath intentionally points to the svn viewer URI';
+  `sessionid` varchar(36) character set utf8 collate utf8_unicode_ci default NULL,
+  `id` int(11) NOT NULL default '0'
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -155,6 +125,7 @@ SET character_set_client = @saved_cs_client;
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES ('test','Test account','test',NULL,'eng-US',NULL,NULL,NULL,0);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -167,4 +138,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-10-07 12:13:28
+-- Dump completed on 2008-10-08 10:34:02
