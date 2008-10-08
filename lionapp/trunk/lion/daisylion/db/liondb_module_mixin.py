@@ -38,8 +38,7 @@ class LionDBModuleMixIn():
         self.dbio.import_xml(self, file, langid, option)
         removed_ids = self.dbio.get_removed_ids_after_import()
         if langid == self.masterlang:
-            self.trace_msg("Process changes (%s)" % self)
-            self.__process_changes(langid, removed_ids)
+            self.process_changes(removed_ids)
     
     def module_export(self, langid, option, output_dir):
         print self.dbio.export(self, langid, option, output_dir)

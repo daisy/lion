@@ -69,7 +69,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         and then add it to all other tables too
         This function is ONLY for adding anything with role=STRING"""
         self.add_string(self.masterlang, textstring, stringid)
-        self.__process_changes(None)
+        self.process_changes(None)
     
     def add_string(self, langid, textstring, stringid):
         """Add a new string to a language table
@@ -90,7 +90,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         results through all other tables"""
         self.remove_item(self.masterlang, stringid)
         removed_ids = stringid,
-        self.__process_changes(removed_ids)
+        self.process_changes(removed_ids)
     
     def remove_item(self, langid, stringid):
         """Remove a string from a table"""
@@ -109,7 +109,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         changes through all other tables"""
         print self.masterlang
         self.add_accelerator(self.masterlang, textstring, stringid, refid, keys)
-        self.__process_changes(None)
+        self.process_changes(None)
     
     def add_accelerator(self, langid, textstring, stringid, refid, keys):
         """Add an accelerator to a table.  
@@ -137,7 +137,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         """Change the text of the item at the given id in the master table.
         Reflect the change in all other tables"""
         self.change_item(self.masterlang, textstring, stringid)
-        self.__process_changes(None)
+        self.process_changes(None)
     
     def change_item(self, langid, textstring, stringid):
         """Change the text of the item at the given ID."""
@@ -230,8 +230,8 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         request = """UPDATE %s SET remarks="%s" WHERE xmlid="%s" """ \
             % (table, textstring, stringid)
         self.execute_query(request)
-    
-    def __process_changes(self, removed_ids):
+
+    def process_changes(self, removed_ids):
         """Process the textflag values (2: changed, 3: new)
         and remove the IDs from all tables"""
         table = self.get_masterlang_table()
