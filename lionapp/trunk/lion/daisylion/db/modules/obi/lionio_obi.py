@@ -4,14 +4,13 @@ import obi_import
 class ObiLionIO(daisylion.db.modules.lion_module.LionIOModule):
     """Obi-specific import and export from/to .resx files."""
 
-    def import_xml(self, session, file, langid, import_type):
-        """Import a document object (from minidom) into a table. The cursor has
-        the current connection to the database."""
+    def import_xml(self, session, files, langid, import_type):
+        """Import files into the database."""
         importer = obi_import.ObiImport(session)
         if import_type == 1:
-            importer.import_resx(file, langid)
+            importer.import_resx(files, langid)
         else:
-            importer.update_from_resx(file, langid)
+            importer.update_from_resx(files, langid)
 
     def get_removed_ids_after_import(self):
         pass
