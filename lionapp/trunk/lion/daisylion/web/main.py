@@ -74,7 +74,6 @@ class MainMenu(mainmenu.mainmenu):
             self.addldocsuri, self.addldocsdesc = self.session.cursor.fetchone()
             self.translate_mnemonics, self.translate_accelerators = \
                 keys.get_keyboard_translation_flags(self.session)
-            
             return self.respond()
     index.exposed = True
 

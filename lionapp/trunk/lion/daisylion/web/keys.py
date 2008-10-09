@@ -24,5 +24,7 @@ def get_keyboard_translation_flags(session):
     langid = util.get_user(session)["users.langid"]
     session.execute_query("""SELECT translate_mnemonics, translate_accelerators FROM
         languages WHERE langid="%s" """ % session.make_table_name(langid))
-    mnem_b, accel_b = session.cursor.fetchone()
-    return (mnem_b, accel_b)
+    mnem1, accel1 = session.cursor.fetchone()
+    mnem2 = session.has_mnemonics()
+    accel2 = session.has_accelerators()
+    return (mnem1 & mnem2, accel1 & accel2)

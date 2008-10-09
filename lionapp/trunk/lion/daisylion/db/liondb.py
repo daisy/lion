@@ -65,6 +65,24 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
     def get_masterlang_table(self):
         return self.make_table_name(self.masterlang)
     
+    def has_accelerators(self):
+        request = """SELECT COUNT(*) from %s WHERE role="ACCELERATOR" """ \
+            % self.get_masterlang_table()
+        self.execute_query(request)
+        if self.cursor.fetchone()[0] == 0:
+            return False
+        else:
+            return True
+    
+    def has_mnemonics(self):
+        request = """SELECT COUNT(*) from %s WHERE role="MNEMONIC" """ \
+            % self.get_masterlang_table()
+        self.execute_query(request)
+        if self.cursor.fetchone()[0] == 0:
+            return False
+        else:
+            return True
+        
     def add_string_master(self, textstring, stringid):
         """add a single string to the master language table, 
         and then add it to all other tables too
