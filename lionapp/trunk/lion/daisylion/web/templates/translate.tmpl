@@ -24,11 +24,26 @@ $section section
 False
 #end def
 #def body
+
+## calculate the drop down list default value
+#set $all_selected = ""
+#set $newtodo_selected = ""
+#set $new_selected = ""
+#set $todo_selected = ""
+#if $last_view == "todo":
+	#set $todo_selected = "SELECTED"
+#elif $last_view == "newtodo":
+	#set $newtodo_selected = "SELECTED"
+#elif $last_view == "new":
+	#set $new_selected = "SELECTED"
+#else:
+	#set $all_selected = "SELECTED"
+#end if
+
 <h1>$title</h1>
 <h2>$page</h2>
 <div id="navigation">
-	<a href="../TranslateStrings?view=all">Translate strings</a>
-	| 
+	<a href="../TranslateStrings?view=all">Translate strings</a>| 
 	#if $translate_accelerators == True:
 	<a href="../ChooseAccelerators?view=all">Assign keyboard shortcuts</a> | 
 	#end if
@@ -49,15 +64,15 @@ False
 	</p>
 </div>
 <div>
-    <form action="change_view" method="POST">
-        <select name="viewfilter">
-            <option value="all">all items</option>
-            <option value="newtodo">all items marked new or to-do</option>
-            <option value="new">all new items</option>
-            <option value="todo">all to-do items</option>
-        </select>
-        <input type="submit" value="Change view" />
-    </form>
+	<form action="change_view" method="POST">
+	    <select name="viewfilter">
+	        <option $all_selected value="all">all items</option>
+	        <option $newtodo_selected value="newtodo">all items marked new or to-do</option>
+	        <option $new_selected value="new">all new items</option>
+	        <option $todo_selected value="todo">all to-do items</option>
+	    </select>
+	    <input type="submit" value="Change view" />
+	</form>
 </div>
 <br/>
 
