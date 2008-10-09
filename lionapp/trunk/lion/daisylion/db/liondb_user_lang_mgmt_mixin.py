@@ -16,9 +16,10 @@ class LionDBUserLangMgmtMixIn():
         if self.check_username(username) == False:
             self.die("User does not exist")
             return
-        self.__remove_user_from_database(username)    
+        self.__remove_user_from_database(username)
 
-    def add_language(self, langid, langname, username, password, realname, email):
+    def add_language(self, langid, langname, username, password, realname,
+        email, mnemonics, accelerators):
         """Add a new language and a user for that language"""
         if self.check_language(langid) != False:
             self.die("Language already exists.")
@@ -28,7 +29,10 @@ class LionDBUserLangMgmtMixIn():
             self.die("Username already exists.")
             return
 
-        self.__add_language_to_database(langid, langname, username, password, realname, email)
+        self.__add_language_to_database(langid, langname, username, password,
+            realname, email,
+            self.__get_app_value(mnemonics, "translate_mnemonics"),
+            self.__get_app_value(accelerators, "translate_accelerators"))
 
 
     def remove_language(self, langid):
@@ -68,14 +72,17 @@ class LionDBUserLangMgmtMixIn():
             LEFT JOIN %(shorter)s ON %(shorter)s.xmlid = %(longer)s.xmlid 
             WHERE %(shorter)s.xmlid is NULL""" % {"longer": longer, "shorter": shorter}
         self.execute_query(request)
-        return (self.make_id_from_table_name(longer), self.make_id_from_table_name(shorter), 
+        return (self.make_id_from_table_name(longer), self.make_id_from_table_name(shorter),
             self.cursor.fetchall())
-            
-    def __add_language_to_database(self, langid, langname, username, password, realname, email):
+
+    def __add_language_to_database(self, langid, langname, username, password, realname, email, mnemonics, accelerators):
         """add the new language and new user"""
         # add the language to the languages table
-        self.execute_query("""INSERT INTO languages (langid, langname) VALUES \
-            ("%(id)s", "%(name)s")""" % {"id": langid, "name": langname})
+        self.execute_query("""INSERT INTO languages
+        (langid, langname, translate_mnemonics, translate_accelerators)
+        VALUES ("%(id)s", "%(name)s", %(mnemonics)s, %(accelerators)s)"""\
+            % {"id": langid, "name": langname, "mnemonics": mnemonics,
+                "accelerators": accelerators})
 
         self.__add_user_to_database(langid, username, password, realname, email)
 
@@ -109,4 +116,17 @@ class LionDBUserLangMgmtMixIn():
     def __remove_user_from_database(self, username):
         """remove a user but not their language"""
         self.execute_query("""DELETE FROM users WHERE username="%s" """ % username)
-        
+
+    def __get_app_value(self, initial, field):
+        """Get the default application value for a field and return it if
+        the initial value is None; otherwise, return the supplied initial
+        value."""
+        if initial == None:
+            self.execute_query("SELECT %s FROM application WHERE name='%s'" \
+                % (field, self.config["main"]["target_app"]))
+            value, = self.cursor.fetchone()
+            self.trace_msg("Using default value %s for %s" % (value, field))
+            return value
+        else:
+            self.trace_msg("Using supplied value %s for %s" % (initial, field))
+            return initial
