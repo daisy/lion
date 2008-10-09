@@ -22,12 +22,7 @@ def validate_keys(key):
 
 def get_keyboard_translation_flags(session):
     langid = util.get_user(session)["users.langid"]
-    #session.execute_query("""SELECT translate_mnemonics, translate_accelerators FROM
-    #    application LIMIT 1""")
-    #mnem_a, accel_a = session.cursor.fetchone()
     session.execute_query("""SELECT translate_mnemonics, translate_accelerators FROM
         languages WHERE langid="%s" """ % session.make_table_name(langid))
     mnem_b, accel_b = session.cursor.fetchone()
-    #a = mnem_a or mnem_b
-    #b = accel_a or accel_b
     return (mnem_b, accel_b)

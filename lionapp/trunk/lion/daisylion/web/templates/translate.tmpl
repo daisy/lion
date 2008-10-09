@@ -15,13 +15,17 @@ Template variables:
 #from xhtml import xhtml
 #extends xhtml
 #def title
-AMIS translation for $language: $section section
+$appname translation for $language
+#end def
+#def page
+$section section
 #end def
 #def usepages
 False
 #end def
 #def body
 <h1>$title</h1>
+<h2>$page</h2>
 <div id="navigation">
 	<a href="../TranslateStrings?view=all">Translate strings</a>
 	| 
@@ -31,7 +35,7 @@ False
 	#if $translate_mnemonics == True:
 	<a href="../ChooseMnemonics?view=all">Choose mnemonics</a> (single-letter shortcuts) | 
 	#end if
-	<a href="../MainMenu">Main</a>
+	<a href="../MainMenu">Back to tasks menu</a>
 	
 </div>
 

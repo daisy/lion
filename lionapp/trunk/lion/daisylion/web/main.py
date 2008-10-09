@@ -15,7 +15,7 @@ import daisylion.db.liondb
 import keys
 
 class Login(login.login):
-    """Things relating to logging in"""
+    """The initial login page"""
     
     def __init__(self, session):
         self.session = session
@@ -56,6 +56,8 @@ class MainMenu(mainmenu.mainmenu):
         self.host = self.session.config["main"]["webhost"]
         self.port = self.session.config["main"]["webport"]
         self.audio_support = self.session.config["main"]["audio_support"]
+        self.appname, self.appversion, self.appdesc, self.appsite, self.applogo = \
+            util.get_application_data(self.session)
         mainmenu.mainmenu.__init__(self)
     
     def index(self):

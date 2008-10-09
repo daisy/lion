@@ -2,6 +2,6 @@ echo "Compiling AMIS templates"
 cd ../db/modules/amis/templates
 ./compile_templates
 cd ../../../../scripts
-echo "Starting the Lion (web configuration)"
+echo "Starting the Lion (local configuration)"
 rm -f nohup.out
-nohup ./start-lion-website amis local &
+./start-lion-website amis local

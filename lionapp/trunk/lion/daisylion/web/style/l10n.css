@@ -18,7 +18,8 @@ input { margin-left: 2em; border: thin black solid; }
 div.comments{margin-top: 3em;}
 .warning {font-weight: bold !important; color: red !important; background-color: yellow !important; border: thin solid red !important;}
 .message {background-color: #CFF;}
-#header img {float: right; margin-right: 3em; margin-top: -1em;}
+#header #images {float: right; margin-top: -6em;}
+#header img {padding-left: 1em;}
 #header {font-size: smaller; border-bottom: thin black solid; padding-bottom: 2em;}
 em {font-weight: bold;}
 div.page_nav {margin-top: 2em; font-size: medium;}

@@ -14,12 +14,20 @@ Template variables:
 #set $logo = $base_url + "lion144.png"
 #def targetid
 #end def
+#def appname
+#end def
+#def applogo
+#end def
 <?xml version="1.0"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-    	<title>$title</title>
+    	<title>The DAISY Lion 
+		#if $appname != None and $appname != "":
+			for $appname 
+		#end if
+		- $title</title>
     	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     	<link href="$css" rel="stylesheet" type="text/css"/>
 		<link rel="icon" href="$icon"/>
@@ -34,10 +42,16 @@ Template variables:
   	</head>
   	<body onload="scroll(); cache_mgmt()">
 		<div id="header">
-			<img src="$logo" 
-				alt="logo for the DAISY Lion" height="91.5" width="108"/>
 			<h1>The DAISY Lion</h1>
 			<p>Web-based localization system</p>
+			
+			<div id="images">
+				#if $applogo != None and $applogo != "":
+				<img src="$applogo" alt="logo for $appname"/>
+				#end if
+				<img src="$logo" alt="logo for the DAISY Lion" height="91.5" width="108"/>
+			</div>
+			
 		</div>
 		$body
 	</body>
