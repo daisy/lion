@@ -23,16 +23,16 @@ Template variables:
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xml:lang="en" lang="en" xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-    	<title>The DAISY Lion 
+    	<title>The DAISY Lion
 		#if $appname != None and $appname != "":
-			for $appname 
+			for $appname
 		#end if
 		- $title</title>
     	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     	<link href="$css" rel="stylesheet" type="text/css"/>
 		<link rel="icon" href="$icon"/>
 		<script language="javascript">
-			function scroll() 
+			function scroll()
 			{
 				var the_id = "$targetid";
 				if (the_id.length > 0)
@@ -42,17 +42,18 @@ Template variables:
   	</head>
   	<body onload="scroll(); cache_mgmt()">
 		<div id="header">
-			<h1>The DAISY Lion</h1>
-			<p>Web-based localization system</p>
-			
-			<div id="images">
+      <div id="header_left">
+        <h1>The DAISY Lion</h1>
+        <p>Web-based localization system</p>
+      </div>
+			<div id="header_images">
 				#if $applogo != None and $applogo != "":
 				<img src="$applogo" alt="logo for $appname"/>
 				#end if
-				<img src="$logo" alt="logo for the DAISY Lion" height="91.5" width="108"/>
+				<img src="$logo" alt="logo for the DAISY Lion"/>
 			</div>
-			
 		</div>
+    <div id="clear"/>
 		$body
 	</body>
 </html>
