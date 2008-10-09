@@ -4,7 +4,7 @@ Template variables:
 	searchList = a row with these fields:
 		xmlid, textstring, status, remarks, ref_string, our_remarks, audiouri
 
-	instructions = what the translator should do	
+	instructions = what the translator should do
 	handler = the function to handle the form submission
 	width = the width of the text box for the translation
 	height = the height of the text box for the translation
@@ -30,8 +30,7 @@ Template variables:
 #end if
 <tr>
 <form action="save_data" method="POST" enctype="multipart/form-data">
-<td class="xmlid">$xmlid</td>
-<td width="30%%">
+<td width="30%%" valign="top">
 	<p>$ref_string</p>
 	#if $our_remarks != None and $our_remarks != "":
 		<div class="comments">
@@ -40,38 +39,35 @@ Template variables:
 		</div>
 	#end if
 </td>
-<td id="$xmlid" >
+<td id="$xmlid" valign="top">
 	#if $error != None and $error != "":
 		<p class="error">$error</p>
 	#end if
-    
+
 	<p class="instructions">$instructions  Remember to <em>Save</em>.</p>
 	<textarea name="translation" cols="$width" rows="$height" class="$classattr">$textstring</textarea>
     <p>Remarks from you:</p>
 	<textarea class="remarks" name="remarks" cols="64" rows="2">$remarks</textarea>
+  <p class="xmlid">$xmlid</p>
 </td>
 #if $self.audio_support == True:
-<td>
+<td valign="top">
 	#if $audiouri != None and len($audiouri) > 0
 	 	<p><a href="$audiouri">Audio (click to play)</a></p>
 	#end if
-    Choose an MP3 file: 
+    Choose an MP3 file:
 	<input type="file" name="audiofile" value="Browse"/>
 </td>
 #else:
     ## a dummy audiofile so as not to alter the function signature
 	<input type="hidden" name="audiofile" value=""/>
 #end if
-<td width="100px">
+<td valign="top">
 	<p>Status:</p>
-	<input name="status" type="radio" $ok value="1"/>
-	<span class="ok">OK</span><br/>
-	
-	<input name="status" type="radio" $todo value="2"/>
-	<span class="todo">TODO</span><br/>
-	
+	<input name="status" type="radio" $ok value="1"/>&nbsp;<span class="ok">OK</span><br/>
+	<input name="status" type="radio" $todo value="2"/>&nbsp;<span class="todo">TODO</span><br/>
 </td>
-<td>
+<td valign="bottom">
 	<input type="submit" value="Save" style="align: bottom"/>
 	<input type="hidden" name="xmlid" value="$xmlid"/>
 	<input type="hidden" name="langid" value="$langid"/>

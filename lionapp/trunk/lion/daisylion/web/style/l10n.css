@@ -26,4 +26,4 @@ div.comments{margin-top: 3em;}
 em {font-weight: bold;}
 div.page_nav {margin-top: 2em; font-size: medium;}
 .warnings, .error {background-color: #F93;}
-.xmlid {font-size: small;}
+.xmlid {font-size: small; text-align:right}
