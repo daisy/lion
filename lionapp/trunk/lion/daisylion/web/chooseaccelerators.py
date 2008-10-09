@@ -25,18 +25,18 @@ class ChooseAccelerators(TranslationPage):
         table = self.session.make_table_name(self.user["users.langid"])
         mtable = self.session.get_masterlang_table()
         langid = self.user["users.langid"]
-        textflags_sql = self.get_sql_for_view_filter(view_filter, table)
-        template_fields = ["xmlid", "textstring", "textflag", "remarks", 
+        status_sql = self.get_sql_for_view_filter(view_filter, table)
+        template_fields = ["xmlid", "textstring", "status", "remarks", 
             "target", "actualkeys", "ref_string", "role"]
         dbfields = ["%s.xmlid" % table, "%s.textstring" % table, 
-            "%s.textflag" % table, "%s.remarks" % table, "%s.target" % table,
+            "%s.status" % table, "%s.remarks" % table, "%s.target" % table,
             "%s.actualkeys" % table, "%s.textstring" % mtable, "%s.role" % mtable]
         
         request = """SELECT %(fields)s FROM %(table)s, %(mastertable)s WHERE %(table)s.\
             xmlid=%(mastertable)s.xmlid AND %(table)s.role="ACCELERATOR" \
             %(where_flags)s""" % \
             {"fields": ",".join(dbfields), "table": table, 
-                "where_flags": textflags_sql, "mastertable": mtable}
+                "where_flags": status_sql, "mastertable": mtable}
         
         self.session.execute_query(request)
         rows = self.session.cursor.fetchall()
@@ -128,7 +128,7 @@ class ChooseAccelerators(TranslationPage):
         (is_valid, msg) = self.validate_single_item(actualkeys, xmlid, langid)
         self.error, self.error_id = msg, xmlid
         if is_valid:
-            request = """UPDATE %(table)s SET textflag="%(status)s",
+            request = """UPDATE %(table)s SET status="%(status)s",
                 textstring="%(textstring)s", remarks="%(remarks)s", 
                 actualkeys="%(actualkeys)s" WHERE xmlid="%(xmlid)s" """ % \
                     {"table": table, "status": status, "actualkeys": 

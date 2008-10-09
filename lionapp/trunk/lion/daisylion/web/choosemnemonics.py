@@ -30,11 +30,11 @@ class ChooseMnemonics(TranslationPage):
         table = self.session.make_table_name(self.user["users.langid"])
         mtable = self.session.get_masterlang_table()
         langid = self.user["users.langid"]
-        textflags_sql = self.get_sql_for_view_filter(view_filter, table)
-        template_fields = ["xmlid", "textstring", "textflag", "remarks", 
+        status_sql = self.get_sql_for_view_filter(view_filter, table)
+        template_fields = ["xmlid", "textstring", "status", "remarks", 
             "target", "ref_string", "role"]
         dbfields = ["%s.xmlid" % table, "%s.textstring" % table, 
-            "%s.textflag" % table, "%s.remarks" % table, "%s.target" % table,
+            "%s.status" % table, "%s.remarks" % table, "%s.target" % table,
             "%s.textstring" % mtable, "%s.role" % mtable]
         
         request = "SELECT DISTINCT mnemonicgroup FROM %s WHERE mnemonicgroup >= 0" % table
@@ -49,7 +49,7 @@ class ChooseMnemonics(TranslationPage):
                 xmlid=%(mastertable)s.xmlid AND %(table)s.mnemonicgroup=%(mnem_group)d \
                  AND %(table)s.role="MNEMONIC" %(where_flags)s""" % \
                 {"fields": ",".join(dbfields), "table": table, 
-                    "where_flags": textflags_sql, "mnem_group": g[0], "mastertable": mtable}
+                    "where_flags": status_sql, "mnem_group": g[0], "mastertable": mtable}
 
             self.session.execute_query(request)
             rows = self.session.cursor.fetchall()

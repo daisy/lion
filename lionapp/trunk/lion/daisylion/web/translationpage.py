@@ -74,7 +74,7 @@ class TranslationPage(translate.translate):
         is_valid, msg = self.validate_single_item(translation, xmlid, langid)
         self.error, self.error_id = msg, xmlid
         if is_valid:
-            request = """UPDATE %(table)s SET textflag="%(status)s", \
+            request = """UPDATE %(table)s SET status="%(status)s", \
                 textstring="%(translation)s", remarks="%(remarks)s" WHERE \
                 xmlid="%(xmlid)s" """ % \
                 {"table": table, "status": status, "translation": MySQLdb.escape_string(translation), \
@@ -135,11 +135,11 @@ class TranslationPage(translate.translate):
     def get_sql_for_view_filter(self, view_filter, table):
         sql = ""
         if view_filter == "new":
-            sql = "and %s.textflag=3" % table 
+            sql = "and %s.status=3" % table 
         elif view_filter =="todo":
-            sql = "and %s.textflag=2" % table
+            sql = "and %s.status=2" % table
         elif view_filter == "newtodo":
-            sql = "and (%(table)s.textflag=2 or %(table)s.textflag=3)" % \
+            sql = "and (%(table)s.status=2 or %(table)s.status=3)" % \
                 {"table": table}
         else:
             sql = ""

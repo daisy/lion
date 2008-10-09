@@ -14,8 +14,7 @@ def main():
     session = LionDB(options.config, options.trace, options.app)    
     sql = args[0]
     
-    request = """SELECT langid FROM languages WHERE langid != "%s" """ % \
-        session.config["main"]["masterlang"]
+    request = "SELECT langid FROM languages"
     
     session.execute_query(request)
     all_langs = session.cursor.fetchall()
@@ -24,8 +23,10 @@ def main():
     
     for l in all_langs:
         request = sql % session.make_table_name(l[0])
-        session.execute_query(request)
-    
+        try:
+            session.execute_query(request)
+        except Exception, e:
+            print "Exception: %s" % e
     
 if __name__=="__main__": main()
 

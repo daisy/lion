@@ -2,7 +2,7 @@
 Template variables:
 
 	searchList = a row with these fields:
-		xmlid, textstring, textflag, remarks, ref_string, our_remarks, audiouri
+		xmlid, textstring, status, remarks, ref_string, our_remarks, audiouri
 
 	instructions = what the translator should do	
 	handler = the function to handle the form submission
@@ -15,15 +15,15 @@ Template variables:
 #def $pagenum
 0
 #end def
-#if $textflag == 1
+#if $status == 1
 	#set $ok = "checked"
 	#set $todo = ""
 	#set $classattr = "ok"
-#elif $textflag == 2
+#elif $status == 2
 	#set $todo = "checked"
 	#set $ok = ""
 	#set $classattr = "todo"
-#elif $textflag == 3
+#elif $status == 3
 	#set $classattr = "new"
 	#set $todo = ""
 	#set $ok = ""

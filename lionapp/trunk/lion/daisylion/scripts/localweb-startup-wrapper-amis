@@ -4,4 +4,4 @@ cd ../db/modules/amis/templates
 cd ../../../../scripts
 echo "Starting the Lion (web configuration)"
 rm -f nohup.out
-nohup ./start-lion-website amis web &
+nohup ./start-lion-website amis local &

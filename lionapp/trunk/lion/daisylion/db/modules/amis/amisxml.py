@@ -31,7 +31,7 @@ class AmisUiDoc(minidom.Document):
             <audio src="path"/>
         </parent>
         Return None in case of error, otherwise a tuple: 
-            (textstring, audiosrc, xmlid, textflag)"""
+            (textstring, audiosrc, xmlid, status)"""
     
         if not elem.firstChild or \
             elem.firstChild.nodeType != Node.TEXT_NODE or \
@@ -46,11 +46,11 @@ class AmisUiDoc(minidom.Document):
         src = audio.getAttribute("src")
         if src == "":
             self.session.warn('No src for for audio element near text with id "%s"' % id)
-        if elem.getAttribute("flag") == "new": textflag = 3
-        elif elem.getAttribute("flag") == "changed": textflag = 2
-        else: textflag = 1
+        if elem.getAttribute("flag") == "new": status = 3
+        elif elem.getAttribute("flag") == "changed": status = 2
+        else: status = 1
         
-        return text, src, id, textflag
+        return text, src, id, status
         
     def get_all_children_with_tagname(self, elem, tagname):
         """Get the immediate children (not the grandchildren) of the element with

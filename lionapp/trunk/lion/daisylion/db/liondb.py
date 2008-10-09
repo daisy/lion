@@ -80,7 +80,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
             self.die("String with ID %s already exists." % stringid)
         
         table = self.make_table_name(langid)
-        self.execute_query("""INSERT INTO %(table)s (textstring, textflag, \
+        self.execute_query("""INSERT INTO %(table)s (textstring, status, \
             xmlid, role) VALUES ("%(textstring)s", 3, \
             "%(xmlid)s", "STRING")""" % \
             {"table": table, "textstring": textstring, "xmlid": stringid})
@@ -126,7 +126,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         table = self.make_table_name(langid)
 
         # add the string to the master table
-        self.execute_query("""INSERT INTO %(table)s (textstring, textflag, \
+        self.execute_query("""INSERT INTO %(table)s (textstring, status, \
             xmlid, actualkeys, target, role) VALUES \
             ("%(textstring)s", 3, "%(xmlid)s", "%(keys)s", "%(refid)s", \
             "ACCELERATOR")""" % \
@@ -149,7 +149,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
 
         table = self.make_table_name(langid)
         self.execute_query("""UPDATE %(table)s SET textstring="%(textstring)s",\
-            textflag=2 WHERE xmlid="%(xmlid)s" """ %\
+            status=2 WHERE xmlid="%(xmlid)s" """ %\
             {"table": table, "textstring": textstring, "xmlid": stringid})
     
     def copy_item(self, stringid, sourcelang, destlang):
@@ -168,7 +168,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         text, role, mnem, target, keys = data
         
         request = """INSERT INTO %(table)s (textstring, xmlid, role, 
-            mnemonicgroup, target, actualkeys, textflag)
+            mnemonicgroup, target, actualkeys, status)
             VALUES ("%(text)s", "%(xmlid)s", "%(role)s", "%(mnem)s", 
             "%(target)s", "%(keys)s", 3)""" % \
             {"table": desttbl, "text": text, "xmlid": stringid, 
@@ -233,7 +233,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         self.execute_query(request)
 
     def process_changes(self, removed_ids):
-        """Process the textflag values (2: changed, 3: new)
+        """Process the status values (2: changed, 3: new)
         and remove the IDs from all tables"""
         table = self.get_masterlang_table()
         # get all the other language tables except the master
@@ -244,11 +244,11 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         if languages == None: return;
 
         # get the changed items
-        self.execute_query("SELECT xmlid FROM %s WHERE textflag=2" % table)
+        self.execute_query("SELECT xmlid FROM %s WHERE status=2" % table)
         changed = self.cursor.fetchall()
         # get the new items
         self.execute_query("SELECT textstring, xmlid, role, mnemonicgroup, \
-        target, actualkeys FROM %s WHERE textflag=3" % table)
+        target, actualkeys FROM %s WHERE status=3" % table)
         newstuff = self.cursor.fetchall()
 
         # reflect the changes/newstuff in all the other languages
@@ -256,7 +256,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
             langtable = self.make_table_name(lang[0])
             if changed != None:
                 for row in changed:
-                    self.execute_query("UPDATE %(table)s SET textflag=2\
+                    self.execute_query("UPDATE %(table)s SET status=2\
                         WHERE xmlid='%(xmlid)s'" % \
                         {"table": langtable, "xmlid": row[0]})
             if newstuff != None:
@@ -264,7 +264,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
                     text, xmlid, role, mnem, target, keys = row
                     self.execute_query("""INSERT INTO %(table)s (textstring, \
                         xmlid, role, mnemonicgroup, target, actualkeys, \
-                        textflag) VALUES ("%(text)s", "%(xmlid)s", \
+                        status) VALUES ("%(text)s", "%(xmlid)s", \
                         "%(role)s", "%(mnem)s", "%(target)s", "%(keys)s", \
                         3)""" % \
                         {"table": langtable, \
@@ -280,7 +280,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
 
         # clear the flags in the master table -- otherwise the changes get 
         # re-added to all tables each time anything changes
-        self.execute_query("UPDATE %s SET textflag=1 WHERE textflag=2 \
-            or textflag=3" % table)
+        self.execute_query("UPDATE %s SET status=1 WHERE status=2 \
+            or status=3" % table)
     
     

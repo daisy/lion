@@ -23,12 +23,12 @@ class TranslateStrings(TranslationPage):
         table = self.session.make_table_name(self.user["users.langid"])
         mtable = self.session.get_masterlang_table()
         langid = self.user["users.langid"]
-        textflags_sql = self.get_sql_for_view_filter(view_filter, table)
-        template_fields = ["xmlid", "textstring", "textflag", "remarks", 
+        status_sql = self.get_sql_for_view_filter(view_filter, table)
+        template_fields = ["xmlid", "textstring", "status", "remarks", 
             "ref_string", "our_remarks"]
         
         dbfields = ["%s.xmlid" % table, "%s.textstring" % table, 
-            "%s.textflag" % table, "%s.remarks" % table, "%s.textstring" % mtable, 
+            "%s.status" % table, "%s.remarks" % table, "%s.textstring" % mtable, 
             "%s.remarks" % mtable]
         
         request = """SELECT %(fields)s FROM %(table)s, %(mastertable)s WHERE %(table)s.\
@@ -37,7 +37,7 @@ class TranslateStrings(TranslationPage):
             %(table)s.role="DIALOG" OR %(table)s.role="MENUITEM") \
             %(where_flags)s""" % \
             {"fields": ",".join(dbfields), "table": table, 
-                "where_flags": textflags_sql, "mastertable": mtable}
+                "where_flags": status_sql, "mastertable": mtable}
         self.session.execute_query(request)
         rows = self.session.cursor.fetchall()
         self.total_num_items = len(rows)

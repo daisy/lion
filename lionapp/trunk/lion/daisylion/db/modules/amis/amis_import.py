@@ -26,16 +26,16 @@ class AmisImport():
         for elem in self.doc.getElementsByTagName("text"):
             data = self.doc.parse_text_element(elem)
             if data:
-                textstring, audiouri, xmlid, textflag = data
+                textstring, audiouri, xmlid, status = data
                 # keys = the actual keys associated with a command
                 keys = elem.parentNode.tagName == "accelerator" and \
                     elem.parentNode.getAttribute("keys") or "NULL"
         
             self.session.execute_query(
-            """INSERT INTO %(table)s (textstring, textflag, audiouri, xmlid,
-            actualkeys) VALUES ("%(textstring)s", %(textflag)d,
+            """INSERT INTO %(table)s (textstring, status, audiouri, xmlid,
+            actualkeys) VALUES ("%(textstring)s", %(status)d,
             "%(audiouri)s", "%(xmlid)s", "%(keys)s")""" % \
-            {"table": self.table, "textstring": textstring, "textflag": textflag,
+            {"table": self.table, "textstring": textstring, "status": status,
                 "audiouri": audiouri, "xmlid": xmlid,
                 "keys": keys})
     
@@ -58,12 +58,12 @@ class AmisImport():
         for elem in self.doc.getElementsByTagName("text"):
             data = self.doc.parse_text_element(elem)
             if data:
-                textstring, audiouri, xmlid, textflag = data
+                textstring, audiouri, xmlid, status = data
             
             self.session.execute_query(
-            """UPDATE %(table)s SET textstring="%(textstring)s", textflag=%(textflag)d, 
+            """UPDATE %(table)s SET textstring="%(textstring)s", status=%(status)d, 
             audiouri="%(audiouri)s" WHERE xmlid="%(xmlid)s" """ % \
-            {"table": self.table, "textstring": textstring, "textflag": textflag,
+            {"table": self.table, "textstring": textstring, "status": status,
             "audiouri": audiouri, "xmlid": xmlid})
     
     def import_xml_audio_only(self, filepath, langid):
@@ -80,7 +80,7 @@ class AmisImport():
         for elem in self.doc.getElementsByTagName("text"):
             data = self.doc.parse_text_element(elem)
             if data:
-                textstring, audiouri, xmlid, textflag = data
+                textstring, audiouri, xmlid, status = data
         
             self.session.execute_query(
             """UPDATE %(table)s SET audiouri="%(audiouri)s" WHERE xmlid="%(xmlid)s" """ % \

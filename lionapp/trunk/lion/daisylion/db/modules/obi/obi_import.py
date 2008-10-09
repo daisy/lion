@@ -37,7 +37,7 @@ class ObiImport():
         self.session.trace_msg("Adding message <%s>" \
             % re.sub("""(['"])""", r"\\\1", text))
         self.session.execute_query("""INSERT INTO %s
-            (textstring, xmlid, textflag, role, mnemonicgroup)
+            (textstring, xmlid, status, role, mnemonicgroup)
             VALUES ("%s", "%s", 3, "STRING", 0)""" %
             (table, re.sub("""(['"])""", r"\\\1", text), xmlid))
 
