@@ -14,6 +14,8 @@ def main():
         help="Set the translate_mnemonics flag for this language.")
     parser.add_option("-x", "--accelerators", dest="accelerators", default=None,
         help="Set the translate_accelerators flag for this language.")
+    parser.add_option("-s", "--short", dest="short", default=None,
+        help="Short (two-letter) language identifier for .resx files.")
     (options, args) = parser.parse_args()
     parser.check_args(3, args)
 
@@ -21,7 +23,7 @@ def main():
     langid, username, pwd = args
     session.add_language(langid, options.langname, username, pwd,
         options.realname, options.email,
-        options.mnemonics, options.accelerators)
+        options.mnemonics, options.accelerators, options.short)
 
 if __name__=="__main__": main()
 

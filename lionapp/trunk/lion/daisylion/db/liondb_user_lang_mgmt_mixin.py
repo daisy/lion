@@ -19,7 +19,7 @@ class LionDBUserLangMgmtMixIn():
         self.__remove_user_from_database(username)
 
     def add_language(self, langid, langname, username, password, realname,
-        email, mnemonics, accelerators):
+        email, mnemonics, accelerators, langid_short):
         """Add a new language and a user for that language"""
         if self.check_language(langid) != False:
             self.die("Language already exists.")
@@ -32,7 +32,8 @@ class LionDBUserLangMgmtMixIn():
         self.__add_language_to_database(langid, langname, username, password,
             realname, email,
             self.__get_app_value(mnemonics, "translate_mnemonics"),
-            self.__get_app_value(accelerators, "translate_accelerators"))
+            self.__get_app_value(accelerators, "translate_accelerators"),
+            langid_short)
 
 
     def remove_language(self, langid):
@@ -75,14 +76,24 @@ class LionDBUserLangMgmtMixIn():
         return (self.make_id_from_table_name(longer), self.make_id_from_table_name(shorter),
             self.cursor.fetchall())
 
-    def __add_language_to_database(self, langid, langname, username, password, realname, email, mnemonics, accelerators):
+    def __add_language_to_database(self, langid, langname, username, password,
+        realname, email, mnemonics, accelerators, langid_short):
         """add the new language and new user"""
         # add the language to the languages table
-        self.execute_query("""INSERT INTO languages
-        (langid, langname, translate_mnemonics, translate_accelerators)
-        VALUES ("%(id)s", "%(name)s", %(mnemonics)s, %(accelerators)s)"""\
-            % {"id": langid, "name": langname, "mnemonics": mnemonics,
-                "accelerators": accelerators})
+        if langid_short == None:
+            self.execute_query("""INSERT INTO languages
+            (langid, langname, translate_mnemonics, translate_accelerators)
+            VALUES ("%(id)s", "%(name)s", %(mnemonics)s, %(accelerators)s)"""\
+                % {"id": langid, "name": langname, "mnemonics": mnemonics,
+                    "accelerators": accelerators})
+        else:
+            self.execute_query("""INSERT INTO languages
+            (langid, langid_short, langname, translate_mnemonics,
+            translate_accelerators)
+            VALUES ("%(id)s", "%(short)s", "%(name)s", %(mnemonics)s,
+            %(accelerators)s)"""\
+                % {"id": langid, "short": langid_short, "name": langname,
+                    "mnemonics": mnemonics, "accelerators": accelerators})
 
         self.__add_user_to_database(langid, username, password, realname, email)
 
