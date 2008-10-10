@@ -89,7 +89,10 @@ class LionDBUserLangMgmtMixIn():
         # create the new table as a copy of the master language table
         table = self.make_table_name(langid)
         self.execute_query("CREATE TABLE %s SELECT * from %s" % (table, self.get_masterlang_table()))
-
+        # make sure the id column is still the primary key
+        self.execute_query("""ALTER TABLE %s MODIFY COLUMN id 
+            INT UNSIGNED NOT NULL AUTO_INCREMENT FIRST, ADD PRIMARY KEY(id)""" % table)
+        
         # flag all "TODO" and clear some fields
         self.execute_query("UPDATE %s SET status=3, audiouri=NULL, remarks=NULL" % table)
 

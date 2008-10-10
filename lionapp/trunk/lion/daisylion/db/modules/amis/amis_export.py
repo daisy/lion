@@ -18,8 +18,9 @@ def export_xml(session, file, langid):
     
     table = session.make_table_name(langid)
     session.execute_query("SELECT xmlid, textstring, actualkeys, role, audiouri FROM %s" % table)
-    
     for xmlid, textstring, actualkeys, role, audiouri in session.cursor:
+        if audiouri == None:
+            audiouri = ""
         elm = doc.get_element_by_id("text", xmlid)
         if elm == None: 
             session.warn("Text element %s not found." % xmlid)
@@ -30,17 +31,18 @@ def export_xml(session, file, langid):
                 elm.firstChild.data = textstring
                 elm.parentNode.setAttribute("keys", actualkeys)
             else:
-                elm.firstChild.data = textstring
-            
+                elm.firstChild.data = textstring.strip()
             audio_elm = doc.get_audio_sibling(elm)
             if audio_elm != None:
                 audio_elm.setAttribute("src", audiouri)
                 audio_elm.setAttribute("from", "")
         else:
             session.warn("Text element %s has no contents." % xmlid)
-    
-    return doc.toxml().encode("utf-8")
-
+    docstring = doc.toxml()
+    if docstring != None:
+        return doc.toxml().encode("utf-8")
+    else:
+        return ""
 
 def export_rc(session, langid):
     # these are template keywords

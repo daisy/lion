@@ -2,7 +2,7 @@
 <ui xmlns="http://amisproject.org" next-id="t435" xml:lang="en">
     <containers>
         <container id="file">
-            <note>This is the menu header "File"</note>
+            <note>This is the menu header &quot;File&quot;</note>
             <caption>
                 <text id="t1">File</text>
                 <audio src="./audio/speechgen0002.mp3" from="file:///Users/marisa/Projects/amis/amisapp/trunk/pipeline/book/daisy202/speechgen0002.smil#text3"/>

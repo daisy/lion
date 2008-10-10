@@ -15,7 +15,7 @@ class AmisImport():
         self.session.trace_msg("Amis import from XML.  File = %s, Language = %s." % (filepath, langid))
         self.table = self.session.make_table_name(langid)
         # clear the tables
-        self.session.execute_query("DELETE FROM %s" % self.table)
+        self.session.execute_query("DELETE FROM %s WHERE preserve = 0" % self.table)
         
         # use our implementation of minidom.Document instead
         minidom.Document = AmisUiDoc
