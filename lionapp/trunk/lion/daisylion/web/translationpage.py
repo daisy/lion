@@ -69,6 +69,11 @@ class TranslationPage(translate.translate):
     index.exposed = True
     
     def change_view(self, viewfilter):
+        # reset the page number when switching the view
+        if self.last_view != None:
+            if self.last_view != viewfilter:
+                self.pagenum = 0
+        
         self.last_view = viewfilter
         self.redirect()
     change_view.exposed = True
