@@ -44,7 +44,7 @@ class Login(login.login):
             t.title = "Logged in"
             self.session.trace_msg("User %s sucessfully logged in." % username)
             t.body = "<p>Login successful!  <a href=\"MainMenu\">Start working</a>.</p>"
-            t.redirect = "MainMenu"
+            t.redirect_url = "MainMenu"
             return t.respond()
     process_login.exposed = True
 

@@ -6,6 +6,7 @@ from templates import translate, error
 import cherrypy
 from cherrypy.lib import static
 import keys
+import inspect
 
 VIEW_DESCRIPTIONS = {"all": "all items", 
     "newtodo": "all items marked new or to-do", 

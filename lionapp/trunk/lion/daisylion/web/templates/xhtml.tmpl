@@ -18,7 +18,7 @@ Template variables:
 #end def
 #def applogo
 #end def
-#def redirect
+#def redirect_url
 #end def
 <?xml version="1.0"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -31,8 +31,8 @@ Template variables:
 		#end if
 		- $title</title>
     	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		#if $redirect != None and $redirect != "":
-			<meta http-equiv="refresh" content="0; url=$redirect"/>
+		#if $redirect_url != None and $redirect_url != "":
+			<meta http-equiv="refresh" content="0; url=$redirect_url"/>
 		#end if
     	<link href="$css" rel="stylesheet" type="text/css"/>
 		<link rel="icon" href="$icon"/>
