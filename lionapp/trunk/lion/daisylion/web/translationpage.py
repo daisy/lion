@@ -94,20 +94,15 @@ class TranslationPage(translate.translate):
         self.session.trace_msg("infile = %s" % infile)
         self.session.trace_msg("type of infile %s" % type(infile))
         size = 0
-        # calculate the filesystem path to the temporary file storage
-        if not self.temp_audio_dir.endswith("/"): self.temp_audio_dir += "/"
-        tempdir = self.temp_audio_dir + self.user["users.langid"] + "/"
-        if not os.path.exists(tempdir) or not os.path.isdir(tempdir):
-            os.mkdir(tempdir)
-        outfilename = os.path.join(tempdir, infile.filename)
+        
+        save_dir, www_dir = self.session.get_tempaudio_paths()
+        if not os.path.exists(save_dir) or not os.path.isdir(save_dir):
+            os.mkdir(save_dir)
+        
+        outfilename = os.path.join(save_dir, infile.filename)
         self.session.trace_msg("Going to save to %s" % outfilename)
         outfile = file (outfilename, 'wb')
-        
-        # this is the URI used to read the temporary file back from the web server
-        # we'll link to the temp file until it gets integrated into the permanent fileset (done manually for now)
-        if not self.temp_audio_uri.endswith("/"): self.temp_audio_uri += "/"
-        wwwdir = self.temp_audio_uri + self.user["users.langid"] + "/"
-        www_filename = wwwdir + infile.filename
+        www_filename = www_dir + infile.filename
         
         while 1:
             data = infile.file.read(8192)
@@ -119,22 +114,7 @@ class TranslationPage(translate.translate):
             self.session.warn("Uploaded file size is 0")
         else:
             self.session.trace_msg("Uploaded file %s, %d bytes" % (outfile.name, size))
-            # update the tempaudio table
-            # does this have an entry already?
-            request = """SELECT id FROM tempaudio WHERE xmlid="%s" and langid="%s" """ % \
-                (xmlid, langid)
-            self.session.execute_query(request)
-            # if so, just update it
-            if self.session.cursor.rowcount > 0:
-                request = """UPDATE tempaudio SET audiouri="%(audiouri)s" WHERE 
-                    xmlid="%(xmlid)s" AND langid="%(langid)s" """  % \
-                    {"audiouri": www_filename, "xmlid": xmlid, "langid": langid}
-            # otherwise create a new entry
-            else:
-                request = """INSERT INTO tempaudio (audiouri, xmlid, langid) VALUES
-                    ("%(audiouri)s", "%(xmlid)s", "%(langid)s" ) """ % \
-                    {"audiouri": www_filename, "xmlid": xmlid, "langid": langid}
-            self.session.execute_query(request)
+            self.session.write_tempaudio(xmlid, langid, www_filename)
     
     def get_sql_for_view_filter(self, view_filter, table):
         sql = ""
@@ -245,9 +225,7 @@ class TranslationPage(translate.translate):
                     if audiodir != "" and not audiodir.endswith("/"):
                         audiodir += "/"
                     audiouri = permanenturi + audiodir + audiouri + permanenturiparams
-                return audiouri
-            else:
-                return ""
+        return audiouri
     
     def make_table(self, view, page_number):
         """The subclasses must override this function"""

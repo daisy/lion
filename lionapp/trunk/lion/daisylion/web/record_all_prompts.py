@@ -79,13 +79,13 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
     def process_upload(self, zipfile, tempdir):
         """Import their prompts book into the system"""
         # unzip into a directory of the same name
-        os.popen("unzip %s -o -d %s" % (zipfile, os.path.dirname(zipfile)))
+        os.popen("unzip -o %s -d %s" % (zipfile, os.path.dirname(zipfile)))
         
         # get ('/blah/blah/file', '.ext')
         a, b = os.path.splitext(zipfile)
         ncx = os.path.join(a, "obi_dtb.ncx")
         # run the db import script
-        self.session.import_audio_prompts(self.user["users.langid"], ncx)
+        self.session.import_audio_prompts(self.user["users.langid"], ncx, True)
         # move all the mp3 files into the language directory
         os.popen("mv %s/*.mp3 %s" % (a, tempdir))
         self.session.trace_msg("Uploaded file processed")

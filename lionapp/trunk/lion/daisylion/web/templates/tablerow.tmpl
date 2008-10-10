@@ -52,7 +52,7 @@ Template variables:
 </td>
 #if $self.audio_support == True:
 <td valign="top">
-	#if $audiouri != None and len($audiouri) > 0
+	#if $audiouri != None and len($audiouri) > 0:
 	 	<p><a href="$audiouri">Audio (click to play)</a></p>
 	#end if
     Choose an MP3 file:
