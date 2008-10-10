@@ -1,3 +1,5 @@
+from xml.dom import minidom
+
 class LionDBAudioMixIn():
     def accept_all_temp_audio(self, langid):
         """copy the audio uris from the tempaudio table to the permanent table for the given language.

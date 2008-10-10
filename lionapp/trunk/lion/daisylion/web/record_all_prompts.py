@@ -72,21 +72,23 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
         
         # TODO: show a "processing..." page
         
-        self.process_upload(outfilename)
+        self.process_upload(outfilename, tempdir)
         raise cherrypy.InternalRedirect("UploadComplete")
     upload_zipfile_of_prompts.exposed = True
     
-    def process_upload(self, zipfile):
+    def process_upload(self, zipfile, tempdir):
         """Import their prompts book into the system"""
+        # unzip into a directory of the same name
+        os.popen("unzip %s -o -d %s" % (zipfile, os.path.dirname(zipfile)))
+        
         # get ('/blah/blah/file', '.ext')
         a, b = os.path.splitext(zipfile)
         ncx = os.path.join(a, "obi_dtb.ncx")
-        # unzip into a directory of the same name
-        os.popen("unzip %s -d %s" % (zipfile, a))
-        
         # run the db import script
         self.session.import_audio_prompts(self.user["users.langid"], ncx)
-        self.session.trace("Uploaded file processed")
+        # move all the mp3 files into the language directory
+        os.popen("mv %s/*.mp3 %s" % (a, tempdir))
+        self.session.trace_msg("Uploaded file processed")
 
         
 class UploadComplete(uploadcomplete.uploadcomplete):

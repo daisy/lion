@@ -14,16 +14,6 @@ class AmisUiDoc(minidom.Document):
         nothing fatal happens."""
         self.session = session
     
-    def warn(self, msg):
-        """A wrapper for session.warn that checks that session has been set"""
-        if self.session != None:
-            self.session.warn(msg)
-    
-    def trace(self, msg):
-        """a wrapper for session.trace_msg that checks that session has been set"""
-        if self.session != None:
-            self.session.trace_msg(msg)
-    
     def parse_text_element(self, elem):
         """A text element that appears in the following context:
         <parent>
@@ -40,12 +30,14 @@ class AmisUiDoc(minidom.Document):
         text = self.escape_quotes(elem.firstChild.wholeText)
         id = elem.getAttribute("id")
         if id == "":
-            self.warn('No id for text element with text = "%s"' % text)
+            if self.session:
+                self.session.warn('No id for text element with text = "%s"' % text)
         audio = self.get_first_child_with_tagname(elem.parentNode, "audio")
         if not audio: return None
         src = audio.getAttribute("src")
         if src == "":
-            self.session.warn('No src for for audio element near text with id "%s"' % id)
+            if self.session: 
+                self.session.warn('No src for for audio element near text with id "%s"' % id)
         if elem.getAttribute("flag") == "new": status = 3
         elif elem.getAttribute("flag") == "changed": status = 2
         else: status = 1
@@ -159,7 +151,8 @@ class AmisUiDoc(minidom.Document):
 
     def printelements(self, session, elms):
         for el in elms:
-            session.trace_msg("\t%s\n" % el.toxml())
+            if self.session:
+                self.session.trace_msg("\t%s\n" % el.toxml())
 
     
     def escape_quotes(self, str):

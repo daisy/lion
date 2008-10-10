@@ -219,31 +219,35 @@ class TranslationPage(translate.translate):
         else:
             # get the full path to the files' permanent directory.  we need it because audiouris from language
             # tables are relative
-            # And now this is split in two: the directory/param part is from
+            # This is split in two: the directory/param part is from
             # the application table, plus a language-specific directory part.
-            request = """SELECT permanenturi, permanenturiparams FROM
-            application WHERE name="%s" """ % self.application
-            self.session.execute_query(request)
-            permanenturi, permanenturiparams = self.session.cursor.fetchone()
             request = """SELECT audiodir FROM languages WHERE langid="%s" """ %\
                 self.user["users.langid"]
             self.session.execute_query(request)
             audiodir, = self.session.cursor.fetchone()
-            # now select the audiouri itself
-            request = """SELECT audiouri FROM %s WHERE xmlid="%s" """ % \
-                (self.session.make_table_name(langid), xmlid)
-            self.session.execute_query(request)
-            audiouri = self.session.cursor.fetchone()[0]
-            if audiouri != None and audiouri != "":
-                # concatenate the uri strings
-                if permanenturi != "" and not permanenturi.endswith("/"):
-            	    permanenturi += "/"
-                if audiouri.startswith("./"):
-            	    audiouri = audiouri[2:]
-                if audiodir != "" and not audiodir.endswith("/"):
-                    audiodir += "/"
-                audiouri = permanenturi + audiodir + audiouri + permanenturiparams
-        return audiouri
+            # there might not be any permanent audio repository
+            if audiodir != None:
+                request = """SELECT permanenturi, permanenturiparams FROM
+                application WHERE name="%s" """ % self.application
+                self.session.execute_query(request)
+                permanenturi, permanenturiparams = self.session.cursor.fetchone()
+                # now select the audiouri itself
+                request = """SELECT audiouri FROM %s WHERE xmlid="%s" """ % \
+                    (self.session.make_table_name(langid), xmlid)
+                self.session.execute_query(request)
+                audiouri = self.session.cursor.fetchone()[0]
+                if audiouri != None and audiouri != "":
+                    # concatenate the uri strings
+                    if permanenturi != "" and not permanenturi.endswith("/"):
+                	    permanenturi += "/"
+                    if audiouri.startswith("./"):
+                	    audiouri = audiouri[2:]
+                    if audiodir != "" and not audiodir.endswith("/"):
+                        audiodir += "/"
+                    audiouri = permanenturi + audiodir + audiouri + permanenturiparams
+                return audiouri
+            else:
+                return ""
     
     def make_table(self, view, page_number):
         """The subclasses must override this function"""
