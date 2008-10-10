@@ -93,8 +93,11 @@ class ObiImport():
                     if reduce(lambda x, y: x and y == values[0], values, True):
                         # All values are the same, so drop the filename from
                         # the id (keep the role as a prefix)
-                        xmlid, q = self.__add_query(table, id, "", values[0],
-                            role)
+                        files = sorted(pairs.keys())
+                        filestr = reduce(lambda x, y: "%s;%s" % (x, y), files,
+                            files.pop(0))
+                        xmlid, q = self.__add_query(table, id, filestr,
+                            values[0], role)
                         queries[xmlid] = q
                     else:
                         # Values are different so output them all
