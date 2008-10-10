@@ -100,7 +100,7 @@ class TranslationPage(translate.translate):
         self.session.trace_msg("type of infile %s" % type(infile))
         size = 0
         
-        save_dir, www_dir = self.session.get_tempaudio_paths()
+        save_dir, www_dir = self.session.get_tempaudio_paths(langid)
         if not os.path.exists(save_dir) or not os.path.isdir(save_dir):
             os.mkdir(save_dir)
         

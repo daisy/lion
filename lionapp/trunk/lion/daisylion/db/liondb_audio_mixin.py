@@ -1,5 +1,4 @@
 from xml.dom import minidom
-import util
 
 class LionDBAudioMixIn():
     def accept_all_temp_audio(self, langid):
@@ -72,7 +71,7 @@ class LionDBAudioMixIn():
                 
                 # or we're writing to the temp audio table
                 else:
-                    a, b = self.get_tempaudio_paths()
+                    a, b = self.get_tempaudio_paths(langid)
                     self.write_tempaudio(db_xmlid, langid, b + xml_audio_src)
             else:
                 self.warn("""No match between db string="%s" and ncx label="%s"?! (id = %s)""" %
@@ -97,9 +96,7 @@ class LionDBAudioMixIn():
                 {"audiouri": file, "xmlid": xmlid, "langid": langid}
         self.execute_query(request)
 
-    def get_tempaudio_paths(self):
-        user = util.get_user(self)
-        langid = user["users.langid"]
+    def get_tempaudio_paths(self, langid):
         temp_audio_dir = self.config["main"]["temp_audio_dir"]
         temp_audio_uri = self.config["main"]["temp_audio_uri"]
         
