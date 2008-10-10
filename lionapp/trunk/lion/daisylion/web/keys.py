@@ -23,7 +23,7 @@ def validate_keys(key):
 def get_keyboard_translation_flags(session):
     langid = util.get_user(session)["users.langid"]
     session.execute_query("""SELECT translate_mnemonics, translate_accelerators FROM
-        languages WHERE langid="%s" """ % session.make_table_name(langid))
+        languages WHERE langid="%s" """ % langid)
     mnem1, accel1 = session.cursor.fetchone()
     mnem2 = session.has_mnemonics()
     accel2 = session.has_accelerators()
