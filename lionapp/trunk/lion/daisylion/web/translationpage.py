@@ -52,7 +52,8 @@ class TranslationPage(translate.translate):
         self.last_view = view
         user = util.get_user(self.session)
         if user == None:
-            return error.error().respond()
+            e = errorpage.ErrorPage(self.session, "Login error")
+            return e.index()
         self.user = user
         self.language = user["languages.langname"]
         self.view_description = VIEW_DESCRIPTIONS[view]

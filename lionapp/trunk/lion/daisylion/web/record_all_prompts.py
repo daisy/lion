@@ -1,7 +1,8 @@
 import os
+import cherrypy
 import daisylion.db.liondb
 import util
-from templates import batchofprompts, error
+from templates import batchofprompts, error, uploadcomplete
 
 class RecordAllPrompts(batchofprompts.batchofprompts):
     user = None
@@ -11,6 +12,7 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
         self.session = session
         self.host = self.session.config["main"]["webhost"]
         self.port = self.session.config["main"]["webport"]
+        self.temp_audio_dir = self.session.config["main"]["temp_audio_dir"]
         self.error = ""
         self.error_id = ""
         self.warnings = ""
@@ -20,7 +22,8 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
         """Show the page"""
         user = util.get_user(self.session)
         if user == None:
-            return error.error().respond()
+            e = errorpage.ErrorPage(self.session, "Login error")
+            return e.index()
         self.user = user
         self.language = user["languages.langname"]
         return self.respond()
@@ -40,7 +43,63 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
         return strings_xhtml
     generate_prompts_as_xhtml.exposed = True
     
-    def upload_zipfile_of_prompts(self, zipfile):
+    def upload_zipfile_of_prompts(self, infile):
         """Accept a zipfile of the prompts + ncx file."""
-        return """<h1>O HAI!</h1> <p><a href="../MainMenu">Back to the main menu</a></p>"""
+        self.session.trace_msg("Zipfile upload = %s" % infile.filename)
+        self.session.trace_msg("type of file %s" % type(infile.filename))
+        size = 0
+        # calculate the filesystem path to the temporary file storage
+        if not self.temp_audio_dir.endswith("/"): self.temp_audio_dir += "/"
+        tempdir = self.temp_audio_dir + self.user["users.langid"] + "/"
+        if not os.path.exists(tempdir) or not os.path.isdir(tempdir):
+            os.mkdir(tempdir)
+            os.popen("chmod o+r %s" % tempdir)
+        outfilename = os.path.join(tempdir, infile.filename)
+        self.session.trace_msg("Going to save to %s" % outfilename)
+        outfile = file (outfilename, 'wb')
+        
+        while 1:
+            data = infile.file.read(8192)
+            if not data: break
+            else: outfile.write(data)
+            size += len(data)
+        
+        if size == 0:
+            self.session.warn("Uploaded file size is 0")
+        else:
+            self.session.trace_msg("Uploaded file %s, %d bytes" % (outfile.name, size))
+        outfile.close()
+        
+        # TODO: show a "processing..." page
+        
+        self.process_upload(outfilename)
+        raise cherrypy.InternalRedirect("UploadComplete")
     upload_zipfile_of_prompts.exposed = True
+    
+    def process_upload(self, zipfile):
+        """Import their prompts book into the system"""
+        # get ('/blah/blah/file', '.ext')
+        a, b = os.path.splitext(zipfile)
+        ncx = os.path.join(a, "obi_dtb.ncx")
+        # unzip into a directory of the same name
+        os.popen("unzip %s -d %s" % (zipfile, a))
+        
+        # run the db import script
+        self.session.import_audio_prompts(self.user["users.langid"], ncx)
+        self.session.trace("Uploaded file processed")
+
+        
+class UploadComplete(uploadcomplete.uploadcomplete):
+    """This menu gives the tasks for the translators"""
+    def __init__(self, session):
+        self.session = session
+        self.application = self.session.config["main"]["target_app"]
+        self.host = self.session.config["main"]["webhost"]
+        self.port = self.session.config["main"]["webport"]
+        self.appname, self.appversion, self.appdesc, self.appsite, self.applogo = \
+            util.get_application_data(self.session)
+        uploadcomplete.uploadcomplete.__init__(self)
+
+    def index(self):
+        return self.respond()
+    index.exposed = True

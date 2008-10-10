@@ -10,7 +10,8 @@ import translatestrings
 import choosemnemonics
 import chooseaccelerators
 import record_all_prompts
-from templates import login, mainmenu, error, xhtml
+import errorpage
+from templates import login, mainmenu, xhtml
 import daisylion.db.liondb
 import keys
 
@@ -65,7 +66,8 @@ class MainMenu(mainmenu.mainmenu):
         user = util.get_user(self.session)
         if user == None:
             self.session.warn("No user logged in for this session.")
-            return error.error().respond()
+            e = errorpage.ErrorPage(self.session, "Login error")
+            return e.index()
         else:
             self.user = user["users.realname"]
             self.language = user["languages.langname"]
@@ -101,6 +103,7 @@ def main():
     root.ChooseMnemonics = choosemnemonics.ChooseMnemonics(session)
     root.ChooseAccelerators = chooseaccelerators.ChooseAccelerators(session)
     root.RecordAllPrompts = record_all_prompts.RecordAllPrompts(session)
+    root.RecordAllPrompts.UploadComplete = record_all_prompts.UploadComplete(session)
     root.style = "./style/"
     app = cherrypy.tree.mount(root, script_name='/')
     
