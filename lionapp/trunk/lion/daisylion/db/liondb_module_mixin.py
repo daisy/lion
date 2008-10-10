@@ -25,7 +25,7 @@ class LionDBModuleMixIn():
 
         except Exception, e:
             self.die("""Could not load module for application "%s" (%s)""" \
-                % (self.target_app, e))
+                % (self.target_app, e), 1)
         
         return module_object
     

@@ -1,5 +1,6 @@
 import daisylion.db.modules.lion_module
 import obi_import
+import obi_export
 
 class ObiLionIO(daisylion.db.modules.lion_module.LionIOModule):
     """Obi-specific import and export from/to .resx files."""
@@ -15,5 +16,7 @@ class ObiLionIO(daisylion.db.modules.lion_module.LionIOModule):
     def get_removed_ids_after_import(self):
         pass
 
-    def export(session, langid, file):
-        session.trace_msg("EXPORT FROM OBI.")
+    def export(self, session, langid, export_type, output_folder):
+        """Export .resx files for a given language."""
+        exporter = obi_export.export_resx(session, langid, output_folder)
+        return "OK"
