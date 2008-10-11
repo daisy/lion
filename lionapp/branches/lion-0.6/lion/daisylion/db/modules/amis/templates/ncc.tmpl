@@ -1,0 +1,51 @@
+#*
+	$menus
+	$title_chapter
+	$langid
+	$organized_by_menu_chapter
+	$other_commands_chapter
+*#
+#import daisylion.db.modules.amis.keys_book
+
+<?xml version="1.0" encoding="windows-1252"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>$title_chapter[0].caption.text</title>
+		<meta name="dc:title" content="$title_chapter[0].caption.text"/>
+		<meta name="dc:creator" content="DAISY Lion"/>
+		<meta name="dc:date" content="2008-07-08" scheme="yyyy-mm-dd"/>
+		<meta name="dc:format" content="Daisy 2.02"/>
+		<meta name="dc:identifier" content="amis-keyboard-shortcuts-$langid"/>
+		<meta name="dc:language" content="en" scheme="ISO 639"/>
+		<meta name="dc:publisher" content="DAISY Consortium"/>
+		<meta name="ncc:depth" content="2"/>
+		<meta name="ncc:multimediaType" content="audioNcc"/>
+		<meta name="ncc:charset" content="utf-8"/>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+		<meta name="ncc:tocItems" content="0"/>
+	</head>
+	<body>
+		
+		<h1 class="title" id="nav1">
+			<a href="1.smil#$title_chapter[0].caption.id">$title_chapter[0].caption.text</a>
+		</h1>
+		
+		<h1 id="nav2">
+			<a href="2.smil#$organized_by_menu_chapter[0].caption.id">$organized_by_menu_chapter[0].caption.text</a>
+		</h1>
+		
+		#set $count=3
+		#for $menu in $menus:
+			<h2 id="nav$count">
+				<a href="${count}.smil#$menu[0].caption.id">$menu[0].caption.text</a>
+			</h2>
+			#set $count += 1
+		#end for
+		<h1 id="nav$count">
+			<a href="${count}.smil#$other_commands_chapter[0].caption.id">
+				$other_commands_chapter[0].caption.text</a>
+		</h1>
+		
+	</body>
+</html>

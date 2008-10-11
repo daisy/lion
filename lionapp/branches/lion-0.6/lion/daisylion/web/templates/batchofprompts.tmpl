@@ -1,0 +1,47 @@
+#*
+Template variables:
+	user = user's real name
+	language = language name
+	actions = list of menu links
+*#
+
+#from xhtml import xhtml
+#extends xhtml
+#def title
+
+#end def
+#def body
+<h1>Prompts</h1>
+<p>After you've translated all the items, you can choose to record them all at once and upload them here.  This can be easier than uploading an individual file for each prompt if you have a lot to upload.  Typically, you only need to do this batch upload of prompts if you are recording your entire translation for the first time.</p>
+
+<h2>Get Obi</h2>
+<p>Obi is the name of the recording tool you will use to do the recording.  <a href="http://daisy-trac.cvsdude.com/obi">Download Obi</a> and then install it.</p>
+
+<h2>Import</h2>
+<p>Press this button to download an XHTML file containing all your prompts.  Save this file to your disk.  Start Obi and create a new project by importing this file.  You should see all your prompts on the screen, each as a section heading.
+
+<form action="generate_prompts_as_xhtml" method="GET">
+<input type="Submit" value="Download"/>
+</form>
+
+<h2>Record your project</h2>
+<p>Using a microphone, record your narration of each prompt.  Make sure the audio isn't too quiet.</p>
+
+<h2>Prepare your project</h2>
+<p>Perform these actions from Obi:</p>
+<ul>
+	<li>Under the &quot;Tools&quot; menu, select &quot;Export as DAISY&quot;</li>
+	<li>Under the &quot;Tools&quot; menu, select &quot;DTBAudioEncoder&quot;
+</ul>
+<p>Then exit Obi. Find your project folder and look for a subfolder called &quot;MP3&quot;.  Create a zip of that folder.</p>
+
+<h2>Upload your files</h2>
+<p>Upload your zipfile using the file browser and upload button below.  Please remain on this page until your upload has completed.</p>
+<form action="upload_zipfile_of_prompts" method="POST" enctype="multipart/form-data">
+<input type="file" name="infile" value="Browse"/>
+<br/>
+<input type="Submit" value="Upload"/>
+</form>
+
+<p><a href="../MainMenu">Back to the main menu</a></p>
+#end def
