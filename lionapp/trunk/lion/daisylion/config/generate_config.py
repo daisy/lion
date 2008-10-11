@@ -26,7 +26,7 @@ module=amis
 "obi": 
 """audio_support=false
 dbname=obi_resx
-target_app=obi
+target_app=obi1
 module=obi
 """
 }
