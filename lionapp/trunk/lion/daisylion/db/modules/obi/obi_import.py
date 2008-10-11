@@ -27,7 +27,9 @@ def get_strings(file):
     .AccessibleSomething. The id is the name of that element (which will also
     be qualified by the file where it came from). The text is the content of
     the first text child element."""
-    strings = {"STRING":{}, "MNEMONIC":{}, "ACCELERATOR":{}}
+    # We add a fake REMARKS field to store remarks; they will be integrated
+    # back into the table after the strings have been added.
+    strings = {"STRING":{}, "MNEMONIC":{}, "ACCELERATOR":{}, "REMARKS":{}}
     doc = minidom.parse(file)
     for data in doc.getElementsByTagName("data"):
         try:
@@ -57,6 +59,13 @@ def get_strings(file):
                     strings["STRING"][xmlid] = re.sub("\s*\(&.\)|&", "", text)
                 else:
                     strings["STRING"][xmlid] = text
+            # Get comments as well
+            comments = data.getElementsByTagName("comment")
+            if len(comments) > 0:
+                comments[0].normalize()
+                if comments[0].hasChildNodes():
+                    strings["REMARKS"][xmlid] = re.sub("""(["'])""", r"\\\1",
+                        comments[0].firstChild.data)
         except:
             pass
     return strings
@@ -101,7 +110,7 @@ def get_role_from_xmlid(xmlid):
     """Get back the role from the xmlid suffix."""
     suffix = xmlid[-1]
     return suffix == "S" and "STRING" or suffix == "M" and "MNEMONIC" \
-        or suffix == "A" and "ACCELERATOR"
+        or suffix == "A" and "ACCELERATOR" or suffix == "R" and "REMARKS"
 
 
 class ObiImport():
@@ -116,12 +125,25 @@ class ObiImport():
         xmlids = get_strings_by_xmlid(files)
         table = self.session.make_table_name(langid)
         self.session.execute_query("DELETE FROM %s" % table)
+        remarks = []
         for xmlid in sorted(xmlids.keys()):
             role = get_role_from_xmlid(xmlid)
-            self.session.execute_query("""INSERT INTO %s
-                (xmlid, textstring, role, status, mnemonicgroup)
-                VALUES ("%s", "%s", "%s", 3, 0)""" \
-                % (table, xmlid, xmlids[xmlid], role))
+            if role == "REMARKS":
+                # We'll handle remarks later
+                remarks.append(xmlid)
+            else:
+                self.session.execute_query("""INSERT INTO %s
+                    (xmlid, textstring, role, status, mnemonicgroup)
+                    VALUES ("%s", "%s", "%s", 3, 0)""" \
+                    % (table, xmlid, xmlids[xmlid], role))
+        for xmlid in remarks:
+            x = re.sub("R$", "S", xmlid)
+            if xmlids.has_key(x):
+                self.session.execute_query("""UPDATE %s
+                    SET remarks="%s" WHERE xmlid="%s" """ \
+                    % (table, xmlids[xmlid], x))
+            else:
+                self.session.warn("Couldn't match remark for %s" % xmlid)
 
     def populate_from_resx(self, files, langid):
         """Populate strings for a slave language from a list of .resx files.
