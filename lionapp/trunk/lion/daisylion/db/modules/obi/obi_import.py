@@ -116,8 +116,20 @@ class ObiImport():
         The language table must already exist; replace strings that exist in
         the database with values from the .resx files and skip those that
         don't exist in the database."""
-        self.session.die("Populate is not implemented yet", 1)
-
+        if self.session.check_language(langid) == False:
+            self.die("Language %s does not exist" % langid)
+        table = self.make_table_name(langid)
+        strings = get_all_strings(files)    
+        
+        #### 
+        # these 2 lines will change
+        for s in strings:
+            id = make_id(s)
+        ####
+            request = """UPDATE %s SET textstring="%s" WHERE xmlid="%s" """ % \
+                (table, s, id)
+            self.session.execute_query(request)
+    
     def update_from_resx(self, files, langid):
         """Update strings from a list of .resx files: replace those that have a
         different value; remove old strings that are not in the new import and
