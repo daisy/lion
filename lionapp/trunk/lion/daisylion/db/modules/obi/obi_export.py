@@ -1,4 +1,5 @@
 from xml.dom import minidom
+import obi_import
 import re
 
 def export_resx(session, langid, dir):
@@ -8,12 +9,13 @@ def export_resx(session, langid, dir):
     Dialogs/About.resx becomes Dialogs/About.gi.resx)"""
     dir = re.sub("/$", "", dir)
     session.trace_msg("export_resx %s %s %s" % (session, langid, dir))
-    session.execute_query("SELECT langid_short FROM languages WHERE langid=%s"\
+    session.execute_query(
+        """SELECT langid_short FROM languages WHERE langid="%s" """ \
         % langid)
     langid_short, = session.cursor.fetchone()
     session.trace_msg("langid_short = %s" % langid_short)
-    strings = __fetch_strings(session)
-    __apply_mnemonics(strings, session)
+    strings = fetch_strings(langid, session)
+    apply_mnemonics(strings, session)
     for file in strings.keys():
         path_orig = dir + "/" + file + ".resx"
         path = dir + "/" + file + "." + langid_short + ".resx"
@@ -43,29 +45,34 @@ def export_resx(session, langid, dir):
             session.die("Couldn't export %s (%s)" % (path, e), 1)
 
 
-def __apply_mnemonics(strings, session):
+def apply_mnemonics(strings, session):
     """Apply mnemonics to strings by reintroducing the & special form."""
     for file in strings["MNEMONIC"].keys():
-        for name, mnemonic in strings["MNEMONIC"][file].iteritems:
+        for name, mnemonic in strings["MNEMONIC"][file].iteritems():
             if strings["STRING"].has_key(file) and \
                 strings["STRING"][file].has_key(name):
-                pass
+                s = strings["STRING"][file][name]
+                ss = re.sub("(%s)" % mnemonic, "&\\1", s, 1)
+                if s == ss:
+                    strings["STRING"][file][name] = "%s (%s)" % (s, mnemonic)
+                else:
+                    strings["STRING"][file][name] = ss
             else:
                 session.warn("No match in strings for mnemonic %s:%s" \
                     (file, name))
 
-def __fetch_strings(session):
+def fetch_strings(langid, session):
     """Fetch all strings from the DB and organize them by role, file, and
     name. Return the dictionary of these strings."""
-    # We only care about STRING and MNEMONIC roles at this point.
-    strings = {"STRING": {}, "MNEMONIC": {}}
+    strings = {}
     session.execute_query("SELECT xmlid, textstring, role FROM %s" % langid)
     for row in session.cursor.fetchall():
         xmlid, textstring, role = row
-        m = re.match("\\w:([^:]+):(.+)", xmlid)
+        m = re.match("([^:]+):([^:]+)", xmlid)
         if m:
             files, name = m.groups()
             for file in files.rsplit(";"):
-                if not strings[role].has_key[file]: strings[role][file] = {}
-                strings[role][file] = textstring
+                if not strings.has_key(role): strings[role] = {}
+                if not strings[role].has_key(file): strings[role][file] = {}
+                strings[role][file][name] = textstring
     return strings
