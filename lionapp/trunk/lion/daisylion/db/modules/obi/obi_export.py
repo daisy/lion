@@ -14,8 +14,9 @@ def export_resx(session, langid, dir):
         % langid)
     langid_short, = session.cursor.fetchone()
     session.trace_msg("langid_short = %s" % langid_short)
-    strings = fetch_strings(langid, session)
-    apply_mnemonics(strings, session)
+    all_strings = fetch_strings(langid, session)
+    apply_mnemonics(all_strings, session)
+    strings = all_strings["STRING"]
     for file in strings.keys():
         path_orig = dir + "/" + file + ".resx"
         path = dir + "/" + file + "." + langid_short + ".resx"
@@ -54,7 +55,7 @@ def apply_mnemonics(strings, session):
                 s = strings["STRING"][file][name]
                 ss = re.sub("(%s)" % mnemonic, "&\\1", s, 1)
                 if s == ss:
-                    strings["STRING"][file][name] = "%s (%s)" % (s, mnemonic)
+                    strings["STRING"][file][name] = "%s (&%s)" % (s, mnemonic)
                 else:
                     strings["STRING"][file][name] = ss
             else:
