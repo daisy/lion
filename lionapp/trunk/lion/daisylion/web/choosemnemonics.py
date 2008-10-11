@@ -121,8 +121,12 @@ class ChooseMnemonics(TranslationPage):
             group_id = r[0]
             # get the difference between the total items in the mnemonic group and the
             # distinct strings in the mnemonic group
-            expr1 = "SELECT count(*) FROM %s WHERE mnemonicgroup = %d" % (table, group_id)
-            expr2 = "SELECT count(DISTINCT textstring) FROM %s WHERE mnemonicgroup = %d" % (table, group_id)
+            expr1 = """SELECT count(textstring) FROM %s 
+                WHERE mnemonicgroup = %d 
+                AND role="MNEMONIC" """ % (table, group_id)
+            expr2 = """SELECT count(DISTINCT textstring) FROM %s 
+                WHERE mnemonicgroup = %d
+                AND role="MNEMONIC" """ % (table, group_id)
             request = "SELECT (%s) - (%s) AS diff_rows" % (expr1, expr2)
             self.session.execute_query(request)
             # if the two sets are not the same length, there is a conflict somewhere

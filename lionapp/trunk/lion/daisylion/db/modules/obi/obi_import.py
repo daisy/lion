@@ -130,16 +130,11 @@ class ObiImport():
         don't exist in the database."""
         if self.session.check_language(langid) == False:
             self.session.die("Language %s does not exist" % langid, 1)
-        table = self.make_table_name(langid)
-        strings = get_all_strings(files)    
-        
-        #### 
-        # these 2 lines will change
-        for s in strings:
-            id = make_id(s)
-        ####
-            request = """UPDATE %s SET textstring="%s" WHERE xmlid="%s" """ % \
-                (table, s, id)
+        table = self.session.make_table_name(langid)
+        strings = get_strings_by_xmlid(files)    
+        for id in strings.keys():
+            request = """UPDATE %s SET textstring="%s", status=1 WHERE xmlid="%s" """ % \
+                (table, strings[id], id)
             self.session.execute_query(request)
     
     def update_from_resx(self, files, langid):

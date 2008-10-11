@@ -132,7 +132,7 @@ class AmisImport():
             items = self.doc.get_items_in_container(elem)
             
             self.session.trace_msg("group id = %d" % groupid)
-            self.doc.printelements(self.session, items)
+            #self.doc.printelements(self.session, items)
             
             self.__get_mnemonics_and_write_data(items, groupid)
             groupid += 1
@@ -142,7 +142,8 @@ class AmisImport():
             items = self.doc.get_items_in_dialog(elem)
             self.__get_mnemonics_and_write_data(items, groupid)
             self.session.trace_msg("group id = %d" % groupid)
-            self.doc.printelements(self.session, items)
+            if groupid == 20:
+                self.doc.printelements(self.session, items)
             groupid += 1
 
 

@@ -3,7 +3,7 @@ from daisylion.db.liondb import LionDB
 
 def main():
     usage = """usage: %prog [options] sqlstatement
-    Type %s for the language table name
+    Type %(table)s as a token for the language table name
     
     This will run the sql query on all language tables"""
     
@@ -22,7 +22,7 @@ def main():
         exit(1)
     
     for l in all_langs:
-        request = sql % session.make_table_name(l[0])
+        request = sql % {"table": session.make_table_name(l[0])}
         try:
             session.execute_query(request)
         except Exception, e:

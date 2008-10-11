@@ -10,7 +10,7 @@ def main():
     
     usage = """usage: %prog [options] langid file"""
     parser = GlobalOptionsParser(usage=usage)
-    parser.add_option("-e", "--import_type", dest="import_type", type="int", default=1, 
+    parser.add_option("-i", "--importtype", dest="import_type", type="int", default=1, 
         help=import_description)
     (options, args) = parser.parse_args()
     parser.check_args(2, args)
