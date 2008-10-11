@@ -11,7 +11,8 @@ import inspect
 VIEW_DESCRIPTIONS = {"all": "all items", 
     "newtodo": "all items marked new or to-do", 
     "new": "all new items", 
-    "todo": "all to-do items"}
+    "todo": "all to-do items", 
+    "allok": "all completed items"}
 
 class TranslationPage(translate.translate):
     """The base class for a page of items to be translated
@@ -28,7 +29,7 @@ class TranslationPage(translate.translate):
     
     def __init__(self, session):
         self.session = session
-        self.application = self.session.config["main"]["target_app"]
+        self.appid = self.session.config["main"]["target_app"]
         self.host = self.session.config["main"]["webhost"]
         self.port = self.session.config["main"]["webport"]
         self.masterlang = self.session.config["main"]["masterlang"]
@@ -131,6 +132,8 @@ class TranslationPage(translate.translate):
         elif view_filter == "newtodo":
             sql = "and (%(table)s.status=2 or %(table)s.status=3)" % \
                 {"table": table}
+        elif view_filter == "allok":
+            sql = "and (%s.status=1)" % table
         else:
             sql = ""
         return sql
@@ -214,7 +217,7 @@ class TranslationPage(translate.translate):
             # there might not be any permanent audio repository
             if audiodir != None:
                 request = """SELECT permanenturi, permanenturiparams FROM
-                application WHERE name="%s" """ % self.application
+                application WHERE appid="%s" """ % self.appid
                 self.session.execute_query(request)
                 permanenturi, permanenturiparams = self.session.cursor.fetchone()
                 # now select the audiouri itself

@@ -75,7 +75,7 @@ def read_cookie():
 
 def get_application_data(session):
     request = """SELECT name, version, description, website, logo 
-        FROM application WHERE name="%s" """ % (session.config["main"]["target_app"])
+        FROM application WHERE appid="%s" """ % (session.config["main"]["target_app"])
     session.execute_query(request)
     name, version, description, website, logo = session.cursor.fetchone()
     return (name, version, description, website, logo)

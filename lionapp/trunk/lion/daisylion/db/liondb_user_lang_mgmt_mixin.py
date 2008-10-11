@@ -120,7 +120,10 @@ class LionDBUserLangMgmtMixIn():
         # drop the table with the language data
         table = self.make_table_name(langid)
         self.execute_query("""DROP TABLE %s""" % table)
-
+        
+        #clear any entries in the tempaudio table that use this langid
+        self.execute_query("""DELETE FROM tempaudio WHERE langid="%s" """ % langid)
+    
     def __add_user_to_database(self, langid, username, password, realname, email):
         """add user to the users table.  their associated language should already exist"""
         self.execute_query("""INSERT INTO users (username, realname, password, \
@@ -136,7 +139,7 @@ class LionDBUserLangMgmtMixIn():
         the initial value is None; otherwise, return the supplied initial
         value."""
         if initial == None:
-            self.execute_query("SELECT %s FROM application WHERE name='%s'" \
+            self.execute_query("SELECT %s FROM application WHERE appid='%s'" \
                 % (field, self.config["main"]["target_app"]))
             value, = self.cursor.fetchone()
             self.trace_msg("Using default value %s for %s" % (value, field))

@@ -54,7 +54,7 @@ class MainMenu(mainmenu.mainmenu):
     
     def __init__(self, session):
         self.session = session
-        self.application = self.session.config["main"]["target_app"]
+        self.appid = self.session.config["main"]["target_app"]
         self.host = self.session.config["main"]["webhost"]
         self.port = self.session.config["main"]["webport"]
         self.audio_support = self.session.config["main"]["audio_support"]
@@ -73,7 +73,7 @@ class MainMenu(mainmenu.mainmenu):
             self.user = user["users.realname"]
             self.language = user["languages.langname"]
             self.session.execute_query("""SELECT addldocsuri, addldocsdesc FROM
-                application WHERE name="%s" """ % self.application)
+                application WHERE appid="%s" """ % self.appid)
             self.addldocsuri, self.addldocsdesc = self.session.cursor.fetchone()
             self.translate_mnemonics, self.translate_accelerators = \
                 keys.get_keyboard_translation_flags(self.session)

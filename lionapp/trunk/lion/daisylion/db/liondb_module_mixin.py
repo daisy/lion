@@ -6,9 +6,11 @@ class LionDBModuleMixIn():
         # Import the application module, which lives here:
         # top-level/modules/APP/lionio_APP.someclass
         # someclass is defined in the config file and it inherits from LionIOModule
-        self.dbio = self.load_module(self.target_app, 
-            self.config[self.target_app]["lioniomodule"],
-            self.config[self.target_app]["lionioclass"])
+        mod = self.config["main"]["module"]
+        self.dbio = self.load_module(
+            mod, 
+            self.config[mod]["lioniomodule"],
+            self.config[mod]["lionioclass"])
     
     def load_module(self, app, module_file, class_name):
         # Import the application module, which lives here:

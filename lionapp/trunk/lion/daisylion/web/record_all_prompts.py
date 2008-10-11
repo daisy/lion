@@ -70,8 +70,6 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
             self.session.trace_msg("Uploaded file %s, %d bytes" % (outfile.name, size))
         outfile.close()
         
-        # TODO: show a "processing..." page
-        
         self.process_upload(outfilename, tempdir)
         raise cherrypy.InternalRedirect("UploadComplete")
     upload_zipfile_of_prompts.exposed = True
@@ -92,10 +90,10 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
 
         
 class UploadComplete(uploadcomplete.uploadcomplete):
-    """This menu gives the tasks for the translators"""
+    """This is shown when the zipfile upload has completed"""
     def __init__(self, session):
         self.session = session
-        self.application = self.session.config["main"]["target_app"]
+        self.appid = self.session.config["main"]["target_app"]
         self.host = self.session.config["main"]["webhost"]
         self.port = self.session.config["main"]["webport"]
         self.appname, self.appversion, self.appdesc, self.appsite, self.applogo = \

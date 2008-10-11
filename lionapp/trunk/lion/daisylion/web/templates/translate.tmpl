@@ -30,12 +30,15 @@ False
 #set $newtodo_selected = ""
 #set $new_selected = ""
 #set $todo_selected = ""
+#set $allok_selected = ""
 #if $last_view == "todo":
 	#set $todo_selected = "SELECTED"
 #elif $last_view == "newtodo":
 	#set $newtodo_selected = "SELECTED"
 #elif $last_view == "new":
 	#set $new_selected = "SELECTED"
+#elif $last_view == "allok":
+	#set $allok_selected = "SELECTED"
 #else:
 	#set $all_selected = "SELECTED"
 #end if
@@ -70,6 +73,7 @@ False
 	        <option $newtodo_selected value="newtodo">all items marked new or to-do</option>
 	        <option $new_selected value="new">all new items</option>
 	        <option $todo_selected value="todo">all to-do items</option>
+			<option $allok_selected value="allok">all done items</option>
 	    </select>
 	    <input type="submit" value="Change view" />
 	</form>

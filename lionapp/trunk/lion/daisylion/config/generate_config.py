@@ -19,13 +19,15 @@ DYNAMIC_APP_SECTION = {
 "amis": 
 """audio_support=true
 dbname=amislion
-target_app=amis
+target_app=amis3
+module=amis
 """,
 
 "obi": 
 """audio_support=false
 dbname=obi_resx
 target_app=obi
+module=obi
 """
 }
 
