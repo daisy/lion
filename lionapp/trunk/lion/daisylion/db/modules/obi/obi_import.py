@@ -91,8 +91,8 @@ class ObiImport():
                     # is different for all occurrences.
                     values = pairs.values()
                     if reduce(lambda x, y: x and y == values[0], values, True):
-                        # All values are the same, so drop the filename from
-                        # the id (keep the role as a prefix)
+                        # All values are the same, so list all files that
+                        # contain it for the id separated by ;
                         files = sorted(pairs.keys())
                         filestr = reduce(lambda x, y: "%s;%s" % (x, y), files,
                             files.pop(0))
@@ -111,10 +111,18 @@ class ObiImport():
                 self.session.execute_query(queries[xmlid])
         self.session.trace_msg("done: import_resx")
 
-    def update_from_resx(self, path, langid):
-        """Update strings from a .resx file: replace those that have a
+    def populate_from_resx(self, files, langid):
+        """Populate strings for a slave language from a list of .resx files.
+        The language table must already exist; replace strings that exist in
+        the database with values from the .resx files and skip those that
+        don't exist in the database."""
+        self.session.die("Populate is not implemented yet", 1)
+
+    def update_from_resx(self, files, langid):
+        """Update strings from a list of .resx files: replace those that have a
         different value; remove old strings that are not in the new import and
         add new ones."""
+        self.session.die("Update is not implemented yet", 1)
 
 
     def __add_query(self, table, id, file, textstring, role, status=3):
