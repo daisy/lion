@@ -12,7 +12,7 @@ def get_all_strings(files):
         # Use the base name of the file (remove common directory prefix and
         # extension) as a part of the id of strings, since many may share the
         # same name (like label1.Text for instance.)
-        file_stem = re.sub("\\.resx$", "", file)
+        file_stem = re.sub("(\\.\\w+)?\\.resx$", "", file)
         file_stem = re.sub("^%s" % prefix, "", file_stem)
         for role in new_strings.keys():
             if not strings.has_key(role): strings[role] = {}
