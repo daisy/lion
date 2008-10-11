@@ -54,8 +54,6 @@ def __apply_mnemonics(strings, session):
                 session.warn("No match in strings for mnemonic %s:%s" \
                     (file, name))
 
-
-
 def __fetch_strings(session):
     """Fetch all strings from the DB and organize them by role, file, and
     name. Return the dictionary of these strings."""

@@ -61,6 +61,48 @@ def get_strings(file):
             pass
     return strings
 
+def get_strings_by_xmlid(files):
+    """Get all strings indexed by their xmlid for easy sorting and retrieval."""
+    strings = get_all_strings(files)
+    xmlids = {}
+    for role in strings.keys():
+        suffix = role[0]
+        for id, pairs in strings[role].iteritems():
+            l = len(pairs.keys())
+            if l == 1:
+                # Only one string with this name/id so it is prefixed with
+                # its role and its file name
+                xmlids[get_xmlid(pairs.keys()[0], id, suffix)] = \
+                    pairs.values()[0]
+            elif l > 1:
+                # Several pairs; this can be either common labels like
+                # mOKButton.Text (which should all have the same value)
+                # or just a common name like label1.Text where the value
+                # is different for all occurrences.
+                values = pairs.values()
+                if reduce(lambda x, y: x and y == values[0], values, True):
+                    # All values are the same, so list all files that
+                    # contain it for the id separated by ;
+                    files = sorted(pairs.keys())
+                    filestr = reduce(lambda x, y: "%s;%s" % (x, y), files,
+                        files.pop(0))
+                    xmlids[get_xmlid(filestr, id, suffix)] = values[0]
+                else:
+                    # Values are different so output them all
+                    for stem, text in pairs.iteritems():
+                        xmlids[get_xmlid(stem, id, suffix)] = text
+    return xmlids
+
+def get_xmlid(file, id, suffix):
+    """Create an xmlid id from the name, file stem list and role suffix."""
+    return "%s:%s:%s" % (file, id, suffix)
+
+def get_role_from_xmlid(xmlid):
+    """Get back the role from the xmlid suffix."""
+    suffix = xmlid[-1]
+    return suffix == "S" and "STRING" or suffix == "M" and "MNEMONIC" \
+        or suffix == "A" and "ACCELERATOR"
+
 
 class ObiImport():
 
@@ -68,48 +110,18 @@ class ObiImport():
         """Creat a new import object for a session."""
         self.session = session
 
+
     def import_resx(self, files, langid):
         """Import strings from a list of .resx files."""
-        strings = get_all_strings(files)
+        xmlids = get_strings_by_xmlid(files)
         table = self.session.make_table_name(langid)
         self.session.execute_query("DELETE FROM %s" % table)
-        for role in strings.keys():
-            prefix = role[0]
-            queries = {}
-            for id, pairs in strings[role].iteritems():
-                l = len(pairs.keys())
-                if l == 1:
-                    # Only one string with this name/id so it is prefixed with
-                    # its role and its file name
-                    xmlid, q = self.__add_query(table, id, pairs.keys()[0],
-                        pairs.values()[0], role)
-                    queries[xmlid] = q
-                elif l > 1:
-                    # Several pairs; this can be either common labels like
-                    # mOKButton.Text (which should all have the same value)
-                    # or just a common name like label1.Text where the value
-                    # is different for all occurrences.
-                    values = pairs.values()
-                    if reduce(lambda x, y: x and y == values[0], values, True):
-                        # All values are the same, so list all files that
-                        # contain it for the id separated by ;
-                        files = sorted(pairs.keys())
-                        filestr = reduce(lambda x, y: "%s;%s" % (x, y), files,
-                            files.pop(0))
-                        xmlid, q = self.__add_query(table, id, filestr,
-                            values[0], role)
-                        queries[xmlid] = q
-                    else:
-                        # Values are different so output them all
-                        for stem, text in pairs.iteritems():
-                            xmlid, q = self.__add_query(table, id, stem, text,
-                                role)
-                            queries[xmlid] = q
-            # Execute queries in the order of the xmlids (hopefully this order
-            # will make sense to users)
-            for xmlid in sorted(queries.keys()):
-                self.session.execute_query(queries[xmlid])
-        self.session.trace_msg("done: import_resx")
+        for xmlid in sorted(xmlids.keys()):
+            role = get_role_from_xmlid(xmlid)
+            self.session.execute_query("""INSERT INTO %s
+                (xmlid, textstring, role, status, mnemonicgroup)
+                VALUES ("%s", "%s", "%s", 3, 0)""" \
+                % (table, xmlid, xmlids[xmlid], role))
 
     def populate_from_resx(self, files, langid):
         """Populate strings for a slave language from a list of .resx files.
@@ -117,7 +129,7 @@ class ObiImport():
         the database with values from the .resx files and skip those that
         don't exist in the database."""
         if self.session.check_language(langid) == False:
-            self.die("Language %s does not exist" % langid)
+            self.session.die("Language %s does not exist" % langid, 1)
         table = self.make_table_name(langid)
         strings = get_all_strings(files)    
         
@@ -135,15 +147,3 @@ class ObiImport():
         different value; remove old strings that are not in the new import and
         add new ones."""
         self.session.die("Update is not implemented yet", 1)
-
-
-    def __add_query(self, table, id, file, textstring, role, status=3):
-        """Creat a query to add a string in the DB. Return the xmlid that is
-        being build for this string as well as the query to be executed
-        later."""
-        prefix = role[0]
-        xmlid = "%s:%s:%s" % (prefix, file, id)
-        return xmlid, """INSERT INTO %s
-            (xmlid, textstring, role, status, mnemonicgroup)
-            VALUES ("%s", "%s", "%s", %d, 0)""" \
-            % (table, xmlid, textstring, role, status)
