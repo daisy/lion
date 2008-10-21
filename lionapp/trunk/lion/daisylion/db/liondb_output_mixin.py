@@ -21,7 +21,10 @@ class LionDBOutputMixIn():
         """Get all strings that have the given roles"""
         output = """<?xml version="1.0"?>\n<strings langid=\"""" + langid + "\">"
         for item in results:
-            output += """<s id="%s">%s</s>""" % (item[0], item[1].encode("utf-8"))
+            id_attr = ""
+            if item[0] != None and item[0] != "":
+                id_addr = """ id=\"%s\"""" % item[0].encode("utf-8")
+            output += """<s%s>%s</s>""" % (id_addr, item[1].encode("utf-8"))
         output += "</strings>"
         return output
     
