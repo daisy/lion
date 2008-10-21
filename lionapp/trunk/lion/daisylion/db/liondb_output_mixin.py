@@ -3,7 +3,7 @@ class LionDBOutputMixIn():
         """Export all text strings to stdout.  Exclude mnemonic and accelerator items."""
         self.trace_msg("Export all strings to stdout")
         table = self.make_table_name(langid)
-        self.execute_query("""SELECT textstring FROM """ + table + """
+        self.execute_query("""SELECT xmlid, textstring FROM """ + table + """
             where (role="STRING" or role="MENUITEM" or role="DIALOG" or \
             role="CONTROL") and translate=1""")
         strings = self.cursor.fetchall()
@@ -13,7 +13,7 @@ class LionDBOutputMixIn():
         """Export all strings to stdout"""
         self.trace_msg("Export strings to stdout")
         table = self.make_table_name(langid)
-        self.execute_query("SELECT textstring FROM " + table)
+        self.execute_query("SELECT xmlid, textstring FROM " + table)
         strings = self.cursor.fetchall()
         return self.__stringlist_to_xml(strings, langid)
     
@@ -21,7 +21,7 @@ class LionDBOutputMixIn():
         """Get all strings that have the given roles"""
         output = """<?xml version="1.0"?>\n<strings langid=\"""" + langid + "\">"
         for item in results:
-            output += "<s>" + item[0].encode("utf-8") + "</s>"
+            output += """<s id="%s">%s</s>""" % (item[0], item[1].encode("utf-8"))
         output += "</strings>"
         return output
     
