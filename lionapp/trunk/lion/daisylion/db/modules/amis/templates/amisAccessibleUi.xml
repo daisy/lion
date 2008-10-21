@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ui xmlns="http://amisproject.org" next-id="t435" xml:lang="en">
+<ui xmlns="http://amisproject.org" next-id="t438" xml:lang="en">
     <containers>
         <container id="file">
             <note>This is the menu header &quot;File&quot;</note>
@@ -1986,6 +1986,24 @@ Adaptive Multimedia Information System</text>
                     <audio src="./audio/speechgen0310.mp3" from="file:///Users/marisa/Projects/amis/amisapp/trunk/pipeline/book/daisy202/speechgen0310.smil#text319"/>
                 </promptItem>
             </prompt>
-        </generalPrompts>
+            <prompt id="searching_for_text">
+               <promptItem>
+                 <text id="t435">Searching for text</text>
+                 <audio src=""/>
+               </promptItem>
+           </prompt>
+           <prompt id="not_found">
+             <promptItem>
+               <text id="t436">Text not found</text>
+               <audio src=""/>
+             </promptItem>
+           </prompt>
+           <prompt id="paused">
+             <promptItem>
+               <text id="t437">Paused</text>
+               <audio src=""/>
+             </promptItem>
+           </prompt>
+          </generalPrompts>
     </prompts>
 </ui>

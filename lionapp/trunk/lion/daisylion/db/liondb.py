@@ -290,10 +290,11 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
                             "xmlid": xmlid, \
                             "role": role, "mnem": mnem, "target": target, \
                             "keys": keys})
-            if removed_ids != None:
+            if removed_ids != None and len(removed_ids) > 0:
                 for id in removed_ids:
-                    self.execute_query("DELETE FROM %(table)s WHERE \
-                        xmlid='%(xmlid)s'" % {"table": langtable, "xmlid": id})
+                    if id != "":
+                        self.execute_query("DELETE FROM %(table)s WHERE \
+                            xmlid='%(xmlid)s'" % {"table": langtable, "xmlid": id})
         #end language list loop
 
         # clear the flags in the master table -- otherwise the changes get 
