@@ -18,6 +18,7 @@ def export_xml(session, file, langid):
     
     table = session.make_table_name(langid)
     session.execute_query("SELECT xmlid, textstring, actualkeys, role, audiouri FROM %s" % table)
+    
     for xmlid, textstring, actualkeys, role, audiouri in session.cursor:
         if audiouri == None:
             audiouri = ""

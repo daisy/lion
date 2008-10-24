@@ -66,6 +66,9 @@ class LionDBAudioMixIn():
             if xml_text == db_text and xml_audio_src != "":
                 # if we're writing permanent audio uris to the language table
                 if audio_is_temporary == False:
+                    audio_dir_prefix = self.config["main"]["audio_dir_prefix"]
+                    if not audio_dir_prefix.endswith("/"): audio_dir_prefix += "/"
+                    xml_audio_src = audio_dir_prefix + xml_audio_src
                     self.execute_query("""UPDATE %s SET audiouri="%s" WHERE xmlid="%s" """ %
                         (self.make_table_name(langid), xml_audio_src, db_xmlid))
                 
