@@ -68,8 +68,8 @@ def export_rc(session, langid):
 def export_keys_book(session, xmlfile, langid, folder, audio_source_dir):
     """Fill in the templates for the keyboard shortcuts book"""
     session.trace_msg ("Keyboard shortcuts book export for %s" % (langid))
-    keys_book.export_keys_book(session, xmlfile, langid, folder)
-    session.trace_msg("Saved in %s.  Just add the audio clips!" % folder)
+    keys_book.export_keys_book(session, xmlfile, langid, folder, audio_source_dir)
+    session.trace_msg("Saved in %s." % folder)
 
 if __name__ == "__main__":
     export_keys_book(None, "", "", "")

@@ -86,7 +86,7 @@ def export_keys_book(session, xmlfile, langid, folder, local_audio_dir):
     smil.textfile = textfilename
     
     audio_files = []
-    smil_objects - []
+    smil_objects = []
     # the title chapter
     smil.menuitems = title_chapter
     smiles.append(smil.respond())
@@ -110,11 +110,14 @@ def export_keys_book(session, xmlfile, langid, folder, local_audio_dir):
     
     # collect the audio files
     for s in smil_objects:
-        for item in s:
-            audio_files.append(item.audio)
+        for item in s.menuitems:
+            if item.caption != None: 
+                audio_files.append(item.caption.audio)
+            if item.shortcut != None:
+                audio_files.append(item.shortcut.audio)
     
     __write_to_disk(folder, textfilename, navstring, textfile, smiles)
-    __copy_audio_files(folder, audio_files)
+    __copy_audio_files(local_audio_dir, audio_files, folder)
 
 def __calculate_menus(session, langid, xmlfile):
     # use our dom instead
@@ -256,9 +259,10 @@ def __write_to_disk(folder, textfilename, navstring, textfile, smiles):
         smilcount += 1
     
 
-def __copy_audio_files(folder, audio_files):
-    print "***AUDIO FILES***"
+def __copy_audio_files(sourcefolder, audio_files, destfolder):
+    if not sourcefolder.endswith("/"): sourcefolder += "/"
     for a in audio_files:
-        print a
-    print "*****END*********"
+        f = sourcefolder + a
+        os.popen("cp %s %s" % (f, destfolder))
+
 
