@@ -8,6 +8,6 @@ class LionIOModule():
     def get_removed_ids_after_import(self):
         return NotImplemented
     
-    def export(self, session, langid, export_type, output_folder = ""):
+    def export(self, session, langid, export_type, additional_params):
         return NotImplemented
   

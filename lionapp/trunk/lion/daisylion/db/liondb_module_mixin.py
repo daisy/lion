@@ -42,5 +42,5 @@ class LionDBModuleMixIn():
         if langid == self.masterlang:
             self.process_changes(removed_ids)
     
-    def module_export(self, langid, option, output_dir):
-        print self.dbio.export(self, langid, option, output_dir)
+    def module_export(self, langid, option, additional_params):
+        print self.dbio.export(self, langid, option, additional_params)

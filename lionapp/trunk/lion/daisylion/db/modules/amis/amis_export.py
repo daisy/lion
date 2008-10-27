@@ -65,7 +65,7 @@ def export_rc(session, langid):
     t.rc = rc
     return t.respond()
 
-def export_keys_book(session, xmlfile, langid, folder):
+def export_keys_book(session, xmlfile, langid, folder, audio_source_dir):
     """Fill in the templates for the keyboard shortcuts book"""
     session.trace_msg ("Keyboard shortcuts book export for %s" % (langid))
     keys_book.export_keys_book(session, xmlfile, langid, folder)

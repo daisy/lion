@@ -23,7 +23,7 @@ class ObiLionIO(daisylion.db.modules.lion_module.LionIOModule):
     def get_removed_ids_after_import(self):
         pass
 
-    def export(self, session, langid, export_type, output_folder):
+    def export(self, session, langid, export_type, additional_params):
         """Export .resx files for a given language."""
-        exporter = obi_export.export_resx(session, langid, output_folder)
+        exporter = obi_export.export_resx(session, langid, additional_params[0])
         return "OK"

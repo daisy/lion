@@ -41,7 +41,7 @@ class PhrasePair():
 MNEMONIC, ACCELERATOR = range(2)
 
 
-def export_keys_book(session, xmlfile, langid, folder):
+def export_keys_book(session, xmlfile, langid, folder, local_audio_dir):
     """generate a DAISY book of the keyboard commands"""
     table = session.make_table_name(langid)
     
@@ -66,7 +66,6 @@ def export_keys_book(session, xmlfile, langid, folder):
     nav.organized_by_menu_chapter = organized_by_menu_chapter
     nav.other_commands_chapter = other_commands_chapter
     navstring = nav.respond()
-    #navstring = "ARRGGHH"
     
     
     # fill in the text template
@@ -86,24 +85,37 @@ def export_keys_book(session, xmlfile, langid, folder):
     smil.title_text = title_chapter[0].caption.text
     smil.textfile = textfilename
     
+    audio_files = []
+    smil_objects - []
     # the title chapter
     smil.menuitems = title_chapter
     smiles.append(smil.respond())
+    smil_objects.append(smil)
+    
     
     # the "organized by menu" chapter
     smil.menuitems = organized_by_menu_chapter
     smiles.append(smil.respond())
+    smil_objects.append(smil)
     
     # all the menus
     for menu in menus:
         smil.menuitems = menu
         smiles.append(smil.respond())
+        smil_objects.append(smil)
     
     smil.menuitems = other_commands_chapter
     smiles.append(smil.respond())
+    smil_objects.append(smil)
+    
+    # collect the audio files
+    for s in smil_objects:
+        for item in s:
+            audio_files.append(item.audio)
     
     __write_to_disk(folder, textfilename, navstring, textfile, smiles)
-    
+    __copy_audio_files(folder, audio_files)
+
 def __calculate_menus(session, langid, xmlfile):
     # use our dom instead
     xml.dom.minidom.Document = amisxml.AmisUiDoc
@@ -243,3 +255,10 @@ def __write_to_disk(folder, textfilename, navstring, textfile, smiles):
         f.close()
         smilcount += 1
     
+
+def __copy_audio_files(folder, audio_files):
+    print "***AUDIO FILES***"
+    for a in audio_files:
+        print a
+    print "*****END*********"
+

@@ -66,7 +66,7 @@ def fetch_strings(langid, session):
     """Fetch all strings from the DB and organize them by role, file, and
     name. Return the dictionary of these strings."""
     strings = {}
-    session.execute_query("SELECT xmlid, textstring, role FROM %s" % langid)
+    session.execute_query("SELECT xmlid, textstring, role FROM %s" % session.make_table_name(langid))
     for row in session.cursor.fetchall():
         xmlid, textstring, role = row
         m = re.match("([^:]+):([^:]+)", xmlid)

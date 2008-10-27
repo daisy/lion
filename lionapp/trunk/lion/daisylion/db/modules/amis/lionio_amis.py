@@ -21,7 +21,7 @@ class AmisLionIO (daisylion.db.modules.lion_module.LionIOModule):
         "removed" attribute"""
         return self.importer.get_idlist_for_removal()
     
-    def export(self, session, langid, export_type, output_folder = ""):
+    def export(self, session, langid, export_type, additional_params=[]):
         # the xml file that acts as a template for exports
         xml_filepath = daisylion.db.modules.amis.templates.__path__[0]
         xml_filepath = os.path.join(xml_filepath, "amisAccessibleUi.xml")
@@ -31,9 +31,11 @@ class AmisLionIO (daisylion.db.modules.lion_module.LionIOModule):
         elif export_type == 2:
             return amis_export.export_rc(session, langid)
         elif export_type == 3:
+            output_folder = additional_params[0]
+            local_audio_dir = additional_params[1]
             sz = len(output_folder)
             # make sure the folder path ends with a slash
             if sz > 0 and output_folder[sz-1] != '/':
                 output_folder += '/'
-            return amis_export.export_keys_book(session, xml_filepath, langid, output_folder)
+            return amis_export.export_keys_book(session, xml_filepath, langid, output_folder, local_audio_dir)
     
