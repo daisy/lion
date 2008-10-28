@@ -92,7 +92,6 @@ def export_keys_book(session, xmlfile, langid, folder, local_audio_dir):
     smiles.append(smil.respond())
     smil_objects.append(smil.menuitems)
     
-    
     # the "organized by menu" chapter
     smil.menuitems = organized_by_menu_chapter
     smiles.append(smil.respond())
@@ -264,7 +263,6 @@ def __copy_audio_files(sourcefolder, audio_files, destfolder):
     for a in audio_files:
         f = sourcefolder + a
         cmd = "cp %s %s" % (f, destfolder)
-        print cmd
         os.popen(cmd)
 
 
