@@ -222,15 +222,10 @@ def __make_predetermined_chapters(session, table):
     other_commands_header.caption.audio = session.get_audiouri(table, "t393")
     other_commands_header.caption.id = "t393"
 
-    # TODO: put text in the DB (record some audio too!)
-    desc_text = """Commands for AMIS and corresponding keyboard shortcuts are given below.  \
-    Some commands have only single-letter shortcuts to be used once inside the menu.  \
-    Other commands have multi-key combinations."""
     description = PhrasePair()
     description.caption = TextAudio()
-    description.caption.text = desc_text
-    # TODO: get the real audio!  this is just a placeholder
-    description.caption.audio = organized_by_menu_header.caption.audio
+    description.caption.text = session.get_textstring(table, "t439")
+    description.caption.audio = session.get_audiouri(table, "t439")
     description.caption.id = "desc"
     
     # fill in the pre-determined chapters
