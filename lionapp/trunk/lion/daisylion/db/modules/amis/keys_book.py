@@ -55,13 +55,13 @@ def export_keys_book(session, xmlfile, langid, folder, local_audio_dir):
     nav = templates.ncc.ncc()
     nav.langid = langid
     nav.menus = menus
-    for menu in menus:
+    """for menu in menus:
         for m in menu:
             session.trace_msg(m.caption.text)
             session.trace_msg(m.caption.id)
             session.trace_msg(m.caption.audio)
         session.trace_msg("---")
-    
+    """
     nav.title_chapter = title_chapter
     nav.organized_by_menu_chapter = organized_by_menu_chapter
     nav.other_commands_chapter = other_commands_chapter
@@ -90,27 +90,27 @@ def export_keys_book(session, xmlfile, langid, folder, local_audio_dir):
     # the title chapter
     smil.menuitems = title_chapter
     smiles.append(smil.respond())
-    smil_objects.append(smil)
+    smil_objects.append(smil.menuitems)
     
     
     # the "organized by menu" chapter
     smil.menuitems = organized_by_menu_chapter
     smiles.append(smil.respond())
-    smil_objects.append(smil)
+    smil_objects.append(smil.menuitems)
     
     # all the menus
     for menu in menus:
         smil.menuitems = menu
         smiles.append(smil.respond())
-        smil_objects.append(smil)
+        smil_objects.append(smil.menuitems)
     
     smil.menuitems = other_commands_chapter
     smiles.append(smil.respond())
-    smil_objects.append(smil)
+    smil_objects.append(smil.menuitems)
     
     # collect the audio files
     for s in smil_objects:
-        for item in s.menuitems:
+        for item in s:
             if item.caption != None: 
                 audio_files.append(item.caption.audio)
             if item.shortcut != None:
@@ -263,6 +263,8 @@ def __copy_audio_files(sourcefolder, audio_files, destfolder):
     if not sourcefolder.endswith("/"): sourcefolder += "/"
     for a in audio_files:
         f = sourcefolder + a
-        os.popen("cp %s %s" % (f, destfolder))
+        cmd = "cp %s %s" % (f, destfolder)
+        print cmd
+        os.popen(cmd)
 
 
