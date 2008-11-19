@@ -6,7 +6,7 @@ from daisylion.db.modules.obi_import import ObiImport
 def main():
     parser = GlobalOptionsParser(usage="%prog [options] files...")
     (options, args) = parser.parse_args()
-    importer = ObiImport(
+    importer = ObiImport()
     show_strings(strings)
 
 def show_strings(strings):
