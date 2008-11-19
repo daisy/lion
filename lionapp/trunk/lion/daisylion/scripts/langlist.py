@@ -11,6 +11,7 @@ def main():
     
     session = LionDB(options.config, options.trace, options.app)    
     results = session.list_all_languages()
+    print "%d languages" % len(results)
     for r in results:
         usernamepwd = "(%s, %s)" % (r[3], r[4])
         if options.shortlist == False:
