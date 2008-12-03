@@ -194,7 +194,7 @@ def __make_predetermined_chapters(session, table):
     # these are commands that aren't in the menus
     extra_ids = ["t394", "t396", "t399", "t402", 
         "t405", "t408", "t411", "t414", "t417", "t420",
-        "t423", "t426", "t429"]
+        "t423", "t426", "t429", "t440", "t443"]
     extra_ids_as_menuitems = []
     for id in extra_ids:
         item = PhrasePair()
