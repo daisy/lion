@@ -1,4 +1,5 @@
 import os
+import os.path
 import MySQLdb
 import util
 import daisylion.db.liondb
@@ -98,6 +99,7 @@ class TranslationPage(translate.translate):
     save_data.exposed = True
     
     def save_audio(self, infile, langid, xmlid):
+        infilename = os.path.basename(infile.filename.replace("\\", "/"))
         self.session.trace_msg("infile = %s" % infile)
         self.session.trace_msg("type of infile %s" % type(infile))
         size = 0
@@ -106,10 +108,10 @@ class TranslationPage(translate.translate):
         if not os.path.exists(save_dir) or not os.path.isdir(save_dir):
             os.mkdir(save_dir)
         
-        outfilename = os.path.join(save_dir, infile.filename)
+        outfilename = os.path.join(save_dir, infilename)
         self.session.trace_msg("Going to save to %s" % outfilename)
         outfile = file (outfilename, 'wb')
-        www_filename = www_dir + infile.filename
+        www_filename = www_dir + infilename
         
         while 1:
             data = infile.file.read(8192)
