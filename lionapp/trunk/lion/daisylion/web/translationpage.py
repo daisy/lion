@@ -43,8 +43,8 @@ class TranslationPage(translate.translate):
         self.error = ""
         self.error_id = ""
         self.warnings = ""
-        self.appname, self.appversion, self.appdesc, self.appsite, self.applogo = \
-            util.get_application_data(self.session)
+        self.appname, self.appversion, self.appdesc, self.appsite, self.applogo, \
+            self.comments = util.get_application_data(self.session)
     
         self.url_string = "../%s?view=%s&id_anchor=%s"
         

@@ -96,8 +96,8 @@ class UploadComplete(uploadcomplete.uploadcomplete):
         self.appid = self.session.config["main"]["target_app"]
         self.host = self.session.config["main"]["webhost"]
         self.port = self.session.config["main"]["webport"]
-        self.appname, self.appversion, self.appdesc, self.appsite, self.applogo = \
-            util.get_application_data(self.session)
+        self.appname, self.appversion, self.appdesc, self.appsite, self.applogo, \
+            self.comments = util.get_application_data(self.session)
         uploadcomplete.uploadcomplete.__init__(self)
 
     def index(self):
