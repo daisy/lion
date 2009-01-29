@@ -44,11 +44,16 @@ class LionDBUserLangMgmtMixIn():
         self.__remove_language_from_database(langid)
         self.trace_msg("Language %s deleted!" % langid)
 
-    def list_all_languages(self):
-        """list all languages and their associated users"""
-        request = """SELECT languages.langid, languages.langname, users.realname, users.username, users.password
-            FROM languages LEFT OUTER JOIN users ON users.langid=languages.langid ORDER BY langid"""  
-    
+    def list_all_languages(self, order_by_login_time = False):
+        """list all languages and their associated users.
+        option to put the last-logged-in user first.  otherwise in alpha order by langid."""
+        if order_by_login_time == False:
+            request = """SELECT languages.langid, languages.langname, users.realname, users.username, users.password 
+                FROM languages LEFT OUTER JOIN users ON users.langid=languages.langid ORDER BY users.langid"""  
+        else:
+            request = """SELECT languages.langid, languages.langname, users.realname, users.username, users.password, 
+                users.lastlogin FROM languages LEFT OUTER JOIN users ON users.langid=languages.langid 
+                ORDER BY users.lastlogin DESC"""
         self.execute_query(request)        
         return self.cursor.fetchall()
     
