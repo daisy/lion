@@ -15,7 +15,8 @@ class ChooseAccelerators(TranslationPage):
         self.instructions = "Enter a key combination (A-Z/+/-/Up/Down/Left/Right/Esc) below."
         self.about = "This is the accelerators page. Accelerators are keyboard shortcuts for program actions. \
             You may use A-Z (U.S. Ascii characters), plus (+), minus (-), Up, Down, Left, Right, or Esc \
-            for your custom shortcuts."
+            for your custom shortcuts.  Some items do not require text translation, but they may require \
+            an audio recording to be uploaded."
         self.check_conflict = True
         self.url = "ChooseAccelerators"
         TranslationPage.__init__(self, session)    
@@ -44,8 +45,7 @@ class ChooseAccelerators(TranslationPage):
         form = "<table>"
         for r in rows:
             data = dict(zip(template_fields, r))
-            if self.is_excluded(data["actualkeys"]) == True:
-                continue
+            
             locallang_ref = self.build_accelerator_string(table,
                     data["target"], data["textstring"])
             masterlang_ref = self.build_accelerator_string(mtable, 
@@ -61,6 +61,8 @@ class ChooseAccelerators(TranslationPage):
             t.langid = self.user["users.langid"]
             t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
             t.audio_support = self.audio_support
+            t.text_translation = (not self.is_excluded(data["actualkeys"]))
+            
             if self.error != "" and self.error_id == data["xmlid"]:
     	        t.error = self.error
     	    else:

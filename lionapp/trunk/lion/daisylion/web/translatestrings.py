@@ -10,7 +10,7 @@ class TranslateStrings(TranslationPage):
         self.textbox_rows = 3
         self.instructions = "Enter the translation below."
         self.about = "This is the main page.  All the strings to be translated\
-         for the AMIS interface are on this page."
+         for the software's interface are on this page."
         self.warning_links = None
         self.check_conflict = False
         self.warning_message = None

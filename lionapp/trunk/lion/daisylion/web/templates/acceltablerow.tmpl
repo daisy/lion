@@ -11,6 +11,8 @@ Template variables:
 	height = the height of the text box for the translation
 	langid = the id of the language being translated into
 	audio_support = whether to show the audio upload field
+	text_translation = enable text translation (sometimes we don't want the user to be able to change the text, but they should
+	be able to upload an audio recording)
 	
 Identical to tablerow except for the dataentry part.This should really be derived from tablerow but it's not working; I suspect because Cheetah #blocks can't have arguments.
 
@@ -47,26 +49,33 @@ Identical to tablerow except for the dataentry part.This should really be derive
 	
 	## start of dataentry area
 	## this looks like KEYMASK + small textbox for entering a letter 
-	<p class="instructions">
-		#if len($thekeys) > 0
-			$instructions 
-		#end if
-		Remember to <em>Save</em>.
-	</p>
-	Shortcut: <span class="$classattr">$keymask</span>
-	#if len($thekeys) > 0
-	<textarea id="keys_$xmlid" name="thekeys" cols="5" rows="1" class="$classattr">$thekeys</textarea>
+	
+	#if $text_translation == True:
+	  <p class="instructions">
+  		#if len($thekeys) > 0
+  			$instructions 
+  		#end if
+  		Remember to <em>Save</em>.
+  	</p>
+	  Shortcut: <span class="$classattr">$keymask</span>
+	  #if len($thekeys) > 0:
+	    <textarea id="keys_$xmlid" name="thekeys" cols="5" rows="1" class="$classattr">$thekeys</textarea>
+	  #end if
+	  <br/>
+	  ## and then another text box for entering the label for the entire shortcut
+	  <p>Now type the human-readable version of the shortcut.  For example, your language might have its own words or abbreviations for Space or Control.</p>
+	  <textarea name="translation" cols="30" rows="3" class="$classattr">$textstring</textarea>
+	#else
+	  ## dummy values to preserve what's already there
+	  <input type="hidden" name="thekeys" value="$thekeys"/>
+	  <input type="hidden" name="translation" value="$textstring"/>
 	#end if
-	<br/>
-	## and then another text box for entering the label for the entire shortcut
-	<p>Now type the human-readable version of the shortcut.  For example, your language might have its own words or abbreviations for Space or Control.</p>
-	<textarea name="translation" cols="30" rows="3" class="$classattr">$textstring</textarea>
 	<input type="hidden" name="keymask" value="$keymask"/>
 	## end of dataentry area
-	
 	<p>Remarks from you:</p>
 	<textarea class="remarks" name="remarks" cols="64" rows="2">$remarks</textarea>
 </td>
+
 #if $audio_support == True:
 <td>
 	#if $audiouri != None and len($audiouri) > 0
