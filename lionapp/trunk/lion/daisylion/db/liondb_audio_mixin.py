@@ -1,4 +1,5 @@
 from xml.dom import minidom
+import os
 
 class LionDBAudioMixIn():
     def accept_all_temp_audio(self, langid):
@@ -112,3 +113,39 @@ class LionDBAudioMixIn():
         if not temp_audio_uri.endswith("/"): temp_audio_uri += "/"
         www_dir = temp_audio_uri + langid + "/"
         return save_to_dir, www_dir
+    
+    def generate_audio(self, langid, dir):
+        """Generate all the audio prompts. This needs to be run on a computer with a TTS that can be invoked via command line.
+        Here we use the "say" command on OSX.  All files must be uploaded to SVN manually. """
+        
+        # get all the prompts
+        table = self.make_table_name(langid)
+        self.execute_query("SELECT xmlid, textstring FROM " + table)
+        strings = self.cursor.fetchall()
+        
+        os.popen("mkdir %s" % dir)
+        os.popen("rm -rf %s*.aiff" % dir)
+        
+        for s in strings:
+            # adjust the text, make an audio recording, and add the filename to the DB
+            xmlid, text = s
+            filename = "%s_%s.aiff" % (langid, xmlid)
+            outfile = dir + filename
+            outfile_web = "./audio/" + filename
+            text = self.correct_pronunciation(text)
+            os.popen("""say -o %s "%s" """ % (outfile, text))
+            #self.execute_query("""UPDATE %s SET audiouri="%s" WHERE xmlid="%s" """ % (table, outfile_web, xmlid))
+            print text
+            print xmlid
+            print ""
+    
+    def correct_pronunciation(self, text):
+        """return a version of the text formatted for use with OSX TTS"""
+        text_mod = text.replace("DAISY", "Daisy")
+        text_mod = text_mod.replace("OK", "okay")
+        text_mod = text_mod.replace("AMIS", "[[inpt PHON]]_AO+mIY>.[[inpt TEXT]]")
+        text_mod = text_mod.replace("Max.", "Maximum")
+        text_mod = text_mod.replace("Copyright (c) ", "Copyright ")
+        text_mod = text_mod.replace("Ctrl", "Control")
+        text_mod = text_mod.replace("%%s", "")
+        return text_mod
