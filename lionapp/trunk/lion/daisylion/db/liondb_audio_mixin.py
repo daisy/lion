@@ -157,5 +157,6 @@ class LionDBAudioMixIn():
         text_mod = text_mod.replace("Max.", "Maximum")
         text_mod = text_mod.replace("Copyright (c) ", "Copyright ")
         text_mod = text_mod.replace("Ctrl", "Control")
-        text_mod = text_mod.replace("%%s", "")
+        # todo: this doesn't work
+        text_mod = text_mod.replace("%s", "")
         return text_mod
