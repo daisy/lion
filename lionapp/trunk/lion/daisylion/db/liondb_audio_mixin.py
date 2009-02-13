@@ -129,12 +129,22 @@ class LionDBAudioMixIn():
         for s in strings:
             # adjust the text, make an audio recording, and add the filename to the DB
             xmlid, text = s
-            filename = "%s_%s.aiff" % (langid, xmlid)
+            filename = "%s_%s" % (langid, xmlid)
             outfile = dir + filename
             outfile_web = "./audio/" + filename
+            tempfile = dir + "tempaudio"
+            
             text = self.correct_pronunciation(text)
-            os.popen("""say -o %s "%s" """ % (outfile, text))
-            #self.execute_query("""UPDATE %s SET audiouri="%s" WHERE xmlid="%s" """ % (table, outfile_web, xmlid))
+            # record the TTS
+            os.popen("""say -o %s.aiff "%s" """ % (tempfile, text))
+            #convert to MP3        
+            os.popen("""lame %s.aiff %s.mp3""" % (tempfile, outfile))
+            os.popen("""rm -rf %s.aiff""" % tempfile)
+            # todo: trim the file.  sox will do it, but it cuts it too close to the end
+            # for now, we will use audacity externally
+            # see http://groups.google.com/group/linux.debian.bugs.dist/browse_thread/thread/a5bbb6588cd77634
+            
+            self.execute_query("""UPDATE %s SET audiouri="%s.mp3" WHERE xmlid="%s" """ % (table, outfile_web, xmlid))
             print text
             print xmlid
             print ""
