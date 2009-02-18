@@ -192,9 +192,34 @@ def __get_all_data_from_idlist(session, table, idlist):
 
 def __make_predetermined_chapters(session, table):
     # these are commands that aren't in the menus
-    extra_ids = ["t394", "t396", "t399", "t402", 
-        "t405", "t408", "t411", "t414", "t417", "t420",
-        "t423", "t426", "t429", "t440", "t443"]
+    """+-------+------------------------------+
+    | xmlid | textstring                   |
+    +-------+------------------------------+
+    | t394  | Toggle book audio         | 
+    | t396  | Toggle self-voicing audio    | 
+    | t399  | Focus on sidebar             | 
+    | t402  | Focus on text                | 
+    | t405  | Decrease self-voicing volume | 
+    | t408  | Increase self-voicing volume | 
+    | t411  | Decrease book volume         | 
+    | t414  | Increase book volume         | 
+    | t417  | Decrease section depth       | 
+    | t420  | Find next                    | 
+    | t423  | Find previous                | 
+    | t426  | Increase section depth       | 
+    | t429  | Reset highlight colors       | 
+    | t440  | Increase TTS volume          | 
+    | t443  | Decrease TTS volume          | 
+    +-------+------------------------------+
+    """
+    extra_ids = ["t420", "t423", 
+        "t399", "t402", 
+        "t394", "t396", 
+        "t405", "t408", 
+        "t411", "t414",
+        "t440", "t443", 
+        "t417", "t426", 
+        "t429", ]
     extra_ids_as_menuitems = []
     for id in extra_ids:
         item = PhrasePair()
@@ -248,10 +273,12 @@ def __write_to_disk(folder, textfilename, navstring, textfile, smiles):
     smilcount = 1
     for s in smiles:
         f = open(folder + str(smilcount) + ".smil", "w")
+        # our audio files aren't in any directory
+        s = s.replace("<audio src=\"./audio/", "<audio src=\"")
         f.write(s)
         f.close()
         smilcount += 1
-    
+        
 
 def __copy_audio_files(sourcefolder, audio_files, destfolder):
     if not sourcefolder.endswith("/"): sourcefolder += "/"
@@ -259,5 +286,4 @@ def __copy_audio_files(sourcefolder, audio_files, destfolder):
         f = sourcefolder + a
         cmd = "cp %s %s" % (f, destfolder)
         os.popen(cmd)
-
-
+    

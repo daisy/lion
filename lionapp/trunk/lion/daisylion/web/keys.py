@@ -15,7 +15,7 @@ def validate_keys(key):
     p = re.compile(expr, re.IGNORECASE)
     if p.match(key) and len(key) == 1:
         return True
-    if key.lower() in named_keys:
+    if key.lower() in named_keys or key == "":
         return True
     
     return False

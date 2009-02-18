@@ -87,6 +87,9 @@ class ChooseAccelerators(TranslationPage):
         """Take something like 'Ctrl+0' and isolate 'Ctrl+' and 'O'.  Return both parts.  Account for 'Ctrl++' and Space
         (in AMIS, you can't change Space, so we can treat it like a keymask) """
         if keys == "Space":
+            # it is a huge hack to treat "space" like a keymask by returning it as the first part of the tuple
+            # but this saves us trouble in AMIS because users cannot change Space
+            # nor can they change keymasks
             return keys, ""
         
         last_part=""
@@ -170,6 +173,7 @@ class ChooseAccelerators(TranslationPage):
             msg = "Data is empty."       
         else:
             mask, keys = self.parse_key_masks(data)
+            self.session.trace_msg("Validating >>%s<<" % keys)
             if validate_keys(keys):
                 is_valid = True
             else:

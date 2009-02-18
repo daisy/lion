@@ -134,7 +134,10 @@ class LionDBAudioMixIn():
             outfile_web = "./audio/" + filename
             tempfile = dir + "tempaudio"
             
-            text = self.correct_pronunciation(text)
+            text1 = self.correct_pronunciation(text)
+            if (text1 != text):
+                print "%s ==> %s" % (text, text1)
+            text = text1
             # record the TTS
             os.popen("""say -o %s.aiff "%s" """ % (tempfile, text))
             #convert to MP3        
@@ -157,6 +160,7 @@ class LionDBAudioMixIn():
         text_mod = text_mod.replace("Max.", "Maximum")
         text_mod = text_mod.replace("Copyright (c) ", "Copyright ")
         text_mod = text_mod.replace("Ctrl", "Control")
-        # todo: this doesn't work
         text_mod = text_mod.replace("%s", "")
+        text_mod = text_mod.replace("++", "plus plus")
+        text_mod = text_mod.replace("+-", "plus minus")
         return text_mod
