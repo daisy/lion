@@ -168,9 +168,15 @@ class LionDBAudioMixIn():
         
     def archive_audio(self, langid, audio_dir, svn=False):
         """move unreferenced audio clips from audio_dir into a subfolder"""
+        # this conflicts with minidom
+        import pysvn
+        
+        # create an svn client
+        if svn == True: 
+            svn_client = pysvn.Client()
         
         # make a directory for the archived unused files
-        folder = "unused_audio_" + str(datetime.date.today())
+        folder = "../unused_audio_" + str(datetime.date.today())
         subdir = os.path.join(audio_dir, folder)
         if not os.path.exists(subdir) or not os.path.isdir(subdir):
             os.mkdir(subdir)
@@ -180,34 +186,49 @@ class LionDBAudioMixIn():
         self.execute_query("SELECT audiouri FROM " + table)
         strings = self.cursor.fetchall()
         # adjust the list
-        filelist = []
+        db_filelist = []
         for s in strings:
             f = s[0]
-            filelist.append(f.replace("./audio/", ""))
-            
-        count = 0
+            db_filelist.append(f.replace("./audio/", ""))
+        
+        disk_filelist = []
         # get a list of all audio files in the directory
         for f in os.popen("""ls %s*mp3""" % audio_dir):
             audio_file = f.replace("\n", "")
-            if os.path.basename(audio_file) not in filelist:
-                count+=1
+            audio_file = os.path.basename(audio_file) 
+            disk_filelist.append(audio_file)
+        
+        # first make sure that all the required audio files are there
+        for f in db_filelist:
+            if f not in disk_filelist:
+                self.warn("DB file reference %s not found in physical directory" % (f, ))
+        
+        count_unused = 0
+        count_used = 0
+        # check the disk filelist against the database filelist
+        # move unreferenced files to a subdirectory
+        for f in disk_filelist:
+            # the full path (disk_filelist has only filenames for easy comparison against the db)
+            disk_file = os.path.join(audio_dir, f)
+            if f not in db_filelist:
+                count_unused+=1
                 # remove the end of line character from the file name
-                instr = "cp %s %s" % (audio_file, subdir)
+                instr = "cp %s %s" % (disk_file, subdir)
                 os.popen(instr)
                 # optionally reflect the changes in subversion
                 if svn == True:
-                   instr = "svn rm %s" % audio_file
-                   os.popen(instr)
+                    svn_client.remove(disk_file)
                 else:
-                    instr = "rm %s" % audio_file
-                    os.popen(next_instr)
+                    instr = "rm %s" % disk_file
+                    os.popen(instr)
+            else:
+                count_used += 1
         
         if svn == True:
-            instr = "svn add %s" % subdir
-            instr = """svn commit %s -m "moved unused audio files into archive" """
-            os.popen(instr)
+            svn_client.add(subdir)
+            svn_client.checkin(audio_dir, "DAISY Lion audio archiving: moved unreferenced files to %s" % subdir)
         
-        self.trace_msg("%d unused files moved to %s" % (count, subdir))
+        self.trace_msg("%d unused files moved to %s; %d files currently in use" % (count_unused, subdir, count_used))
 
         
         

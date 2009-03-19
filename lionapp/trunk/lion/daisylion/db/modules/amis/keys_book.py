@@ -121,9 +121,10 @@ def export_keys_book(session, xmlfile, langid, folder, local_audio_dir):
 def __calculate_menus(session, langid, xmlfile):
     # use our dom instead
     xml.dom.minidom.Document = amisxml.AmisUiDoc
+    print xmlfile
     doc = minidom.parse(xmlfile)
     doc.set_session(session)
-
+    
     table = session.make_table_name(langid)
     if doc == None:
         session.die("Document could not be parsed.")
