@@ -283,7 +283,8 @@ def __write_to_disk(folder, textfilename, navstring, textfile, smiles):
 def __copy_audio_files(sourcefolder, audio_files, destfolder):
     if not sourcefolder.endswith("/"): sourcefolder += "/"
     for a in audio_files:
-        f = sourcefolder + a
+        f = sourcefolder + a.replace("./audio/", "")
+        print f
         cmd = "cp %s %s" % (f, destfolder)
         os.popen(cmd)
     

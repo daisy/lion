@@ -1,5 +1,6 @@
 from xml.dom import minidom
 import os
+import datetime
 
 class LionDBAudioMixIn():
     def accept_all_temp_audio(self, langid):
@@ -164,3 +165,52 @@ class LionDBAudioMixIn():
         text_mod = text_mod.replace("++", "plus plus")
         text_mod = text_mod.replace("+-", "plus minus")
         return text_mod
+        
+    def archive_audio(self, langid, audio_dir, svn=False):
+        """move unreferenced audio clips from audio_dir into a subfolder"""
+        
+        # make a directory for the archived unused files
+        folder = "unused_audio_" + str(datetime.date.today())
+        subdir = os.path.join(audio_dir, folder)
+        if not os.path.exists(subdir) or not os.path.isdir(subdir):
+            os.mkdir(subdir)
+        
+        # find a list of audio uris that are in use
+        table = self.make_table_name(langid)
+        self.execute_query("SELECT audiouri FROM " + table)
+        strings = self.cursor.fetchall()
+        # adjust the list
+        filelist = []
+        for s in strings:
+            f = s[0]
+            filelist.append(f.replace("./audio/", ""))
+            
+        count = 0
+        # get a list of all audio files in the directory
+        for f in os.popen("""ls %s*mp3""" % audio_dir):
+            audio_file = f.replace("\n", "")
+            if os.path.basename(audio_file) not in filelist:
+                count+=1
+                # remove the end of line character from the file name
+                instr = "cp %s %s" % (audio_file, subdir)
+                os.popen(instr)
+                # optionally reflect the changes in subversion
+                if svn == True:
+                   instr = "svn rm %s" % audio_file
+                   os.popen(instr)
+                else:
+                    instr = "rm %s" % audio_file
+                    os.popen(next_instr)
+        
+        if svn == True:
+            instr = "svn add %s" % subdir
+            instr = """svn commit %s -m "moved unused audio files into archive" """
+            os.popen(instr)
+        
+        self.trace_msg("%d unused files moved to %s" % (count, subdir))
+
+        
+        
+        
+        
+        
