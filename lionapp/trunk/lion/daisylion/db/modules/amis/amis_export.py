@@ -6,6 +6,7 @@ import fill_rc
 import keys_book
 import templates.AmisRCTemplate
 from xml.dom import minidom, Node
+import time
 
 def export_xml(session, file, langid):
     session.trace_msg("XML Export for %s to %s" % (langid, file))
@@ -13,6 +14,9 @@ def export_xml(session, file, langid):
     minidom.Document = amisxml.AmisUiDoc
     doc = minidom.parse(file)
     doc.set_session(session)
+    metainfo = doc.getElementsByTagName("created")
+    if len(metainfo) > 0:
+        metainfo[0].setAttribute("date", time.strftime("%Y-%m-%d_%H:%M:%S"))
     if doc == None:
         session.die("Document could not be parsed.")
     
@@ -58,7 +62,9 @@ def export_rc(session, langid):
         "ms_endif": "#endif",
         "ms_undef": "#undef",
         "ms_pragma": "#pragma",
-        "ms_else": "#else"}
+        "ms_else": "#else",
+        "datetime": time.strftime("%Y-%m-%d_%H:%M:%S")
+        }
     
     rc = fill_rc.FillRC(session, langid)
     t = templates.AmisRCTemplate.AmisRCTemplate(searchList=msterms)
