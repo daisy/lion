@@ -36,7 +36,11 @@ class DBSession:
         """Connect to the database."""
         if not self.connected:
             self.trace_msg("Connecting to the database...")
-            self.db = DB.connect.db_connect("admin", self.host, self.dbname)
+            if self.config["main"]["dbhost"] == "localhost":
+                self.db = DB.connect.db_connect("admin", self.host, self.dbname)
+            else:
+                self.db = DB.connect.db_connect("remote", self.host, self.dbname)
+            
             self.cursor = self.db.cursor()
             # just for safety!
             self.cursor.execute("SET collation_connection = utf8_unicode_ci")
