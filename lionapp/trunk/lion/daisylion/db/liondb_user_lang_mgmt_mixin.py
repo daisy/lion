@@ -44,17 +44,33 @@ class LionDBUserLangMgmtMixIn():
         self.__remove_language_from_database(langid)
         self.trace_msg("Language %s deleted!" % langid)
 
-    def list_all_languages(self, order_by_login_time = False):
+    def list_all_languages(self, order_by_login_time = False, order_by_work_todo = False):
         """list all languages and their associated users.
-        option to put the last-logged-in user first.  otherwise in alpha order by langid."""
-        if order_by_login_time == False:
-            request = """SELECT languages.langid, languages.langname, users.realname, users.username, users.password 
-                FROM languages LEFT OUTER JOIN users ON users.langid=languages.langid ORDER BY users.langid"""  
-        else:
+        option to put the last-logged-in user first or to order by the amount of remaining work.
+        otherwise in alpha order by langid."""
+        
+        if order_by_work_todo == True:
+            all_langs = self.list_all_languages()
+            todo = []
+            for l in all_langs:
+                work = self.get_number_todo(l[0]) + self.get_number_new(l[0])
+                todo.append(work)
+            # sort the all_langs list according to the values in todo
+            combined = zip(todo, all_langs)
+            combined.sort(reverse=True)
+            return combined
+            
+        if order_by_login_time == True:
             request = """SELECT languages.langid, languages.langname, users.realname, users.username, users.password, 
                 users.lastlogin FROM languages LEFT OUTER JOIN users ON users.langid=languages.langid 
                 ORDER BY users.lastlogin DESC"""
-        self.execute_query(request)        
+            self.execute_query(request)        
+            return self.cursor.fetchall()
+            
+        # the default case
+        request = """SELECT languages.langid, languages.langname, users.realname, users.username, users.password 
+            FROM languages LEFT OUTER JOIN users ON users.langid=languages.langid ORDER BY users.langid"""  
+        self.execute_query(request)
         return self.cursor.fetchall()
     
     def list_langtable_diffs(self, langid1, langid2):
@@ -80,7 +96,32 @@ class LionDBUserLangMgmtMixIn():
         self.execute_query(request)
         return (self.make_id_from_table_name(longer), self.make_id_from_table_name(shorter),
             self.cursor.fetchall())
-
+    
+    def get_new_todo(self, langid):
+        """return the xmlid, textstring, and status of items marked new/todo"""
+        table = self.make_table_name(langid)
+        request = "SELECT xmlid, textstring, status FROM %s WHERE status > 1" % table
+        self.execute_query(request)
+        return self.cursor.fetchall()
+    
+    def get_number_todo(self, langid):
+        """get the number of items marked TODO"""
+        return self.__get_count_by_status(langid, 2)
+        
+    def get_number_complete(self, langid):
+        """get the number of items marked DONE"""
+        return self.__get_count_by_status(langid, 1)
+        
+    def get_number_new(self, langid):
+        """get the number of items marked NEW"""
+        return self.__get_count_by_status(langid, 3)
+    
+    def __get_count_by_status(self, langid, status):
+        table = self.make_table_name(langid)
+        request = "SELECT count(*) FROM %s WHERE STATUS=%d" % (table, status)
+        self.execute_query(request)
+        return self.cursor.fetchone()[0]
+        
     def __add_language_to_database(self, langid, langname, username, password,
         realname, email, mnemonics, accelerators, langid_short):
         """add the new language and new user"""
