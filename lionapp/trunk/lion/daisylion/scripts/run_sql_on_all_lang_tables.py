@@ -25,6 +25,10 @@ def main():
         request = sql % {"table": session.make_table_name(l[0])}
         try:
             session.execute_query(request)
+            if session.cursor.rowcount > 0:
+                for r in session.cursor.fetchall():
+                    for field in r:
+                        print field
         except Exception, e:
             print "Exception: %s" % e
     

@@ -13,7 +13,9 @@ def main():
     sql = args[0]
     session.execute_query(sql)
     if session.cursor.rowcount != 0:
-        print session.cursor.fetchall()
+        for r in session.cursor.fetchall():
+            for field in r:
+                print field
     
 if __name__=="__main__": main()
 

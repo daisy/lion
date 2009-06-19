@@ -132,7 +132,7 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
     def add_accelerator_master(self, textstring, stringid, refid, keys):
         """Add an accelerator to the master language table and propagate the
         changes through all other tables"""
-        print self.masterlang
+        # print self.masterlang
         self.add_accelerator(self.masterlang, textstring, stringid, refid, keys)
         self.process_changes(None)
     
