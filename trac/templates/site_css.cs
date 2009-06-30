@@ -195,6 +195,7 @@ div.wiki
 <?cs
 ##################################################################
 # Site CSS - Place custom CSS, including overriding styles here.
+# the ClearSilver templates need to be upgraded to Genshi !
 ?>
 #content {
  margin-left: 2em;
