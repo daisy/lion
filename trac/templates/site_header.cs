@@ -23,6 +23,7 @@ window.onload=function(){dp.SyntaxHighlighter.HighlightAll('code');}
 <?cs
 ####################################################################
 # Site header - Contents are automatically inserted above Trac HTML
+# Note: this pre-Genshi template (i.e. ClearSilver) will not work with the new version of Trac !
 ?>
 
 <div style="float:right;font-size:0.7em;">
