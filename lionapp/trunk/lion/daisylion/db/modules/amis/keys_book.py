@@ -285,6 +285,6 @@ def __copy_audio_files(sourcefolder, audio_files, destfolder):
     for a in audio_files:
         f = sourcefolder + a.replace("./audio/", "")
         print f
-        cmd = "cp %s %s" % (f, destfolder)
+        cmd = "cp \"%s\" \"%s\"" % (f, destfolder)
         os.popen(cmd)
     

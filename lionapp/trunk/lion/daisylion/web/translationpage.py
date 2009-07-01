@@ -89,7 +89,7 @@ class TranslationPage(translate.translate):
             request = """UPDATE %(table)s SET status="%(status)s", \
                 textstring="%(translation)s", remarks="%(remarks)s" WHERE \
                 xmlid="%(xmlid)s" """ % \
-                {"table": table, "status": status, "translation": MySQLdb.escape_string(translation), \
+                {"table": table, "status": status, "translation": MySQLdb.escape_string(translation.strip()), \
                     "remarks": MySQLdb.escape_string(remarks), "xmlid": xmlid}
             self.session.execute_query(request)
             if audiofile != None and audiofile != "" and audiofile.filename != "": 
