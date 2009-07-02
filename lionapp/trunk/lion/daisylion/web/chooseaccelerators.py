@@ -16,7 +16,9 @@ class ChooseAccelerators(TranslationPage):
         self.about = "This is the accelerators page. Accelerators are keyboard shortcuts for program actions. \
             You may use A-Z (U.S. Ascii characters), plus (+), minus (-), Up, Down, Left, Right, or Esc \
             for your custom shortcuts.  Some items do not require text translation, but they may require \
-            an audio recording to be uploaded."
+            an audio recording to be uploaded. <br/> \
+            You should only record the keyboard shortcut for the MP3 audio (e.g. <em>&quot;Control plus D&quot;</em>, not \
+            &quot;Control plus D: Add bookmark&quot;.)"
         self.check_conflict = True
         self.url = "ChooseAccelerators"
         TranslationPage.__init__(self, session)    
@@ -60,6 +62,8 @@ class ChooseAccelerators(TranslationPage):
             t.instructions = self.instructions
             t.langid = self.user["users.langid"]
             t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
+            t.audionotes = "Record only your keyboard shortcut.  E.g. <em>&quot;%s&quot;</em>" % data["actualkeys"]
+            
             t.audio_support = self.audio_support
             t.text_translation = (not self.is_excluded(data["actualkeys"]))
             

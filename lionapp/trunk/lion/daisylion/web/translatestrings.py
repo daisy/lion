@@ -55,6 +55,8 @@ class TranslateStrings(TranslationPage):
     	    t.pagenum = pagenum
     	    t.audio_support = self.audio_support
     	    t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
+    	    t.audionotes = ""
+            
     	    if self.error != "" and self.error_id == data["xmlid"]:
     	        t.error = self.error
     	    else:

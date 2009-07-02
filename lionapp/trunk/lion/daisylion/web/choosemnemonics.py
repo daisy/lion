@@ -21,7 +21,9 @@ class ChooseMnemonics(TranslationPage):
         self.instructions = "Enter a single letter."
         self.about = "This is the mnemonics page.  Mnemonics are shortcut \
             letters in a menu item or button.  Each item in a group must have \
-            a unique mnemonic."
+            a unique mnemonic.<br/>\
+            You should only record the mnemonic letter for the MP3 audio (e.g. <em>&quot;X&quot;</em>, not \
+            &quot;X: Exit&quot;.)"
         self.url = "ChooseMnemonics"
         TranslationPage.__init__(self, session)    
 
@@ -78,6 +80,7 @@ class ChooseMnemonics(TranslationPage):
                     t.langid = self.user["users.langid"]
                     t.audiouri = self.get_current_audio_uri(data["xmlid"], self.user["users.langid"])
                     t.audio_support = self.audio_support
+                    t.audionotes = "Record only the mnemonic letter.  E.g. <em>&quot;%s&quot;</em>" % data["textstring"]
                     if self.error != "" and self.error_id == data["xmlid"]:
             	        t.error = self.error
             	    else:

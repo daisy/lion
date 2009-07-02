@@ -189,7 +189,8 @@ class LionDBAudioMixIn():
         db_filelist = []
         for s in strings:
             f = s[0]
-            db_filelist.append(f.replace("./audio/", ""))
+            if f != None:
+                db_filelist.append(f.replace("./audio/", ""))
         
         disk_filelist = []
         # get a list of all audio files in the directory
