@@ -24,7 +24,7 @@
   </xsl:template>
 
   <xsl:template match="s">
-    <h1 xmlns="http://www.w3.org/1999/xhtml">
+    <h1 xmlns="http://www.w3.org/1999/xhtml" id="{@id}">
       <xsl:value-of select="."/>
     </h1>
   </xsl:template>

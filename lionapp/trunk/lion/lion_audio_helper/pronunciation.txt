@@ -1,0 +1,6 @@
+AMIS -> ahmee
+#
+Ctrl -> Control
+#
+ANSI/NISO z3986-2005 -> ansee niyso z 39 86 dash 2005
+#

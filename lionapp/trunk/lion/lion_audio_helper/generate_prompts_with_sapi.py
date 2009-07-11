@@ -12,17 +12,13 @@ Convert them to MP3 with the tool of your choice.
 import sys
 import os
 from xml.dom import minidom, Node
-import subprocess 
-# edit this list as necessary by adding new rules formatted exactly like this: (Word, Pronunciation) 
-PRONUNCIATION_RULES = (
-("AMIS", "ahmee"), 
-("Ctrl" "Control")
-# add your rule here followed by a comma
-)
-#end of list
+import fileinput
+
+PRONUNCIATION_RULES = []
 
 def main():
-    doc = minidom.parse("prompts.html")
+    parse_pronunciation_rules()
+    doc = minidom.parse("french_prompts.html")
     for elem in doc.getElementsByTagName("h1"):
         if not elem.firstChild or elem.firstChild.nodeType != Node.TEXT_NODE:
             continue
@@ -35,8 +31,18 @@ def correct_pronunciation(text):
     """return a version of the text formatted for use with OSX TTS"""
     text_mod = text
     for rule in PRONUNCIATION_RULES:
+        print rule
         text_mod = text_mod.replace(rule[0], rule[1])
     return text_mod
+
+
+def parse_pronunciation_rules():
+    f = open("pronunciation.txt").read()
+    pairs = f.split("#")
+    for p in pairs:
+        if p != "\n":
+            PRONUNCIATION_RULES.append(p.replace("\n", "").split("->"))
+
     
 if __name__ == "__main__":
     main()
