@@ -230,9 +230,31 @@ class LionDBAudioMixIn():
             svn_client.checkin(audio_dir, "DAISY Lion audio archiving: moved unreferenced files to %s" % subdir)
         
         self.trace_msg("%d unused files moved to %s; %d files currently in use" % (count_unused, subdir, count_used))
+        
+    def import_audio_by_number(self, langid, audio_dir):
+        # make sure each ID has an audio file 
+        table = self.make_table_name(langid)
+        self.execute_query("SELECT xmlid FROM " + table)
+        rows = self.cursor.fetchall()
+        count_found = 0
+        count_not_found = 0
+        for r in rows:
+            id = r[0]
+            f = "%s.mp3" % id
+            disk_file = os.path.join(audio_dir, f)
+            if os.path.isfile(disk_file) == True:
+                # add the file reference to the DB
+                # but make sure it's a relative path.  we can assume the form of ./audio/file.mp3
+                audiouri = "./audio/%s" % f
+                self.execute_query("""UPDATE %s SET audiouri="%s" WHERE xmlid="%s" """ % 
+                    (table, audiouri, id))
+                count_found += 1
+            else:
+                count_not_found += 1
+        
+        self.trace_msg("Audio imported for %s" % langid)
+        self.trace_msg("Added %d references; did not find references for %d items" % 
+            (count_found, count_not_found))
 
-        
-        
-        
         
         
