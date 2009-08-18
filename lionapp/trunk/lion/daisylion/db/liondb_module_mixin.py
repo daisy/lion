@@ -43,4 +43,4 @@ class LionDBModuleMixIn():
             self.process_changes(removed_ids)
     
     def module_export(self, langid, option, additional_params):
-        print self.dbio.export(self, langid, option, additional_params)
+        return self.dbio.export(self, langid, option, additional_params)

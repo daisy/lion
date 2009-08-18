@@ -10,7 +10,7 @@ def main():
     
     session = LionDB(options.config, options.trace, "amis")
     langid = args[0]
-    session.module_export(langid, 2, None)
+    print session.module_export(langid, 2, None)
 
 if __name__=="__main__": main()
 

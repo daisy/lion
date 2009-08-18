@@ -9,6 +9,6 @@ def main():
     langid, dir = args
     session.trace_msg("Export for langid=%s to directory %s" % (langid, dir))
     additional_params = (dir,)
-    session.module_export(langid, 0, additional_params)
+    print session.module_export(langid, 0, additional_params)
 
 if __name__=="__main__": main()
