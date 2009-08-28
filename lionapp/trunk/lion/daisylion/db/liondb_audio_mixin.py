@@ -41,7 +41,7 @@ class LionDBAudioMixIn():
             % (xmlid, langid)
         self.execute_query(request)
     
-    def import_audio_prompts(self, langid, ncx, audio_is_temporary=False):
+    def import_audio_prompts(self, langid, ncx, audio_is_temporary=False, simulate_only=False):
         """Fill up the database with prompts file names. We use the NCX file
         from the Obi export and match the navPoint text label with textstrings
         in the DB."""
@@ -57,8 +57,10 @@ class LionDBAudioMixIn():
             "http://www.daisy.org/z3986/2005/ncx/", "navLabel")
         self.trace_msg("Got %d labels for %d strings" %
             (xml_labels.__len__(), db_items.__len__()))
-        
+        count = 0
+        warnings = []
         for xml_label, db_item in zip(xml_labels, db_items):
+            count+=1
             db_xmlid = db_item[0]
             db_text = db_item[1]
             xml_text = xml_label.getElementsByTagNameNS(
@@ -66,22 +68,27 @@ class LionDBAudioMixIn():
             xml_audio_src = xml_label.getElementsByTagNameNS(
                 "http://www.daisy.org/z3986/2005/ncx/", "audio")[0].getAttribute("src")
             if xml_text == db_text and xml_audio_src != "":
-                # if we're writing permanent audio uris to the language table
-                if audio_is_temporary == False:
-                    audio_dir_prefix = self.config["main"]["audio_dir_prefix"]
-                    if not audio_dir_prefix.endswith("/"): audio_dir_prefix += "/"
-                    xml_audio_src = audio_dir_prefix + xml_audio_src
-                    self.execute_query("""UPDATE %s SET audiouri="%s" WHERE xmlid="%s" """ %
-                        (self.make_table_name(langid), xml_audio_src, db_xmlid))
-                
-                # or we're writing to the temp audio table
+                if simulate_only == True:
+                    self.trace_msg("Found audio for xmlid=%s: %s (%s)" % (db_xmlid, xml_audio_src, db_text))
                 else:
-                    a, b = self.get_tempaudio_paths(langid)
-                    self.write_tempaudio(db_xmlid, langid, b + xml_audio_src)
+                    # if we're writing permanent audio uris to the language table
+                    if audio_is_temporary == False:
+                        audio_dir_prefix = self.config["main"]["audio_dir_prefix"]
+                        if not audio_dir_prefix.endswith("/"): audio_dir_prefix += "/"
+                        xml_audio_src = audio_dir_prefix + xml_audio_src
+                        self.execute_query("""UPDATE %s SET audiouri="%s" WHERE xmlid="%s" """ %
+                            (self.make_table_name(langid), xml_audio_src, db_xmlid))
+                
+                    # or we're writing to the temp audio table
+                    else:
+                        a, b = self.get_tempaudio_paths(langid)
+                        self.write_tempaudio(db_xmlid, langid, b + xml_audio_src)
+            
             else:
-                self.warn("""No match between db string="%s" and ncx label="%s"?! (id = %s)""" %
-                        (db_text, xml_text, db_xmlid))
-
+                self.warn("""At item #%d, id=%s, no match between db string and ncx label\n*%s*\n*%s*\n""" %
+                        (count, db_xmlid, db_text, xml_text))
+                warnings.append((db_xmlid, xml_audio_src, db_text, xml_text))
+        return warnings
 
     def write_tempaudio(self, xmlid, langid, file):
         # update the tempaudio table
