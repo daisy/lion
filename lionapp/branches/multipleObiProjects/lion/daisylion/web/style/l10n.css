@@ -1,0 +1,29 @@
+body { background-color: white; color: black; font-family: sans-serif;
+  margin: 2em; }
+h1 { font-family: sans-serif; font-size: 150% }
+table { border-collapse: collapse; }
+td { border: solid black thin; padding: 4px; }
+select { border: solid black thin; }
+textarea { background-color: #ffd; border: solid black thin; padding: 4px;
+  margin-bottom: 4px; }
+textarea.remarks {background-color: #ffffff}
+label { float: left; text-align: right; width: 5em; }
+input { margin-left: 2em; border: thin black solid; }
+.blank { margin-top: 90%; font-size: small; text-align: right; }
+.ok { background-color: #dfd; }
+.todo { background-color: #ffd; }
+.new { background-color: #fdd; }
+.instructions{font-style: italic; font-size: small;}
+.comments {font-style: italic; font-size: small; background-color: #FFE6F8;}
+div.comments{margin-top: 3em;}
+.warning {font-weight: bold !important; color: red !important; background-color: yellow !important; border: thin solid red !important;}
+.message {background-color: #CFF;}
+#header_left { float: left; padding-bottom: 2em }
+#header_images { text-align: right; padding-bottom: 2em }
+#header img {margin-left: 1em; height: 88px }
+#header { font-size: smaller; }
+#clear { clear: both; border-top: thin black solid }
+em {font-weight: bold;}
+div.page_nav {margin-top: 2em; font-size: medium;}
+.warnings, .error {background-color: #F93;}
+.xmlid {font-size: small; text-align:right}

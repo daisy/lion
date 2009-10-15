@@ -1,0 +1,110 @@
+#*
+Template variables:
+
+	actions = navigation links
+	about = about this page
+	view_description = about this page view
+	count = number of items being displayed
+	form = table rows, each containing a translation form
+	usepages = if True, this represents a page
+	total_num_pages = the total number of pages
+	pagenum = the current page number
+	all_warnings = html-formatted list of warnings about the page
+*#
+
+#from xhtml import xhtml
+#extends xhtml
+#def title
+$appname translation for $language
+#end def
+#def page
+$section section
+#end def
+#def usepages
+False
+#end def
+#def body
+
+## calculate the drop down list default value
+#set $all_selected = ""
+#set $newtodo_selected = ""
+#set $new_selected = ""
+#set $todo_selected = ""
+#set $allok_selected = ""
+#if $last_view == "todo":
+	#set $todo_selected = "SELECTED"
+#elif $last_view == "newtodo":
+	#set $newtodo_selected = "SELECTED"
+#elif $last_view == "new":
+	#set $new_selected = "SELECTED"
+#elif $last_view == "allok":
+	#set $allok_selected = "SELECTED"
+#else:
+	#set $all_selected = "SELECTED"
+#end if
+
+<h1>$title</h1>
+<h2>$page</h2>
+<div id="navigation">
+	<a href="../TranslateStrings?view=all">Translate strings</a> | 
+	#if $translate_accelerators == True:
+	<a href="../ChooseAccelerators?view=all">Assign keyboard shortcuts</a> | 
+	#end if
+	#if $translate_mnemonics == True:
+	<a href="../ChooseMnemonics?view=all">Choose mnemonics</a> | 
+	#end if
+	<a href="../MainMenu">Back to tasks menu</a>
+	
+</div>
+
+<div class="description">
+	<p>$about</p>
+	<p>Showing $view_description ($count items).  
+	#if $usepages == True:
+		#set $p = $pagenum + 1
+		Page $p of $total_num_pages
+	#end if
+	</p>
+</div>
+<div>
+	<form action="change_view" method="POST">
+	    <select name="viewfilter">
+	        <option $all_selected value="all">all items</option>
+	        <option $newtodo_selected value="newtodo">all items marked new or to-do</option>
+	        <option $new_selected value="new">all new items</option>
+	        <option $todo_selected value="todo">all to-do items</option>
+			<option $allok_selected value="allok">all done items</option>
+	    </select>
+	    <input type="submit" value="Change view" />
+	</form>
+</div>
+<br/>
+
+## "warnings" variable contains preformatted HTML
+#if $warnings != None and $warnings != "":
+	$warnings
+#end if
+## the big table
+<div>$form</div>
+
+## the page numbers at the bottom
+
+#if $usepages == True and $total_num_pages > 1:
+<div class="page_nav">
+	#if $pagenum != 0:
+		<span><a href="previous_page">&lt;&lt;</a></span>
+	#end if
+	#for $i in range(0, $total_num_pages):
+		#set $display_pagenum = $i + 1
+		#if $pagenum != $i:
+			<span><a href="change_page?pagenum=$i">$display_pagenum</a></span>
+		#else:
+			<span>$display_pagenum</span>
+		#end if
+	#end for
+	#if $pagenum != $total_num_pages - 1:
+		<span><a href="next_page">&gt;&gt;</a></span>
+	#end if
+</div>
+#end if
+#end def

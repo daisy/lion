@@ -1,0 +1,78 @@
+#*
+Template variables:
+
+	searchList = a row with these fields:
+		xmlid, textstring, status, remarks, ref_string, our_remarks, audiouri
+
+	instructions = what the translator should do
+	handler = the function to handle the form submission
+	width = the width of the text box for the translation
+	height = the height of the text box for the translation
+	langid = the id of the language being translated into
+	error = error with data input
+	audio_support = whether to show the audio upload field
+*#
+#def $pagenum
+0
+#end def
+#if $status == 1
+	#set $ok = "checked"
+	#set $todo = ""
+	#set $classattr = "ok"
+#elif $status == 2
+	#set $todo = "checked"
+	#set $ok = ""
+	#set $classattr = "todo"
+#elif $status == 3
+	#set $classattr = "new"
+	#set $todo = ""
+	#set $ok = ""
+#end if
+<tr>
+<form action="save_data" method="POST" enctype="multipart/form-data">
+<td width="30%%" valign="top">
+	<p class="refstring">$ref_string</p>
+	#if $our_remarks != None and $our_remarks != "":
+		<div class="comments">
+			<p class="instructions">Our remarks:</p>
+			<p>$our_remarks</p>
+		</div>
+	#end if
+</td>
+<td id="$xmlid" valign="top">
+	#if $error != None and $error != "":
+		<p class="error">$error</p>
+	#end if
+
+	<p class="instructions">$instructions  Remember to <em>Save</em>.</p>
+	<textarea name="translation" cols="$width" rows="$height" class="$classattr">$textstring</textarea>
+    <p>Remarks from you:</p>
+	<textarea class="remarks" name="remarks" cols="64" rows="2">$remarks</textarea>
+  <p class="xmlid">$xmlid</p>
+</td>
+#if $self.audio_support == True:
+<td valign="top">
+	#if $audiouri != None and len($audiouri) > 0:
+	 	<p><a href="$audiouri">Audio (click to play)</a></p>
+	#end if
+    Choose an MP3 file:
+	<input type="file" name="audiofile" value="Browse"/>
+	<p class="instructions">$audionotes</p>
+</td>
+#else:
+    ## a dummy audiofile so as not to alter the function signature
+	<input type="hidden" name="audiofile" value=""/>
+#end if
+<td valign="top">
+	<p>Status:</p>
+	<input name="status" type="radio" $ok value="1"/>&nbsp;<span class="ok">OK</span><br/>
+	<input name="status" type="radio" $todo value="2"/>&nbsp;<span class="todo">TODO</span><br/>
+</td>
+<td valign="bottom">
+	<input type="submit" value="Save" style="align: bottom"/>
+	<input type="hidden" name="xmlid" value="$xmlid"/>
+	<input type="hidden" name="langid" value="$langid"/>
+	<input type="hidden" name="pagenum" value="$pagenum"/>
+</td>
+</form>
+</tr>

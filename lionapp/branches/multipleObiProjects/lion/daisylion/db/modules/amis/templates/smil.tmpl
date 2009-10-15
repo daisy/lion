@@ -1,0 +1,39 @@
+#*
+	$menuitems
+	$textfile
+	$title_text
+	$langid
+	$ownfilename
+*#
+#import daisylion.db.modules.amis.keys_book
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE smil PUBLIC "-//W3C//DTD SMIL 1.0//EN" "http://www.w3.org/TR/REC-smil/SMIL10.dtd">
+<smil>
+	<head>
+		<meta name="dc:format" content="Daisy 2.02"/>
+		<meta name="title" content="$title_text"/>
+		<meta name="dc:title" content="$title_text"/>
+		<layout>
+			<region id="txtView"/>
+		</layout>
+		<meta name="dc:identifier" content="amis-keyboard-shortcuts-$langid"/>
+	</head>
+	<body>
+		<seq>
+			#set count = 1
+			#for $item in $menuitems:
+				<par endsync="last" id="$item.caption.id">
+					<text src="${textfile}#$item.caption.id"/>
+					<audio src="$item.caption.audio"/>
+				</par>
+				#if $item.shortcut != None:
+					<par endsync="last" id="$item.shortcut.id">
+						<text src="${textfile}#$item.shortcut.id"/>
+						<audio src="$item.shortcut.audio"/>
+					</par>
+				#end if
+				#set count = count + 1
+			#end for	
+		</seq>
+	</body>
+</smil>

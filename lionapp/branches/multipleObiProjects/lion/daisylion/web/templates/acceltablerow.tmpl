@@ -1,0 +1,110 @@
+
+#*
+Template variables:
+
+	searchList = a row with these fields:
+		xmlid, textstring, status, remarks, ref_string, our_remarks, thekeys, keymask
+
+	instructions = what the translator should do	
+	handler = the function to handle the form submission
+	width = the width of the text box for the translation
+	height = the height of the text box for the translation
+	langid = the id of the language being translated into
+	audio_support = whether to show the audio upload field
+	text_translation = enable text translation (sometimes we don't want the user to be able to change the text, but they should
+	be able to upload an audio recording)
+	
+Identical to tablerow except for the dataentry part.This should really be derived from tablerow but it's not working; I suspect because Cheetah #blocks can't have arguments.
+
+*#
+
+#if $status == 1
+	#set $ok = "checked"
+	#set $todo = ""
+	#set $classattr = "ok"
+#elif $status == 2
+	#set $todo = "checked"
+	#set $ok = ""
+	#set $classattr = "todo"
+#elif $status == 3
+	#set $classattr = "new"
+	#set $todo = ""
+	#set $ok = ""
+#end if
+<tr>
+<form action="save_data" method="POST" enctype="multipart/form-data">
+<td width="30%%">
+	<p class="refstring">$ref_string</p>
+	#if $our_remarks != None and $our_remarks != "":
+		<div class="comments">
+			<p class="instructions">Our remarks:</p>
+			<p>$our_remarks</p>
+		</div>
+	#end if
+</td>
+<td id="$xmlid">
+	#if $error != None and $error != "":
+		<p class="error">$error</p>
+	#end if
+	
+	## start of dataentry area
+	## this looks like KEYMASK + small textbox for entering a letter 
+	
+	#if $text_translation == True:
+	  <p class="instructions">
+  		#if len($thekeys) > 0
+  			$instructions 
+  		#end if
+  		Remember to <em>Save</em>.
+  	</p>
+	  Shortcut: <span class="$classattr">$keymask</span>
+	  #if len($thekeys) > 0:
+	    <textarea id="keys_$xmlid" name="thekeys" cols="5" rows="1" class="$classattr">$thekeys</textarea>
+	  #end if
+	  <br/>
+	  ## and then another text box for entering the label for the entire shortcut
+	  <p>Now type the human-readable version of the shortcut.  For example, your language might have its own words or abbreviations for Space or Control.</p>
+	  <textarea name="translation" cols="30" rows="3" class="$classattr">$textstring</textarea>
+	#else
+	  ## dummy values to preserve what's already there
+	  <input type="hidden" name="thekeys" value="$thekeys"/>
+	  <input type="hidden" name="translation" value="$textstring"/>
+	#end if
+	<input type="hidden" name="keymask" value="$keymask"/>
+	## end of dataentry area
+	<p>Remarks from you:</p>
+	<textarea class="remarks" name="remarks" cols="64" rows="2">$remarks</textarea>
+</td>
+
+#if $audio_support == True:
+<td>
+	#if $audiouri != None and len($audiouri) > 0
+	 	<p><a href="$audiouri">Audio (click to play)</a></p>
+	#end if
+    Choose an MP3 file: 
+	<input type="file" name="audiofile" value="Browse"/>
+	<p class="instructions">$audionotes</p>
+</td>
+#else
+    ## dummy value
+	<input type="hidden" name="audiofile" value=""/>
+#end if
+<td width="100px">
+	<p>Status:</p>
+	<input name="status" type="radio" $ok value="1"/>
+	<span class="ok">OK</span><br/>
+	
+	<input name="status" type="radio" $todo value="2"/>
+	<span class="todo">TODO</span><br/>
+	
+</td>
+<td>
+	<input type="submit" value="Save" style="align: bottom"/>
+	<input type="hidden" name="xmlid" value="$xmlid"/>
+	<input type="hidden" name="langid" value="$langid"/>
+	#if len($thekeys) == 0:
+	<input type="hidden" name="thekeys" value="XXXX"/>
+	#end if
+</td>
+</form>
+</tr>
