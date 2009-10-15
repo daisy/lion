@@ -36,7 +36,7 @@ def main():
 
 def write_audio(session, langid, xmlid, audio, simulate=False):
     request = """UPDATE %s SET audiouri="./audio/%s" WHERE xmlid="%s" """ % \
-        (session.make_table_name(langid), xmlid, audio)
+        (session.make_table_name(langid), audio, xmlid)
     if simulate == True:
         print "\n(Simulation)\n%s" % request
     else:

@@ -1,6 +1,8 @@
 #/bin/bash
 # start the lion web server
-PYTHON=python2.5
+
+# this variable inexplicably stopped working
+# PYTHON=python2.5
 
 if [ -z "$1" ];then
     echo "usage: appname [local|web|combo]"
@@ -24,7 +26,7 @@ fi
 THIS_DIR=$(dirname $THIS_FILE_PATH)
 
 # generate the configuration file for the option
-PYTHON "$THIS_DIR"/../config/generate_config.py $1 $2 > "$THIS_DIR"/../config/lion.cfg
+python2.5 "$THIS_DIR"/../config/generate_config.py $1 $2 > "$THIS_DIR"/../config/lion.cfg
 
 # compile the template files
 TEMPLATES_DIR="$THIS_DIR"/../web/templates
@@ -38,4 +40,4 @@ touch "__init__.py"
 cd "$THIS_DIR"
 
 echo "Starting..."
-PYTHON ../web/main.py "$THIS_DIR"/../config/lion.cfg
+python2.5 ../web/main.py "$THIS_DIR"/../config/lion.cfg

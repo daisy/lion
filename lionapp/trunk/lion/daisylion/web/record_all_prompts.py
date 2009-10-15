@@ -2,6 +2,7 @@ import os
 import cherrypy
 import daisylion.db.liondb
 import util
+import math
 from templates import batchofprompts, error, uploadcomplete
 
 class RecordAllPrompts(batchofprompts.batchofprompts):
@@ -29,9 +30,14 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
         return self.respond()
     index.exposed = True
     
-    def generate_prompts_as_xhtml(self):
-        """Generate an XHTML file of all the prompts and offer it to the user for download"""
-        strings_xml = self.session.all_strings(self.user["users.langid"])
+    def generate_prompts(self):
+        """Generate all the prompts.  Return an XHTML document string."""
+        strings_xml = self.__generate_prompts_as_xhtml(self.user["users.langid"])
+        return strings_xml;
+    generate_prompts.exposed = True
+    
+    def __generate_prompts_as_xhtml(self, langid):
+        strings_xml = self.session.all_strings(langid)
         tmpfile = "/tmp/" + self.user["users.langid"] + "-strings"
         file = open(tmpfile, "w")
         file.write(strings_xml)
@@ -41,8 +47,7 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
         for i in os.popen("xsltproc %s %s" % (xslt, tmpfile)):
             strings_xhtml += i
         return strings_xhtml
-    generate_prompts_as_xhtml.exposed = True
-    
+        
     def upload_zipfile_of_prompts(self, infile):
         """Accept a zipfile of the prompts + ncx file."""
         self.session.trace_msg("Zipfile upload = %s" % infile.filename)
@@ -72,12 +77,13 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
         
         self.process_upload(outfilename, tempdir)
         raise cherrypy.InternalRedirect("UploadComplete")
+    
     upload_zipfile_of_prompts.exposed = True
     
     def process_upload(self, zipfile, tempdir):
         """Import their prompts book into the system"""
         # unzip into a directory of the same name
-        os.popen("unzip -o %s -d %s" % (zipfile, os.path.dirname(zipfile)))
+        os.popen("unzip -o -j \"%s\" -d \"%s\"" % (zipfile, os.path.splitext(zipfile)[0]))
         
         # get ('/blah/blah/file', '.ext')
         a, b = os.path.splitext(zipfile)
@@ -85,7 +91,9 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
         # run the db import script
         self.session.import_audio_prompts(self.user["users.langid"], ncx, True)
         # move all the mp3 files into the language directory
-        os.popen("mv %s/*.mp3 %s" % (a, tempdir))
+        cmd = "mv \"%s\"/*.mp3 \"%s\"" % (a, tempdir)
+        self.session.trace_msg(cmd)
+        os.popen(cmd)
         self.session.trace_msg("Uploaded file processed")
 
         
