@@ -2,6 +2,7 @@ import os
 import cherrypy
 import daisylion.db.liondb
 import util
+import math
 from templates import batchofprompts, error, uploadcomplete
 
 class RecordAllPrompts(batchofprompts.batchofprompts):
@@ -16,6 +17,7 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
         self.error = ""
         self.error_id = ""
         self.warnings = ""
+        self.prompts_uri = ""
         batchofprompts.batchofprompts.__init__(self)
     
     def index(self):
@@ -26,12 +28,48 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
             return e.index()
         self.user = user
         self.language = user["languages.langname"]
+        self.prompts_uri = self.generate_prompts_zipfile()
         return self.respond()
     index.exposed = True
     
-    def generate_prompts_as_xhtml(self):
-        """Generate an XHTML file of all the prompts and offer it to the user for download"""
-        strings_xml = self.session.all_strings(self.user["users.langid"])
+    def generate_prompts_zipfile(self):
+        """Generate a zipfile of all the prompts and offer it to the user for download
+        return the uri of the zipfile"""
+        strings_length = self.session.all_strings_length(self.user["users.langid"])
+        midpoint = int(math.floor(strings_length/2))
+        
+        strings_xml_part_one = \
+            self.__generate_prompts_as_xhtml(self.user["users.langid"], 0, midpoint)
+        strings_xml_part_two = \
+            self.__generate_prompts_as_xhtml(self.user["users.langid"], midpoint+1, strings_length-1)
+        
+        # put in the temp_audio_dir, which should actually be called the "temp_anything_dir"
+        if not self.temp_audio_dir.endswith("/"): self.temp_audio_dir += "/"
+        tempdir = self.temp_audio_dir + self.user["users.langid"] + "/"
+        if not os.path.exists(tempdir) or not os.path.isdir(tempdir):
+            os.mkdir(tempdir)
+            os.popen("chmod o+r %s" % tempdir)
+        outfilename_one = os.path.join(tempdir, "amis_prompts_part_one.html")
+        file = open(outfilename_one, "w")
+        file.write(strings_xml_part_one)
+        file.close()
+        
+        outfilename_two = os.path.join(tempdir, "amis_prompts_part_two.html")
+        file = open(outfilename_two, "w")
+        file.write(strings_xml_part_two)
+        file.close()
+        
+        zipfilename = "%s_prompts.zip" % self.user["users.langid"]
+        zipfilepath = os.path.join(tempdir, zipfilename)
+        zipfileuri = "%s/%s/%s" % (self.session.config["main"]["temp_audio_uri"], \
+            self.user["users.langid"], zipfilename)
+        os.popen("zip -j %s %s %s" % (zipfilepath, outfilename_one, outfilename_two))
+        return zipfileuri
+      
+    generate_prompts_zipfile.exposed = True
+    
+    def __generate_prompts_as_xhtml(self, langid, start_index, end_index):
+        strings_xml = self.session.all_strings(langid, start_index, end_index)
         tmpfile = "/tmp/" + self.user["users.langid"] + "-strings"
         file = open(tmpfile, "w")
         file.write(strings_xml)
@@ -41,9 +79,16 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
         for i in os.popen("xsltproc %s %s" % (xslt, tmpfile)):
             strings_xhtml += i
         return strings_xhtml
-    generate_prompts_as_xhtml.exposed = True
     
-    def upload_zipfile_of_prompts(self, infile):
+    def upload_zipfiles_of_prompts(self, infile1, infile2):
+        """Accept two zipfiles of prompts + ncx file"""
+        self.__upload_zipfile_of_prompts(infile1)
+        self.__upload_zipfile_of_prompts(infile2)
+        raise cherrypy.InternalRedirect("UploadComplete")
+    
+    upload_zipfiles_of_prompts.exposed = True
+        
+    def __upload_zipfile_of_prompts(self, infile):
         """Accept a zipfile of the prompts + ncx file."""
         self.session.trace_msg("Zipfile upload = %s" % infile.filename)
         self.session.trace_msg("type of file %s" % type(infile.filename))
@@ -71,13 +116,12 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
         outfile.close()
         
         self.process_upload(outfilename, tempdir)
-        raise cherrypy.InternalRedirect("UploadComplete")
-    upload_zipfile_of_prompts.exposed = True
+    
     
     def process_upload(self, zipfile, tempdir):
         """Import their prompts book into the system"""
         # unzip into a directory of the same name
-        os.popen("unzip -o %s -d %s" % (zipfile, os.path.dirname(zipfile)))
+        os.popen("unzip -o -j \"%s\" -d \"%s\"" % (zipfile, os.path.splitext(zipfile)[0]))
         
         # get ('/blah/blah/file', '.ext')
         a, b = os.path.splitext(zipfile)
@@ -85,7 +129,7 @@ class RecordAllPrompts(batchofprompts.batchofprompts):
         # run the db import script
         self.session.import_audio_prompts(self.user["users.langid"], ncx, True)
         # move all the mp3 files into the language directory
-        os.popen("mv %s/*.mp3 %s" % (a, tempdir))
+        os.popen("mv \"%s/*.mp3\" \"%s\"" % (a, tempdir))
         self.session.trace_msg("Uploaded file processed")
 
         
