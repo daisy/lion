@@ -32,7 +32,10 @@ class LionDBOutputMixIn():
             id_attr = ""
             if item[0] != None and item[0] != "":
                 id_addr = """ id=\"%s\"""" % item[0].encode("utf-8")
-            output += """<s%s>%s</s>""" % (id_addr, item[1].encode("utf-8"))
+            if item[0] != None and item[0] != "":    
+                output += """<s%s>%s</s>""" % (id_addr, item[1].encode("utf-8"))
+            else:
+                output += """<s%s>%s</s>""" % (id_addr, "TODO!")
         output += "</strings>"
         return output
     

@@ -65,6 +65,12 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
     def get_masterlang_table(self):
         return self.make_table_name(self.masterlang)
     
+    def get_langname(self, langid):
+        request = """SELECT langname FROM languages where langid="%s" """ \
+            % langid
+        self.execute_query(request)
+        return self.cursor.fetchone()
+    
     def get_table_length(self, langid):
         table = self.make_table_name(langid)
         request = "SELECT COUNT(*) FROM %s" % table
