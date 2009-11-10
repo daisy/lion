@@ -263,5 +263,7 @@ class LionDBAudioMixIn():
         self.trace_msg("Added %d references; did not find references for %d items" % 
             (count_found, count_not_found))
 
-        
-        
+def clean_audio_file_names(self, langid, audiodir):
+    """rename audio files, removing unacceptable characters.
+    uses the language table, not the tempaudio table"""
+    return

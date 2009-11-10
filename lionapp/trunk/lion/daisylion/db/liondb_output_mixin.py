@@ -16,8 +16,10 @@ class LionDBOutputMixIn():
         self.execute_query("SELECT xmlid, textstring FROM " + table)
         strings = self.cursor.fetchall()
         if end_index == -1: 
-            end_index = len(strings) - 1
-        return self.__stringlist_to_xml(strings[start_index:end_index], langid)
+            end_idx = len(strings)
+        else:
+            end_idx = end_index
+        return self.__stringlist_to_xml(strings[start_index:end_idx], langid)
     
     def all_strings_length(self, langid):
         """return the length of the number of strings in the list of all strings"""
@@ -32,7 +34,7 @@ class LionDBOutputMixIn():
             id_attr = ""
             if item[0] != None and item[0] != "":
                 id_addr = """ id=\"%s\"""" % item[0].encode("utf-8")
-            if item[0] != None and item[0] != "":    
+            if item[1] != None and item[1] != "":    
                 output += """<s%s>%s</s>""" % (id_addr, item[1].encode("utf-8"))
             else:
                 output += """<s%s>%s</s>""" % (id_addr, "TODO!")

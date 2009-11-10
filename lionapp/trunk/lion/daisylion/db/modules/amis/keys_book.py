@@ -116,7 +116,7 @@ def export_keys_book(session, xmlfile, langid, folder, local_audio_dir):
                 audio_files.append(item.shortcut.audio)
     
     __write_to_disk(folder, textfilename, navstring, textfile, smiles)
-    __copy_audio_files(local_audio_dir, audio_files, folder)
+    __copy_audio_files(session, local_audio_dir, audio_files, folder)
 
 def __calculate_menus(session, langid, xmlfile):
     # use our dom instead
@@ -280,11 +280,15 @@ def __write_to_disk(folder, textfilename, navstring, textfile, smiles):
         smilcount += 1
         
 
-def __copy_audio_files(sourcefolder, audio_files, destfolder):
+def __copy_audio_files(session, sourcefolder, audio_files, destfolder):
     if not sourcefolder.endswith("/"): sourcefolder += "/"
     for a in audio_files:
-        f = sourcefolder + a.replace("./audio/", "")
-        print f
-        cmd = "cp \"%s\" \"%s\"" % (f, destfolder)
-        os.popen(cmd)
+        if (a != None and a != ""):
+            f = sourcefolder + a.replace("./audio/", "")
+            print f
+            cmd = "cp \"%s\" \"%s\"" % (f, destfolder)
+            os.popen(cmd)
+        else:
+            session.die("Null audio file.  Could not create keyboard shortcuts book.")
+
     
