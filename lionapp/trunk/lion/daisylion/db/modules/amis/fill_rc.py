@@ -95,6 +95,13 @@ class FillRC():
         """Get a string (including mnemonic, if exists)"""
         return self.menu(strid, False).replace("\n", "\\n")
     
+    def s2(self, strid1, strid2):
+        """concatenate the string with strid + str"""
+        ret = self.session.get_textstring(self.table, strid1)
+        ret += " "
+        ret += self.session.get_textstring(self.table, strid2)
+        return ret
+    
     def join_and_prefix_with_int_token(self, strlist):
         """put the int token before each string"""
         val = ""

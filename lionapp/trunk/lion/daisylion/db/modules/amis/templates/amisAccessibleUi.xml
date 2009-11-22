@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ui xmlns="http://amisproject.org" next-id="t449" xml:lang="en">
+<ui xmlns="http://amisproject.org" next-id="t451" xml:lang="en">
     <created date="" by="DAISY Lion"/>
     <containers>
         <container id="file">
@@ -949,20 +949,40 @@ Adaptive Multimedia Information System</text>
                 </caption>
             </control>
             <control mfcid="IDC_VERSION" translate="no" widget="textlabel autoplay">
-                <caption>
-                    <text id="t164">Version 3.0 beta 2</text>
-                    <audio src="./audio/speechgen0168.mp3" />
+              <caption>
+                <!-- removed text id=164-->
+                  <prompt>
+                    <promptItem>
+                      <text id="t448">Version:</text>
+                      <audio src="something.mp3" />
+                    </promptItem>
+                    <promptItem>
+                      <text id="t449">3.1</text>
+                      <!-- no audio src for this one; it's to be rendered with TTS -->
+                      <audio src=""/>
+                    </promptItem>
+                </prompt>
                 </caption>
             </control>
             <control mfcid="IDC_VERSIONNOTE" translate="no" widget="textlabel autoplay">
                 <caption>
-                    <text id="t165">Release Date: 14 May 2008</text>
-                    <audio src="./audio/speechgen0169.mp3" />
+                  <prompt>
+                    <promptItem>
+                      <!-- removed text id=165-->
+                      <text id="t447">Release Date:</text>
+                      <audio src="something.mp3" />
+                    </promptItem>
+                    <promptItem>
+                      <text id="t450">2009-11-22</text>
+                      <!-- no audio src for this one; it's to be rendered with TTS -->
+                      <audio src=""/>
+                    </promptItem>
+                  </prompt>
                 </caption>
             </control>
             <control mfcid="IDC_COPYRIGHT" translate="no" widget="textlabel autoplay">
                 <caption>
-                    <text id="t166">Copyright (c) 2008 DAISY for All</text>
+                    <text id="t166">Copyright (c) 2009 DAISY Consortium</text>
                     <audio src="./audio/speechgen0170.mp3" />
                 </caption>
             </control>
