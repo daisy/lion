@@ -4,15 +4,27 @@ import codecs
 import amisxml
 import fill_rc
 import keys_book
-import templates.AmisRCTemplate
+import templates.AmisRCTemplate31
+import templates.AmisRCTemplate30
 from xml.dom import minidom, Node
 import time
 
-def export_xml(session, file, langid):
-    session.trace_msg("XML Export for %s to %s" % (langid, file))
+def export_xml(session, langid, target_version):
+    if target_version == "3.0":
+        session.trace_msg("Exporting for AMIS version 3.0")
+        xmlfile = "amisAccessibleUi30.xml"
+    else:
+        session.trace_msg("Exporting for AMIS version 3.1")
+        xmlfile = "amisAccessibleUi31.xml"
+    
+    # the xml file that acts as a template for exports
+    xml_filepath = daisylion.db.modules.amis.templates.__path__[0]
+    xml_filepath = os.path.join(xml_filepath, xmlfile)
+    
+    session.trace_msg("XML Export for %s using template %s" % (langid, xml_filepath))
     # use our dom instead
     minidom.Document = amisxml.AmisUiDoc
-    doc = minidom.parse(file)
+    doc = minidom.parse(xml_filepath)
     doc.set_session(session)
     metainfo = doc.getElementsByTagName("created")
     if len(metainfo) > 0:
@@ -49,7 +61,7 @@ def export_xml(session, file, langid):
     else:
         return ""
 
-def export_rc(session, langid):
+def export_rc(session, langid, target_version):
     # these are template keywords
     # the microsoft #xyz statements had to be replaced with $ms_xyz in the template
     # because "#" is a special character for cheetah (the templating system)
@@ -67,7 +79,12 @@ def export_rc(session, langid):
         }
     
     rc = fill_rc.FillRC(session, langid)
-    t = templates.AmisRCTemplate.AmisRCTemplate(searchList=msterms)
+    if target_version == "3.0":
+        session.trace_msg("Exporting for AMIS version 3.0")
+        t = templates.AmisRCTemplate30.AmisRCTemplate30(searchList=msterms)
+    else:
+        session.trace_msg("Exporting for AMIS version 3.1")
+        t = templates.AmisRCTemplate31.AmisRCTemplate31(searchList=msterms)
     t.rc = rc
     return t.respond()
 

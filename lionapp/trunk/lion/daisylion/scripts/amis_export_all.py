@@ -4,7 +4,8 @@ from daisylion.db.liondb import LionDB
 def main():
     usage = """usage: %prog [options] langid local_audio_dir"""
     parser = GlobalOptionsParser(usage=usage)
-    
+    parser.add_option("-v", "--amisversion", dest="amis_version", type="string", default="3.1", 
+        help="Target version of AMIS (default = 3.1)")
     (options, args) = parser.parse_args()
     parser.check_args(2, args)
     
@@ -23,14 +24,19 @@ def main():
     if not os.path.exists(keys_book_dir) or not os.path.isdir(keys_book_dir):
         os.mkdir(keys_book_dir)
     
+    if options.amis_version == "3.1":
+        session.trace_msg("Exporting for AMIS version 3.1")
+    else:
+        session.trace_msg("Exporting for AMIS version 3.0")
+        
     # export an RC file
-    rc_data = session.module_export(langid, 2, None)
+    rc_data = session.module_export(langid, 2, (options.amis_version))
     f = open(rc_filename, "w")
     f.write(rc_data)
     f.close()
     
     #export an XML file
-    xml_data = session.module_export(langid, 1, None)
+    xml_data = session.module_export(langid, 1, (options.amis_version))
     f = open(xml_filename, "w")
     f.write(xml_data)
     f.close()

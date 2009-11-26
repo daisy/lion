@@ -22,14 +22,15 @@ class AmisLionIO (daisylion.db.modules.lion_module.LionIOModule):
         return self.importer.get_idlist_for_removal()
     
     def export(self, session, langid, export_type, additional_params=[]):
-        # the xml file that acts as a template for exports
-        xml_filepath = daisylion.db.modules.amis.templates.__path__[0]
-        xml_filepath = os.path.join(xml_filepath, "amisAccessibleUi.xml")
-        
+        # export type 1: export XML.  need to specify AMIS version as "3.0" or "3.1"
         if export_type == 1:
-            return amis_export.export_xml(session, xml_filepath, langid)
+            amis_target_version = additional_params[0]
+            return amis_export.export_xml(session, langid, amis_target_version)
+        # export type 2: export RC.  need to specify AMIS version as "3.0" or "3.1"
         elif export_type == 2:
-            return amis_export.export_rc(session, langid)
+            amis_target_version = additional_params[0]
+            return amis_export.export_rc(session, langid, amis_target_version)
+        # export type 3: export keyboard shortcuts book.  no AMIS version required.
         elif export_type == 3:
             output_folder = additional_params[0]
             local_audio_dir = additional_params[1]
