@@ -24,25 +24,23 @@ def main():
     if not os.path.exists(keys_book_dir) or not os.path.isdir(keys_book_dir):
         os.mkdir(keys_book_dir)
     
-    if options.amis_version == "3.1":
-        session.trace_msg("Exporting for AMIS version 3.1")
-    else:
-        session.trace_msg("Exporting for AMIS version 3.0")
-        
+    session.trace_msg("Export all for AMIS Version %s" % options.amis_version)
+            
     # export an RC file
-    rc_data = session.module_export(langid, 2, (options.amis_version))
+    rc_data = session.module_export(langid, 2, (options.amis_version,))
     f = open(rc_filename, "w")
     f.write(rc_data)
     f.close()
     
     #export an XML file
-    xml_data = session.module_export(langid, 1, (options.amis_version))
+    xml_data = session.module_export(langid, 1, (options.amis_version,))
     f = open(xml_filename, "w")
     f.write(xml_data)
     f.close()
     
     #export the keyboard shortcuts book
-    session.module_export(langid, 3, (keys_book_dir, local_audio_dir))
+    session.module_export(langid, 3, (options.amis_version, keys_book_dir, local_audio_dir))
+    
     print "Wrote %s" % rc_filename
     print "Wrote %s" % xml_filename
     print "Created the keyboard shortcuts book in %s" % keys_book_dir

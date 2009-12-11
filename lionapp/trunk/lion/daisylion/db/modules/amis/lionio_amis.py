@@ -22,21 +22,22 @@ class AmisLionIO (daisylion.db.modules.lion_module.LionIOModule):
         return self.importer.get_idlist_for_removal()
     
     def export(self, session, langid, export_type, additional_params=[]):
-        # export type 1: export XML.  need to specify AMIS version as "3.0" or "3.1"
+        # in each option below, you need to specify AMIS version as "3.0" or "3.1"
+        amis_target_version = additional_params[0]
+        # export type 1: export XML. 
         if export_type == 1:
-            amis_target_version = additional_params[0]
             return amis_export.export_xml(session, langid, amis_target_version)
-        # export type 2: export RC.  need to specify AMIS version as "3.0" or "3.1"
+        # export type 2: export RC.  
         elif export_type == 2:
-            amis_target_version = additional_params[0]
             return amis_export.export_rc(session, langid, amis_target_version)
-        # export type 3: export keyboard shortcuts book.  no AMIS version required.
+        # export type 3: export keyboard shortcuts book.  
         elif export_type == 3:
-            output_folder = additional_params[0]
-            local_audio_dir = additional_params[1]
+            output_folder = additional_params[1]
+            local_audio_dir = additional_params[2]
             sz = len(output_folder)
             # make sure the folder path ends with a slash
             if sz > 0 and output_folder[sz-1] != '/':
                 output_folder += '/'
-            return amis_export.export_keys_book(session, xml_filepath, langid, output_folder, local_audio_dir)
+            return amis_export.export_keys_book(session, langid, amis_target_version, \
+                output_folder, local_audio_dir)
     

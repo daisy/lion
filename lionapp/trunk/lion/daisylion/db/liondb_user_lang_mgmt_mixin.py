@@ -17,7 +17,17 @@ class LionDBUserLangMgmtMixIn():
             self.die("User does not exist")
             return
         self.__remove_user_from_database(username)
-
+    
+    def get_user_info(self, langid):
+        """get information about the user for this language"""
+        request = """SELECT users.realname, users.username, users.password, users.email,
+        users.lastlogin, languages.langname from users, languages 
+        where users.langid="%(langid)s" and languages.langid="%(langid)s" """ % \
+        {"langid": langid}
+        self.execute_query(request)
+        return self.cursor.fetchone()
+    
+    
     def add_language(self, langid, langname, username, password, realname,
         email, mnemonics, accelerators, langid_short):
         """Add a new language and a user for that language"""

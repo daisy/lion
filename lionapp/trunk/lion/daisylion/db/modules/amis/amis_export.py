@@ -10,11 +10,10 @@ from xml.dom import minidom, Node
 import time
 
 def export_xml(session, langid, target_version):
+    session.trace_msg("XML Export for AMIS Version %s" % target_version)
     if target_version == "3.0":
-        session.trace_msg("Exporting for AMIS version 3.0")
         xmlfile = "amisAccessibleUi30.xml"
     else:
-        session.trace_msg("Exporting for AMIS version 3.1")
         xmlfile = "amisAccessibleUi31.xml"
     
     # the xml file that acts as a template for exports
@@ -65,7 +64,7 @@ def export_rc(session, langid, target_version):
     # these are template keywords
     # the microsoft #xyz statements had to be replaced with $ms_xyz in the template
     # because "#" is a special character for cheetah (the templating system)
-    session.trace_msg("RC Export for %s" % (langid))
+    session.trace_msg("RC Export for %s, AMIS Version %s" % (langid, target_version))
     msterms = {"ms_include": "#include",
         "ms_define": "#define",
         "ms_if": "#if",
@@ -80,10 +79,8 @@ def export_rc(session, langid, target_version):
     
     rc = fill_rc.FillRC(session, langid)
     if target_version == "3.0":
-        session.trace_msg("Exporting for AMIS version 3.0")
         t = templates.AmisRCTemplate30.AmisRCTemplate30(searchList=msterms)
     else:
-        session.trace_msg("Exporting for AMIS version 3.1")
         t = templates.AmisRCTemplate31.AmisRCTemplate31(searchList=msterms)
     t.rc = rc
     return t.respond()

@@ -41,12 +41,23 @@ class PhrasePair():
 MNEMONIC, ACCELERATOR = range(2)
 
 
-def export_keys_book(session, xmlfile, langid, folder, local_audio_dir):
+def export_keys_book(session, langid, target_version, folder, local_audio_dir):
+    session.trace_msg("Keys book export for AMIS Version %s" % target_version)
+    
+    if target_version == "3.0":
+        xmlfile = "amisAccessibleUi30.xml"
+    else:
+        xmlfile = "amisAccessibleUi31.xml"
+    
+    # the xml file that acts as a template for exports
+    xml_filepath = daisylion.db.modules.amis.templates.__path__[0]
+    xml_filepath = os.path.join(xml_filepath, xmlfile)
+    
     """generate a DAISY book of the keyboard commands"""
     table = session.make_table_name(langid)
     
     # get the menus based on the XML file structure
-    menus = __calculate_menus(session, langid, xmlfile)
+    menus = __calculate_menus(session, langid, xml_filepath)
     
     title_chapter, organized_by_menu_chapter, other_commands_chapter = \
         __make_predetermined_chapters(session, table)
