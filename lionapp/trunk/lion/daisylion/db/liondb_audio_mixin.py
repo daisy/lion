@@ -262,6 +262,57 @@ class LionDBAudioMixIn():
         self.trace_msg("Audio imported for %s" % langid)
         self.trace_msg("Added %d references; did not find references for %d items" % 
             (count_found, count_not_found))
+    
+    def check_audio(self, langid, audio_dir):
+        """are all DB-referenced audio clips existing?"""
+        # find a list of audio uris that are in use
+        table = self.make_table_name(langid)
+        self.execute_query("SELECT audiouri FROM " + table)
+        strings = self.cursor.fetchall()
+        # adjust the list
+        db_filelist = []
+        for s in strings:
+            f = s[0]
+            if f != None:
+                db_filelist.append(f.replace("./audio/", ""))
+        
+        disk_filelist = []
+        # get a list of all audio files in the directory
+        for f in os.popen("""ls %s*mp3""" % audio_dir):
+            audio_file = f.replace("\n", "")
+            audio_file = os.path.basename(audio_file) 
+            disk_filelist.append(audio_file)
+        
+        # first make sure that all the required audio files are there
+        for f in db_filelist:
+            if f not in disk_filelist:
+                self.warn("DB file reference %s not found in physical directory" % (f, ))
+        
+        count_unused = 0
+        count_used = 0
+        # check the disk filelist against the database filelist
+        for f in disk_filelist:
+            # the full path (disk_filelist has only filenames for easy comparison against the db)
+            disk_file = os.path.join(audio_dir, f)
+            if f not in db_filelist:
+                count_unused+=1
+            else:
+                count_used += 1
+        
+        self.trace_msg("%d unused files found; %d files currently in use" % (count_unused, count_used))
+        if count_unused > 0:
+            self.trace_msg("Suggest to run archive_audio.py script to move unused files out of the way.")
+            
+        self.execute_query("SELECT xmlid, textstring FROM %s WHERE audiouri is null" % table)
+        missing_audio = self.cursor.fetchall()
+        missing_count = 0
+        for xmlid, textstring in missing_audio:
+            print "Missing audio for *%s* (id = %s)" % (textstring, xmlid)
+            missing_count += 1
+        
+        print "Missing audio for %d items" % missing_count
+    
+    
 
 def clean_audio_file_names(self, langid, audiodir):
     """rename audio files, removing unacceptable characters.

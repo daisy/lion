@@ -3,7 +3,7 @@ from daisylion.db.liondb import LionDB
 
 def main():
     usage = """usage: %prog [options] langid audio_dir
-    audio_dir is the current audio directory.  unreferenced files will be moved into a subfolder.
+    see if all required audio files are there audio_dir is the current audio directory.  
     e.g. 
     %prog eng-US ./audio/
     
@@ -17,7 +17,7 @@ def main():
     session = LionDB(options.config, options.trace, options.app)    
     langid, audio_dir = args
     if not audio_dir.endswith("/"): audio_dir += "/"
-    session.archive_audio(langid, audio_dir, options.svn)
+    session.check_audio(langid, audio_dir)
 
 if __name__=="__main__": main()
 
