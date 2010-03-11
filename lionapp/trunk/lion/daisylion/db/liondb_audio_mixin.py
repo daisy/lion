@@ -221,13 +221,13 @@ class LionDBAudioMixIn():
             if f not in db_filelist:
                 count_unused+=1
                 # remove the end of line character from the file name
-                instr = "cp %s %s" % (disk_file, subdir)
+                instr = """cp "%s" "%s" """ % (disk_file, subdir)
                 os.popen(instr)
                 # optionally reflect the changes in subversion
                 if svn == True:
                     svn_client.remove(disk_file)
                 else:
-                    instr = "rm %s" % disk_file
+                    instr = """rm "%s" """ % disk_file
                     os.popen(instr)
             else:
                 count_used += 1
@@ -267,14 +267,14 @@ class LionDBAudioMixIn():
         """are all DB-referenced audio clips existing?"""
         # find a list of audio uris that are in use
         table = self.make_table_name(langid)
-        self.execute_query("SELECT audiouri FROM " + table)
+        self.execute_query("SELECT xmlid, audiouri FROM " + table)
         strings = self.cursor.fetchall()
         # adjust the list
         db_filelist = []
         for s in strings:
-            f = s[0]
+            f = s[1]
             if f != None:
-                db_filelist.append(f.replace("./audio/", ""))
+                db_filelist.append((s[0], f.replace("./audio/", "")))
         
         disk_filelist = []
         # get a list of all audio files in the directory
@@ -283,10 +283,12 @@ class LionDBAudioMixIn():
             audio_file = os.path.basename(audio_file) 
             disk_filelist.append(audio_file)
         
+        missing_file_count = 0
         # first make sure that all the required audio files are there
-        for f in db_filelist:
+        for id,f in db_filelist:
             if f not in disk_filelist:
-                self.warn("DB file reference %s not found in physical directory" % (f, ))
+                self.warn("DB file reference %s not found in physical directory (id=%s)" % (f,id))
+                missing_file_count += 1
         
         count_unused = 0
         count_used = 0
@@ -294,24 +296,26 @@ class LionDBAudioMixIn():
         for f in disk_filelist:
             # the full path (disk_filelist has only filenames for easy comparison against the db)
             disk_file = os.path.join(audio_dir, f)
-            if f not in db_filelist:
+            if f not in [f for id, f in db_filelist]:
                 count_unused+=1
             else:
                 count_used += 1
         
-        self.trace_msg("%d unused files found; %d files currently in use" % (count_unused, count_used))
-        if count_unused > 0:
-            self.trace_msg("Suggest to run archive_audio.py script to move unused files out of the way.")
             
         self.execute_query("SELECT xmlid, textstring FROM %s WHERE audiouri is null" % table)
         missing_audio = self.cursor.fetchall()
-        missing_count = 0
+        missing_audio_count = 0
         for xmlid, textstring in missing_audio:
-            print "Missing audio for *%s* (id = %s)" % (textstring, xmlid)
-            missing_count += 1
+            self.warn("Missing audio entries in the DB for *%s* (id = %s)" % (textstring, xmlid))
+            missing_audio_count += 1
         
-        print "Missing audio for %d items" % missing_count
-    
+        print "===========\n==Summary=="
+        print "%d unused files found; %d files currently in use" % (count_unused, count_used)
+        if count_unused > 0:
+            print "Suggest to run archive_audio.py script to move unused files out of the way."
+        
+        print "Missing audio entries in the DB for %d items" % missing_audio_count
+        print "Missing physical files for %d items" % missing_file_count
     
 
 def clean_audio_file_names(self, langid, audiodir):

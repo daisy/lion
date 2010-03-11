@@ -86,6 +86,8 @@ class TranslationPage(translate.translate):
         is_valid, msg = self.validate_single_item(translation, xmlid, langid)
         self.error, self.error_id = msg, xmlid
         if is_valid:
+            self.check_mnemonic_toplevel_menuitem(translation, xmlid, langid)
+            
             request = """UPDATE %(table)s SET status="%(status)s", \
                 textstring="%(translation)s", remarks="%(remarks)s" WHERE \
                 xmlid="%(xmlid)s" """ % \
@@ -257,3 +259,33 @@ class TranslationPage(translate.translate):
 
     def redirect(self, id=""):
         raise cherrypy.InternalRedirect(self.url_string % (self.url, self.last_view, id))
+    
+    def check_mnemonic_toplevel_menuitem(self, translation, xmlid, langid):
+        """ is this a mnemonic and does it have the a top-level menu item as its target?
+        if so, then update the accelerator for this menu item to reflect the chosen mnemonic.
+        top level menu items have accelerators of the form Alt+Mnemonic (e.g. Alt+F = File)"""
+        
+        # is this a mnemonic?
+        table = self.session.make_table_name(langid)
+        request = """SELECT role, target from %s WHERE xmlid="%s" """ % (table, xmlid)
+        self.session.execute_query(request)
+        role, target = self.session.cursor.fetchone()
+        if role != "MNEMONIC": return
+        
+        #ok, it's a mnemonic.  now, is its target a top-level menu item?
+        request = """SELECT role, istoplevel from %s WHERE xmlid="%s" """ % (table, target)
+        self.session.execute_query(request)
+        role, istoplevel = self.session.cursor.fetchone()
+        
+        if role == "MENUITEM" and istoplevel == True:
+            # find the accelerator (it has the same target and is an ACCELERATOR)
+            request = """SELECT xmlid from %s WHERE target="%s" and role="ACCELERATOR" """ % (table, target)
+            self.session.execute_query(request)
+            accelerator_xmlid = self.session.cursor.fetchone()[0]
+            accelstring = "Alt+%s" % translation
+            request = """UPDATE %s SET textstring="%s", actualkeys="%s" WHERE xmlid="%s" """ % \
+                (table, accelstring, accelstring, accelerator_xmlid)
+            
+            self.session.execute_query(request)
+    
+            
