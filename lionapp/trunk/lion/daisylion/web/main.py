@@ -58,8 +58,12 @@ class MainMenu(mainmenu.mainmenu):
         self.host = self.session.config["main"]["webhost"]
         self.port = self.session.config["main"]["webport"]
         self.audio_support = self.session.config["main"]["audio_support"]
+        
+        appdata = util.get_application_data(self.session)
+        self.session.trace_msg(str(appdata))
+        
         self.appname, self.appversion, self.appdesc, self.appsite, self.applogo, \
-            self.comments = util.get_application_data(self.session)
+            self.comments = appdata
         mainmenu.mainmenu.__init__(self)
     
     def index(self):

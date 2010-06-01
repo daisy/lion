@@ -10,27 +10,37 @@ def main():
     parser = GlobalOptionsParser(usage=usage)
     (options, args) = parser.parse_args()
     parser.check_args(1, args)
-    
     session = LionDB(options.config, options.trace, options.app)    
-    sql = args[0]
     
+    if parser.safety_check("run this query on each language table") == False:
+        exit(1)
+    
+    sql = args[0]
+    run_sql_on_all_lang_tables(session, sql)
+
+def run_sql_on_all_lang_tables(session, sql):
     request = "SELECT langid FROM languages"
     
     session.execute_query(request)
     all_langs = session.cursor.fetchall()
-    if parser.safety_check("run this query on each language table") == False:
-        exit(1)
+    
+    retvals = {}
     
     for l in all_langs:
-        request = sql % {"table": session.make_table_name(l[0])}
+        table = session.make_table_name(l[0])
+        request = sql % {"table": table}
         try:
             session.execute_query(request)
             if session.cursor.rowcount > 0:
-                for r in session.cursor.fetchall():
+                rows = session.cursor.fetchall()
+                for r in rows:
                     for field in r:
                         print field
+                retvals[table] = rows
         except Exception, e:
             print "Exception: %s" % e
+    
+    return retvals
     
 if __name__=="__main__": main()
 

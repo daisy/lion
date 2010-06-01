@@ -29,7 +29,7 @@ def main():
     
     if options.pretty == False:
         print "Items still requiring translation work for %s (%s)" % (langname, args[0])
-    html_body = ""
+    html_body = "<p>%d items</p>" % len(results)
     for r in results:
         if r[2] == 2: status = "TODO"
         else: status = "NEW"
@@ -43,8 +43,10 @@ def main():
                 line ="%-25s%-10s%-10s" % (status, r[0], r[1].encode("utf-8")) 
             else:
                 line = "%-25s%-10s%-10s" % (status, r[0], "MISSING")
-            print line
-    
+            print line	
+    if options.pretty == False:
+		print "%d items" % len(results)
+	
     if options.pretty == True:
         print HTML_TEMPLATE % ("amis %s" % langname, html_body)
 

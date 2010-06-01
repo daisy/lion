@@ -27,6 +27,15 @@ class LionDBOutputMixIn():
         self.execute_query("SELECT xmlid, textstring FROM " + table)
         return self.cursor.rowcount
     
+    def all_strings_bilingual(self, langid):
+        """return all strings and also the corresponding string in the master lang table"""
+        request = """SELECT %(master)s.textstring, %(translation)s.textstring 
+        FROM %(master)s, %(translation)s  
+        WHERE %(master)s.xmlid = %(translation)s.xmlid""" % \
+        {"master": self.get_masterlang_table(), "translation": self.make_table_name(langid)}
+        self.execute_query(request)
+        return self.cursor.fetchall()
+    
     def __stringlist_to_xml(self, results, langid):
         """Get all strings that have the given roles"""
         output = """<?xml version="1.0"?>\n<strings langid=\"""" + langid + "\">"

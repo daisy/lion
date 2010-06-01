@@ -4,7 +4,7 @@ import os
 import re
 
 #langid for languages whose translations are complete
-LANGS=["afr-ZA", "eng-AU", "zho-CN", "ice-IS", "tam-IN", "fra-FR", "nob-NO", "nno-NO", "jpn-JP", "spa"]
+LANGS=["afr-ZA", "eng-AU", "zho-CN", "ice-IS", "tam-IN", "fra-FR", "nob-NO", "nno-NO", "jpn-JP", "spa", "zho-TW", "vie-VN", "fin-FI", "srp-RS", "swe-SE"]
 
 def main():
 	usage = """usage: %prog [options] local_langpack_dir"""
@@ -15,7 +15,8 @@ def main():
 	parser.add_option("-x", "--all", dest="all", default=False, action="store_true", help="Export all languages")
 	parser.add_option("-l", "--langid", dest="langid", default="", 
 		help="language ID")
-	
+	parser.add_option("-z", "--custom", dest="custom", default="", help="a comma-separated list of language IDs")
+    
 	(options, args) = parser.parse_args()
 	parser.check_args(1, args)
 	langpacks_dir = args[0]
@@ -28,15 +29,22 @@ def main():
 			process_one(l, langpacks_dir, options, session)
 	# export one language		
 	else:
-		if options.langid == "":
-			session.die("No lang ID specified.  Turn on --all to export all languages.")
-			return
-		process_one(options.langid, langpacks_dir, options, session)
+	    if options.custom != "":
+	        custom_langs = options.custom.split(",")
+	        for l in custom_langs:
+	            process_one(l.strip(), langpacks_dir, options, session)
+	    else:
+	        if options.langid != "":
+	            process_one(options.langid, langpacks_dir, options, session)
+	        else:
+	            session.die("No lang ID specified.  Use --all, --custom, or --langid to specify all, a custom set, or a single language.")
+	            return
+
 
 def process_one(langid, langpacks_dir, options, session):
 	langdir = find_language_directory(langid, langpacks_dir)
 	if langdir == "":
-		session.warn("Cannot process %s: not found in %s" % (options.langid, langpacks_dir))
+		session.warn("Cannot process *%s*: not found in %s" % (langid, langpacks_dir))
 	if options.tmp == True:
 		output_dir = "/tmp/%s" % langid
 	else: 
