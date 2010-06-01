@@ -102,7 +102,11 @@ class ChooseMnemonics(TranslationPage):
             self.session.warn("Invalid mnemonic")
             return ""
         word = row[0]
-        pos = word.lower().find(letter.lower())
+        if letter != None:
+            pos = word.lower().find(letter.lower())
+        else:
+            pos = -1
+        
         if pos == -1:
             return word + ("""(<span style="text-decoration: underline">%s\
                 </span>)""" % letter)
