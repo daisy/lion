@@ -126,6 +126,20 @@ class LionDBUserLangMgmtMixIn():
         """get the number of items marked NEW"""
         return self.__get_count_by_status(langid, 3)
     
+    def reset_items_by_role(self, langid, role):
+        """reset all items of a certain role (ACCELERATOR, MNEMONIC, DIALOG, CONTROL, STRING, MENUITEM)"""
+        table = self.make_table_name(langid)
+        master = self.get_masterlang_table()
+        request = """UPDATE %(lang)s, %(master)s 
+        SET 
+        %(lang)s.textstring = %(master)s.textstring,
+        %(lang)s.status=3, 
+        %(lang)s.actualkeys = %(master)s.actualkeys 
+        WHERE %(lang)s.xmlid = %(master)s.xmlid 
+            AND %(lang)s.role="%(role)s" """ % {"lang": table, "master": master, "role": role}
+        self.execute_query(request)
+    
+        
     def __get_count_by_status(self, langid, status):
         table = self.make_table_name(langid)
         request = "SELECT count(*) FROM %s WHERE STATUS=%d" % (table, status)
