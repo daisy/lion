@@ -70,6 +70,12 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
             % langid
         self.execute_query(request)
         return self.cursor.fetchone()
+
+    def is_rtl(self, langid):
+        request = "SELECT rtl FROM languages WHERE langid='%s'" % langid
+        self.execute_query(request)
+        rtl = self.cursor.fetchone()[0]
+        return rtl
     
     def get_table_length(self, langid):
         table = self.make_table_name(langid)
@@ -82,10 +88,10 @@ class LionDB(LionDBAudioMixIn, LionDBModuleMixIn, LionDBOutputMixIn,
         table = self.make_table_name(langid)
         masterlang_table = self.get_masterlang_table()
         request = """SELECT eng_US.textstring, %(table)s.textstring, %(table)s.audiouri, \
-			%(table)s.xmlid from %(table)s, %(masterlang_table)s 
-			WHERE %(table)s.xmlid = %(masterlang_table)s.xmlid""" % \
-			{"table": table, "masterlang_table": masterlang_table}
-		
+            %(table)s.xmlid from %(table)s, %(masterlang_table)s 
+            WHERE %(table)s.xmlid = %(masterlang_table)s.xmlid""" % \
+            {"table": table, "masterlang_table": masterlang_table}
+        
         self.execute_query(request)
         
         for reftext, text, audio, xmlid in self.cursor.fetchall():

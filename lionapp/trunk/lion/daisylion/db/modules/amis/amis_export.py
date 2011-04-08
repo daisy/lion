@@ -6,6 +6,7 @@ import fill_rc
 import keys_book
 import templates.AmisRCTemplate31
 import templates.AmisRCTemplate30
+import templates.AmisRCTemplate31RTL
 from xml.dom import minidom, Node
 import time
 
@@ -13,7 +14,7 @@ def export_xml(session, langid, target_version):
     session.trace_msg("XML Export for AMIS Version %s" % target_version)
     if target_version == "3.0":
         xmlfile = "amisAccessibleUi30.xml"
-    else:
+    else: # for both 3.1
         xmlfile = "amisAccessibleUi31.xml"
     
     # the xml file that acts as a template for exports
@@ -81,7 +82,14 @@ def export_rc(session, langid, target_version):
     if target_version == "3.0":
         t = templates.AmisRCTemplate30.AmisRCTemplate30(searchList=msterms)
     else:
-        t = templates.AmisRCTemplate31.AmisRCTemplate31(searchList=msterms)
+        # check for RTL
+        if session.is_rtl(langid):
+            session.trace_msg("Right-to-Left")
+            t = templates.AmisRCTemplate31RTL.AmisRCTemplate31RTL(searchList=msterms)
+        else:
+            session.trace_msg("Left-to-Right")
+            t = templates.AmisRCTemplate31.AmisRCTemplate31(searchList=msterms)
+
     t.rc = rc
     return t.respond()
 
