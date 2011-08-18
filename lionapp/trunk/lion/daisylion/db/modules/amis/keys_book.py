@@ -62,6 +62,9 @@ def export_keys_book(session, langid, target_version, folder, local_audio_dir):
     title_chapter, organized_by_menu_chapter, other_commands_chapter = \
         __make_predetermined_chapters(session, table)
     
+    dir = "ltr"
+    if session.is_rtl(langid): dir = "rtl"
+    
     # fill in the NCC template
     nav = templates.ncc.ncc()
     nav.langid = langid
@@ -76,7 +79,9 @@ def export_keys_book(session, langid, target_version, folder, local_audio_dir):
     nav.title_chapter = title_chapter
     nav.organized_by_menu_chapter = organized_by_menu_chapter
     nav.other_commands_chapter = other_commands_chapter
+    nav.dir = dir
     navstring = nav.respond()
+    
     
     
     # fill in the text template
@@ -86,6 +91,7 @@ def export_keys_book(session, langid, target_version, folder, local_audio_dir):
     txt.title_chapter = title_chapter
     txt.organized_by_menu_chapter = organized_by_menu_chapter
     txt.other_commands_chapter = other_commands_chapter
+    txt.dir = dir
     textfile = txt.respond()
     textfilename = "amiskeys.html"
 

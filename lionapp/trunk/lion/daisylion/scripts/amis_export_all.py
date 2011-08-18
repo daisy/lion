@@ -3,8 +3,9 @@ from daisylion.db.liondb import LionDB
 import os
 import re
 
-#langid for languages whose translations are complete
-LANGS=["afr-ZA", "eng-AU", "zho-CN", "ice-IS", "tam-IN", "fra-FR", "nob-NO", "nno-NO", "jpn-JP", "spa", "zho-TW", "vie-VN", "fin-FI", "srp-RS", "swe-SE"]
+#langid for languages whose translations are complete or ready for testing
+LANGS=["afr-ZA", "eng-AU", "zho-CN", "ice-IS", "tam-IN", "fra-FR", "nob-NO", "nno-NO", "jpn-JP", 
+"spa", "zho-TW", "vie-VN", "fin-FI", "srp-RS", "swe-SE", "hun-HU", "nld-NL", "heb-IL"]
 
 def main():
 	usage = """usage: %prog [options] local_langpack_dir"""
