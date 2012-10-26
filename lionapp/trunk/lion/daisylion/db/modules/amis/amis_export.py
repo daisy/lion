@@ -93,10 +93,10 @@ def export_rc(session, langid, target_version):
     t.rc = rc
     return t.respond()
 
-def export_keys_book(session, xmlfile, langid, folder, audio_source_dir):
+def export_keys_book(session, langid, target_version, folder, audio_source_dir):
     """Fill in the templates for the keyboard shortcuts book"""
     session.trace_msg ("Keyboard shortcuts book export for %s" % (langid))
-    keys_book.export_keys_book(session, xmlfile, langid, folder, audio_source_dir)
+    keys_book.export_keys_book(session, langid, target_version, folder, audio_source_dir)
     session.trace_msg("Saved in %s." % folder)
 
 if __name__ == "__main__":

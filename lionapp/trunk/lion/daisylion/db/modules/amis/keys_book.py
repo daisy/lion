@@ -69,21 +69,21 @@ def export_keys_book(session, langid, target_version, folder, local_audio_dir):
     nav = templates.ncc.ncc()
     nav.langid = langid
     nav.menus = menus
-    """for menu in menus:
-        for m in menu:
-            session.trace_msg(m.caption.text)
-            session.trace_msg(m.caption.id)
-            session.trace_msg(m.caption.audio)
-        session.trace_msg("---")
-    """
     nav.title_chapter = title_chapter
     nav.organized_by_menu_chapter = organized_by_menu_chapter
     nav.other_commands_chapter = other_commands_chapter
     nav.dir = dir
     navstring = nav.respond()
     
-    
-    
+    # for menu in menus:
+    #         for m in menu:
+    #             session.trace_msg("*****menu item")
+    #             session.trace_msg(m.caption.text)
+    #             session.trace_msg(m.caption.id)
+    #             session.trace_msg(m.caption.audio)
+    #             session.trace_msg(m.shortcut.id)
+    #         session.trace_msg("---")
+    #     
     # fill in the text template
     txt = templates.xhtml_daisy_text.xhtml_daisy_text()
     txt.langid = langid

@@ -176,11 +176,11 @@ class LionDBAudioMixIn():
     def archive_audio(self, langid, audio_dir, svn=False):
         """move unreferenced audio clips from audio_dir into a subfolder"""
         # this conflicts with minidom
-        import pysvn
+        #import pysvn
         
         # create an svn client
-        if svn == True: 
-            svn_client = pysvn.Client()
+        #if svn == True: 
+        #    svn_client = pysvn.Client()
         
         # make a directory for the archived unused files
         folder = "../unused_audio_" + str(datetime.date.today())
@@ -224,17 +224,19 @@ class LionDBAudioMixIn():
                 instr = """cp "%s" "%s" """ % (disk_file, subdir)
                 os.popen(instr)
                 # optionally reflect the changes in subversion
-                if svn == True:
-                    svn_client.remove(disk_file)
-                else:
-                    instr = """rm "%s" """ % disk_file
-                    os.popen(instr)
+                # if svn == True:
+                #                     svn_client.remove(disk_file)
+                #                 else:
+                #                     instr = """rm "%s" """ % disk_file
+                #                     os.popen(instr)
+                instr = """rm "%s" """ % disk_file
+                os.popen(instr)
             else:
                 count_used += 1
         
-        if svn == True:
-            svn_client.add(subdir)
-            svn_client.checkin(audio_dir, "DAISY Lion audio archiving: moved unreferenced files to %s" % subdir)
+        # if svn == True:
+        #             svn_client.add(subdir)
+        #             svn_client.checkin(audio_dir, "DAISY Lion audio archiving: moved unreferenced files to %s" % subdir)
         
         self.trace_msg("%d unused files moved to %s; %d files currently in use" % (count_unused, subdir, count_used))
         

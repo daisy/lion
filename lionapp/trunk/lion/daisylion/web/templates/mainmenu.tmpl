@@ -28,7 +28,16 @@ Main menu
 		<li><a href="../RecordAllPrompts">Record your prompts with Obi and upload the data</a></li>
     #end if
 	#if $addldocsuri != None and $addldocsuri != ""
-	<li><a href="$addldocsuri">Download additional documents for translation</a> ($addldocsdesc)</li>
+	<li>Download additional documents for translation:
+        <ul>
+            <li><a href="$addldocsuri">($addldocsdesc)</li>
+            <!-- this should go in the DB but as AMIS is our only app right now, it doesn't matter -->
+            <li>
+                <a href="https://github.com/daisy-consortium/amis/raw/c627e158784fa519947ef2d9dcb34ad4d4a50bc8/trunk/amis/src/DefaultLangpack/amis3_help_unrecorded_dtbook.zip">
+                    DTBook version of help file and images (use this with <a href="http://www.daisy.org/tobi">Tobi</a> DAISY production software)</a>
+            </li>
+        </ul>
+    </li>        
     #end if
 </ul>
 #if $comments != None and $comments != ""

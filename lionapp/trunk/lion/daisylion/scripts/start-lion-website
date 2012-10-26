@@ -40,4 +40,4 @@ touch "__init__.py"
 cd "$THIS_DIR"
 
 echo "Starting..."
-python2.5 ../web/main.py "$THIS_DIR"/../config/lion.cfg
+python ../web/main.py "$THIS_DIR"/../config/lion.cfg
